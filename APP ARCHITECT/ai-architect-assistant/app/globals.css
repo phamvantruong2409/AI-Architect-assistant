@@ -1,0 +1,101 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+:root {
+  --background: #f7f5f1;
+  --surface: #ffffff;
+  --surface-muted: #efebe3;
+  --foreground: #211f1c;
+  --foreground-soft: #5d574e;
+  --border: #e4ded3;
+  --accent: #14B8A6;
+  --accent-soft: rgba(20,184,166,0.12);
+  --accent-foreground: #ffffff;
+  --ring: #14B8A6;
+
+  --sidebar-bg: var(--background);
+  --sidebar-surface: var(--surface-muted);
+  --sidebar-fg: var(--foreground);
+  --sidebar-fg-soft: var(--foreground-soft);
+  --sidebar-border: var(--border);
+  --sidebar-active-bg: var(--accent-soft);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-surface: var(--surface);
+  --color-surface-muted: var(--surface-muted);
+  --color-foreground: var(--foreground);
+  --color-foreground-soft: var(--foreground-soft);
+  --color-border: var(--border);
+  --color-accent: var(--accent);
+  --color-accent-soft: var(--accent-soft);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-ring: var(--ring);
+
+  --color-sidebar: var(--sidebar-bg);
+  --color-sidebar-surface: var(--sidebar-surface);
+  --color-sidebar-foreground: var(--sidebar-fg);
+  --color-sidebar-foreground-soft: var(--sidebar-fg-soft);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-active: var(--sidebar-active-bg);
+
+  --font-display: var(--font-montserrat);
+  --font-sans: var(--font-inter);
+
+  --radius-card: 1rem;
+}
+
+.dark {
+  --background: #050B14;
+  --surface: #0B1120;
+  --surface-muted: #111827;
+  --foreground: #FFFFFF;
+  --foreground-soft: #94A3B8;
+  --border: rgba(255,255,255,0.08);
+  --accent: #14B8A6;
+  --accent-soft: rgba(20,184,166,0.12);
+  --accent-foreground: #f0fdfa;
+  --ring: #14B8A6;
+
+  --sidebar-bg: #0A1020;
+  --sidebar-surface: #111827;
+  --sidebar-fg: #FFFFFF;
+  --sidebar-fg-soft: #94A3B8;
+  --sidebar-border: rgba(255,255,255,0.06);
+  --sidebar-active-bg: rgba(20,184,166,0.15);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans);
+}
+
+/* Blueprint-style grid texture */
+.bg-blueprint {
+  background-image:
+    linear-gradient(to right, var(--border) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--border) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+
+/* Floating AI button pulse glow */
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 20px rgba(20, 184, 166, 0.4), 0 0 40px rgba(20, 184, 166, 0.1); }
+  50% { box-shadow: 0 0 30px rgba(20, 184, 166, 0.7), 0 0 60px rgba(20, 184, 166, 0.2); }
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 2.5s ease-in-out infinite;
+}
+
+::selection {
+  background: var(--accent-soft);
+  color: var(--accent);
+}
