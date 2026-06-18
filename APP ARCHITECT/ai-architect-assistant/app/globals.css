@@ -85,6 +85,19 @@ body {
   background-size: 40px 40px;
 }
 
+/* Ẩn thanh cuộn (vẫn cuộn được) */
+.no-scrollbar,
+html,
+body {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE/Edge cũ */
+}
+.no-scrollbar::-webkit-scrollbar,
+html::-webkit-scrollbar,
+body::-webkit-scrollbar {
+  display: none; /* Chrome/Safari/Electron */
+}
+
 /* Floating AI button pulse glow */
 @keyframes pulse-glow {
   0%, 100% { box-shadow: 0 0 20px rgba(20, 184, 166, 0.4), 0 0 40px rgba(20, 184, 166, 0.1); }

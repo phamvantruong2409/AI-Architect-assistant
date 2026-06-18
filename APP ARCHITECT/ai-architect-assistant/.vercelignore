@@ -1,0 +1,14 @@
+node_modules
+.next
+dist
+build
+out
+electron
+scripts
+pw-tmp
+data/covers
+*.exe
+*.zip
+*.blockmap
+tsconfig.tsbuildinfo
+.git

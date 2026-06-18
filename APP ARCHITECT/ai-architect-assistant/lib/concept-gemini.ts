@@ -1,4 +1,4 @@
-import { getGeminiModel } from "@/lib/gemini";
+import { getGeminiModel, generateContentRetry } from "@/lib/gemini";
 import type { Concept, ProjectBrief } from "@/types/concept";
 
 export async function generateConcepts(
@@ -43,7 +43,7 @@ Trả về JSON THUẦN TÚY (không markdown, không \`\`\`), là một MẢNG 
 ]
 Chỉ trả về JSON.`;
 
-  const result = await model.generateContent(prompt);
+  const result = await generateContentRetry(model, prompt);
   const text = result.response.text().trim();
   const cleaned = text
     .replace(/^```json\n?/, "")

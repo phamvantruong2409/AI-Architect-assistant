@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/Button";
 import { PlusIcon } from "@/components/layout/icons";
 import type { RecentProject } from "@/lib/dashboard-data";
 
-export function ProjectsGrid({ limit, title, viewAllHref }: { limit?: number; title: string; viewAllHref?: string }) {
+export function ProjectsGrid({ limit, title, viewAllHref, newProjectInHeader }: { limit?: number; title: string; viewAllHref?: string; newProjectInHeader?: boolean }) {
   const [projects, setProjects] = useState<RecentProject[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
@@ -28,14 +28,21 @@ export function ProjectsGrid({ limit, title, viewAllHref }: { limit?: number; ti
   const editInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
+    // Khi chưa đăng nhập, API có thể trả về rỗng/redirect (không phải JSON).
+    // Phải chống lỗi: không parse body lỗi, và luôn giữ projects là mảng —
+    // nếu không, .slice() bên dưới sẽ ném và làm trắng cả trang.
     fetch("/api/projects")
-      .then((res) => res.json())
-      .then((data: RecentProject[]) => setProjects(data))
+      .then((res) => (res.ok ? res.json() : []))
+      .then((data) => setProjects(Array.isArray(data) ? data : []))
+      .catch(() => setProjects([]))
       .finally(() => setLoading(false));
 
     fetch("/api/settings/projects-root")
-      .then((res) => res.json())
-      .then((data: { projectsRoot: string }) => setProjectsRoot(data.projectsRoot));
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (data && typeof data.projectsRoot === "string") setProjectsRoot(data.projectsRoot);
+      })
+      .catch(() => {});
   }, []);
 
   async function handleCreate(event: FormEvent) {
@@ -181,11 +188,23 @@ export function ProjectsGrid({ limit, title, viewAllHref }: { limit?: number; ti
     <div>
       <div className="flex items-center justify-between">
         <h2 className="font-display text-lg">{title}</h2>
-        {viewAllHref && (
-          <Link href={viewAllHref} className="text-sm font-medium text-accent">
-            Xem tất cả
-          </Link>
-        )}
+        <div className="flex items-center gap-3">
+          {newProjectInHeader && (
+            <button
+              type="button"
+              onClick={() => setShowForm((value) => !value)}
+              className="inline-flex items-center gap-1.5 rounded-card border border-border px-2.5 py-1 text-sm font-medium text-foreground-soft transition-colors hover:border-accent/40 hover:text-accent"
+            >
+              <PlusIcon className="h-3.5 w-3.5" />
+              Dự án mới
+            </button>
+          )}
+          {viewAllHref && (
+            <Link href={viewAllHref} className="text-sm font-medium text-accent">
+              Xem tất cả
+            </Link>
+          )}
+        </div>
       </div>
 
       {showForm && (
@@ -407,7 +426,7 @@ export function ProjectsGrid({ limit, title, viewAllHref }: { limit?: number; ti
             </Card>
           ))}
 
-        {!loading && (
+        {!loading && !newProjectInHeader && (
           <Card className="aspect-[4/3] overflow-hidden">
             <button
               type="button"

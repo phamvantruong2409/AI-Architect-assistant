@@ -1,4 +1,4 @@
-import { getGeminiModel } from "@/lib/gemini";
+import { getGeminiModel, generateContentRetry } from "@/lib/gemini";
 import type { ReviewRequest, ReviewResult } from "@/lib/review-types";
 
 export async function analyzeRender(req: ReviewRequest): Promise<ReviewResult> {
@@ -31,7 +31,7 @@ Trả về JSON THUẦN TÚY (không markdown, không \`\`\`), đúng cấu trú
 }
 Chỉ trả về JSON.`;
 
-  const result = await model.generateContent([
+  const result = await generateContentRetry(model, [
     prompt,
     { inlineData: { mimeType: req.mimeType, data: req.imageBase64 } },
   ]);

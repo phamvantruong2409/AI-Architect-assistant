@@ -116,7 +116,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           </div>
         </header>
 
-        <main className="flex-1 overflow-y-auto">{children}</main>
+        <main className="flex-1 overflow-y-auto no-scrollbar">{children}</main>
       </div>
 
       {/* Floating buttons */}

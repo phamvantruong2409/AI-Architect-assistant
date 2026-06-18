@@ -1,39 +1,31 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { createServiceClient } from '@/lib/supabase'
+import { listBriefs, createBrief } from "@/lib/briefing-store";
 
 export async function GET() {
-  const supabase = createServiceClient()
-  const { data, error } = await supabase
-    .from('briefing_projects')
-    .select('*')
-    .order('created_at', { ascending: false })
-
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 })
-  return NextResponse.json(data)
+  try {
+    return Response.json(await listBriefs());
+  } catch (error) {
+    return Response.json({ error: error instanceof Error ? error.message : "Lỗi tải dữ liệu" }, { status: 500 });
+  }
 }
 
-export async function POST(req: NextRequest) {
-  const body = await req.json()
-  const { client_name, client_email, project_name } = body
-
-  if (!client_name || !project_name) {
-    return NextResponse.json({ error: 'Thiếu tên khách hàng hoặc tên dự án' }, { status: 400 })
+export async function POST(req: Request) {
+  let body: { project_name?: string; client_name?: string };
+  try {
+    body = await req.json();
+  } catch {
+    return Response.json({ error: "Dữ liệu không hợp lệ" }, { status: 400 });
   }
 
-  const supabase = createServiceClient()
-  const { data, error } = await supabase
-    .from('briefing_projects')
-    .insert({
-      client_name,
-      client_email: client_email || null,
-      project_name,
-    })
-    .select()
-    .single()
+  const project_name = typeof body.project_name === "string" ? body.project_name.trim() : "";
+  const client_name = typeof body.client_name === "string" ? body.client_name.trim() : "";
+  if (!project_name || !client_name) {
+    return Response.json({ error: "Thiếu tên dự án hoặc tên khách hàng" }, { status: 400 });
+  }
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 })
-
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
-  const clientUrl = `${appUrl}/brief/${data.client_token}`
-  return NextResponse.json({ project: data, client_url: clientUrl }, { status: 201 })
+  try {
+    const project = await createBrief(project_name, client_name);
+    return Response.json({ project }, { status: 201 });
+  } catch (error) {
+    return Response.json({ error: error instanceof Error ? error.message : "Không thể tạo dự án" }, { status: 500 });
+  }
 }

@@ -1,51 +1,52 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { createServiceClient } from '@/lib/supabase'
+import { getBriefById, deleteBrief, setBriefById } from "@/lib/briefing-store";
+import { generateBriefFromSurvey } from "@/lib/briefing-gemini";
+import { geminiErrorCode, geminiErrorMessage } from "@/lib/gemini-error";
 
 export async function GET(
-  _req: NextRequest,
+  _req: Request,
   { params }: { params: Promise<{ projectId: string }> }
 ) {
-  const { projectId } = await params
-  const supabase = createServiceClient()
-
-  const { data: brief, error: briefError } = await supabase
-    .from('briefing_design_briefs')
-    .select('*')
-    .eq('project_id', projectId)
-    .single()
-
-  if (briefError || !brief) {
-    return NextResponse.json({ error: 'Không tìm thấy design brief' }, { status: 404 })
+  const { projectId } = await params;
+  const record = await getBriefById(projectId);
+  if (!record) {
+    return Response.json({ error: "Không tìm thấy" }, { status: 404 });
   }
-
-  const { data: project } = await supabase
-    .from('briefing_projects')
-    .select('*')
-    .eq('id', projectId)
-    .single()
-
-  const { data: session } = await supabase
-    .from('briefing_quiz_sessions')
-    .select('budget_range')
-    .eq('project_id', projectId)
-    .single()
-
-  return NextResponse.json({ brief, project, budget_range: session?.budget_range })
+  return Response.json(record);
 }
 
-export async function PATCH(
-  req: NextRequest,
+// KTS chủ động bấm tạo brief bằng AI từ đáp án khảo sát đã có.
+export async function POST(
+  _req: Request,
   { params }: { params: Promise<{ projectId: string }> }
 ) {
-  const { projectId } = await params
-  const { kts_notes } = await req.json()
-  const supabase = createServiceClient()
+  const { projectId } = await params;
+  const record = await getBriefById(projectId);
+  if (!record) {
+    return Response.json({ error: "Không tìm thấy" }, { status: 404 });
+  }
+  const answers = record.answers ?? {};
+  if (Object.keys(answers).length === 0) {
+    return Response.json({ error: "Khách hàng chưa hoàn thành khảo sát" }, { status: 400 });
+  }
 
-  const { error } = await supabase
-    .from('briefing_design_briefs')
-    .update({ kts_notes })
-    .eq('project_id', projectId)
+  try {
+    const brief = await generateBriefFromSurvey(record.project_name, record.client_name, answers);
+    await setBriefById(projectId, brief);
+    return Response.json({ ok: true, brief });
+  } catch (error) {
+    console.error("Briefing generate error:", error);
+    return Response.json(
+      { error: geminiErrorMessage(error), code: geminiErrorCode(error) },
+      { status: 502 }
+    );
+  }
+}
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 })
-  return NextResponse.json({ ok: true })
+export async function DELETE(
+  _req: Request,
+  { params }: { params: Promise<{ projectId: string }> }
+) {
+  const { projectId } = await params;
+  const ok = await deleteBrief(projectId);
+  return Response.json({ ok });
 }

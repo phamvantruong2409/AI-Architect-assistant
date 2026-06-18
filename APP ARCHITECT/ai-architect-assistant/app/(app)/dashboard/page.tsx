@@ -5,7 +5,6 @@ import { QuickActions } from "@/components/dashboard/QuickActions";
 import { RecentProjects } from "@/components/dashboard/RecentProjects";
 import { NewsUpdates } from "@/components/dashboard/NewsUpdates";
 import { InspirationToday } from "@/components/dashboard/InspirationToday";
-import { AnalyticsBar } from "@/components/dashboard/AnalyticsBar";
 
 export default function DashboardPage() {
   return (
@@ -40,7 +39,6 @@ export default function DashboardPage() {
           <div className="space-y-6 px-5 py-5">
             <QuickActions />
             <RecentProjects />
-            <AnalyticsBar />
           </div>
         </div>
 

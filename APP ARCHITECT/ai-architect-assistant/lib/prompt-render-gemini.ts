@@ -1,4 +1,4 @@
-import { getGeminiModel } from "@/lib/gemini";
+import { getGeminiModel, generateContentRetry } from "@/lib/gemini";
 import type { PromptRenderFormData, PromptRenderResult, RenderEngine } from "@/lib/prompt-render-types";
 
 const ENGINE_GUIDE: Record<RenderEngine, string> = {
@@ -52,7 +52,7 @@ Trả về JSON THUẦN TÚY (không markdown, không \`\`\`), đúng cấu trú
 }
 Chỉ trả về JSON.`;
 
-  const result = await model.generateContent(prompt);
+  const result = await generateContentRetry(model, prompt);
   const text = result.response.text().trim();
   const cleaned = text
     .replace(/^```json\n?/, "")

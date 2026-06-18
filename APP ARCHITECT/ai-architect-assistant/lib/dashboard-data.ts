@@ -134,6 +134,6 @@ export const studioTools: StudioTool[] = [
   { name: "Portfolio", icon: "image", iconSrc: "/images/studio/logoport.png", href: "/portfolio" },
   { name: "Pháp lý AI", icon: "layers", href: "/studio/regulatory" },
   { name: "Kiến thức AI", icon: "cube", href: "/studio/knowledge" },
-  { name: "Briefing AI", icon: "pencil", href: "/studio/briefing" },
+  { name: "Khảo sát AI", icon: "pencil", href: "/studio/briefing" },
   { name: "Sắp ra mắt", icon: "wand" },
 ];

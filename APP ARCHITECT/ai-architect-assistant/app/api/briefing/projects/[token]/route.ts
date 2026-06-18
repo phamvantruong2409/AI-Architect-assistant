@@ -1,29 +1,46 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { createServiceClient } from '@/lib/supabase'
+import { getBriefByToken, saveSurveyAnswers, type SurveyAnswers } from "@/lib/briefing-store";
 
 export async function GET(
-  _req: NextRequest,
+  _req: Request,
   { params }: { params: Promise<{ token: string }> }
 ) {
-  const { token } = await params
-  const supabase = createServiceClient()
+  const { token } = await params;
+  const record = await getBriefByToken(token);
+  if (!record) {
+    return Response.json({ error: "Không tìm thấy khảo sát" }, { status: 404 });
+  }
+  return Response.json({
+    project: { project_name: record.project_name, client_name: record.client_name },
+    completed: record.status === "completed",
+  });
+}
 
-  const { data: project, error } = await supabase
-    .from('briefing_projects')
-    .select('*')
-    .eq('client_token', token)
-    .single()
-
-  if (error || !project) {
-    return NextResponse.json({ error: 'Không tìm thấy dự án' }, { status: 404 })
+export async function POST(
+  req: Request,
+  { params }: { params: Promise<{ token: string }> }
+) {
+  const { token } = await params;
+  const record = await getBriefByToken(token);
+  if (!record) {
+    return Response.json({ error: "Không tìm thấy khảo sát" }, { status: 404 });
   }
 
-  // Kiểm tra xem đã có brief chưa
-  const { data: brief } = await supabase
-    .from('briefing_design_briefs')
-    .select('*')
-    .eq('project_id', project.id)
-    .single()
+  let body: { answers?: SurveyAnswers };
+  try {
+    body = await req.json();
+  } catch {
+    return Response.json({ error: "Dữ liệu không hợp lệ" }, { status: 400 });
+  }
+  const answers = body.answers ?? {};
 
-  return NextResponse.json({ project, brief: brief || null })
+  // Chỉ lưu đáp án và phản hồi NGAY cho khách (không gọi Gemini).
+  // Brief do kiến trúc sư tự bấm tạo sau (POST /api/briefing/brief/[id]) nếu cần.
+  try {
+    await saveSurveyAnswers(token, answers);
+  } catch (error) {
+    console.error("Briefing save answers error:", error);
+    return Response.json({ error: "Không lưu được khảo sát, vui lòng thử lại" }, { status: 500 });
+  }
+
+  return Response.json({ ok: true });
 }

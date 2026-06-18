@@ -1,89 +1,135 @@
-'use client'
+"use client";
 
-import { useEffect, useState } from 'react'
-import { useParams } from 'next/navigation'
-import Link from 'next/link'
-import { ArrowLeft, Loader2 } from 'lucide-react'
-import BriefPreview from '@/components/briefing/BriefPreview'
-import type { DesignBrief, BriefingProject } from '@/lib/briefing-types'
+import { useEffect, useState } from "react";
+import { useParams } from "next/navigation";
+import Link from "next/link";
+import { ArrowLeft, Loader2, Sparkles } from "lucide-react";
+import { MarkdownLite } from "@/components/chat/MarkdownLite";
+import { SURVEY_SECTIONS } from "@/lib/briefing-survey";
+import type { BriefRecord } from "@/lib/briefing-store";
 
 export default function BriefingDetailPage() {
-  const { id } = useParams<{ id: string }>()
-  const [brief, setBrief] = useState<DesignBrief | null>(null)
-  const [project, setProject] = useState<BriefingProject | null>(null)
-  const [budgetRange, setBudgetRange] = useState<string | undefined>()
-  const [ktsNotes, setKtsNotes] = useState('')
-  const [saving, setSaving] = useState(false)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
+  const { id } = useParams<{ id: string }>();
+  const [record, setRecord] = useState<BriefRecord | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [generating, setGenerating] = useState(false);
+  const [genError, setGenError] = useState<string | null>(null);
 
   useEffect(() => {
     fetch(`/api/briefing/brief/${id}`)
       .then((r) => r.json())
       .then((d) => {
-        if (d.error) throw new Error(d.error)
-        setBrief(d.brief)
-        setProject(d.project)
-        setBudgetRange(d.budget_range)
-        setKtsNotes(d.brief?.kts_notes ?? '')
+        if (d.error) throw new Error(d.error);
+        setRecord(d);
       })
       .catch((err) => setError(err.message))
-      .finally(() => setLoading(false))
-  }, [id])
+      .finally(() => setLoading(false));
+  }, [id]);
 
-  async function handleSaveNotes() {
-    setSaving(true)
+  async function generateBrief() {
+    setGenerating(true);
+    setGenError(null);
     try {
-      await fetch(`/api/briefing/brief/${id}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ kts_notes: ktsNotes }),
-      })
+      const res = await fetch(`/api/briefing/brief/${id}`, { method: "POST" });
+      const d = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(d.error || "Tạo brief thất bại");
+      setRecord((r) => (r ? { ...r, brief: d.brief } : r));
+    } catch (e) {
+      setGenError(e instanceof Error ? e.message : "Tạo brief thất bại");
     } finally {
-      setSaving(false)
+      setGenerating(false);
     }
   }
 
-  if (loading) return (
-    <div className="flex items-center justify-center min-h-screen">
-      <Loader2 size={28} className="animate-spin text-stone-600" />
-    </div>
-  )
+  if (loading) {
+    return (
+      <div className="flex min-h-[60vh] items-center justify-center">
+        <Loader2 size={28} className="animate-spin text-foreground-soft" />
+      </div>
+    );
+  }
 
-  if (error || !brief) return (
-    <div className="flex flex-col items-center justify-center min-h-screen gap-3">
-      <p className="text-stone-400">{error ?? 'Không tìm thấy brief'}</p>
-      <Link href="/studio/briefing" className="text-sm text-stone-500 hover:text-stone-300 underline">Quay lại</Link>
-    </div>
-  )
+  if (error || !record) {
+    return (
+      <div className="flex min-h-[60vh] flex-col items-center justify-center gap-3">
+        <p className="text-foreground-soft">{error ?? "Không tìm thấy brief"}</p>
+        <Link href="/studio/briefing" className="text-sm text-accent hover:underline">
+          Quay lại
+        </Link>
+      </div>
+    );
+  }
+
+  const answers = record.answers ?? {};
 
   return (
     <div className="mx-auto max-w-4xl px-4 py-8">
-      <div className="flex items-center gap-3 mb-8">
-        <Link href="/studio/briefing" className="p-2 text-stone-500 hover:text-stone-200 hover:bg-stone-800 rounded-lg transition-colors">
+      <div className="mb-8 flex items-center gap-3">
+        <Link
+          href="/studio/briefing"
+          className="rounded-lg p-2 text-foreground-soft transition-colors hover:bg-surface-muted hover:text-foreground"
+        >
           <ArrowLeft size={18} />
         </Link>
         <div>
-          <h1 className="font-semibold text-stone-100">{project?.project_name}</h1>
-          <p className="text-xs text-stone-500">{project?.client_name}</p>
+          <h1 className="font-display text-lg font-semibold text-foreground">{record.project_name}</h1>
+          <p className="text-xs text-foreground-soft">Khách hàng: {record.client_name}</p>
         </div>
       </div>
 
-      <BriefPreview brief={brief} project={project!} budgetRange={budgetRange} />
+      {record.brief ? (
+        <div className="rounded-card border border-border bg-surface p-5 sm:p-6 text-sm leading-relaxed text-foreground">
+          <MarkdownLite content={record.brief} />
+        </div>
+      ) : record.status !== "completed" || Object.keys(record.answers ?? {}).length === 0 ? (
+        <p className="rounded-card border border-border bg-surface p-5 text-sm text-foreground-soft">
+          Khách hàng chưa hoàn thành khảo sát nên chưa có dữ liệu để tạo brief.
+        </p>
+      ) : (
+        <div className="flex flex-col items-start gap-3 rounded-card border border-border bg-surface p-5">
+          <p className="text-sm text-foreground-soft">
+            Khách hàng đã hoàn thành khảo sát. Tạo bản brief thiết kế bằng AI từ các đáp án bên dưới.
+          </p>
+          <button
+            onClick={generateBrief}
+            disabled={generating}
+            className="inline-flex items-center gap-2 rounded-lg bg-accent px-4 py-2 text-sm font-medium text-accent-foreground transition-opacity hover:opacity-90 disabled:opacity-50"
+          >
+            {generating ? <Loader2 size={16} className="animate-spin" /> : <Sparkles size={16} />}
+            {generating ? "Đang tạo brief..." : "Tạo brief bằng AI"}
+          </button>
+          {genError && <p className="text-sm text-red-400">{genError}</p>}
+        </div>
+      )}
 
-      <div className="mt-8 bg-stone-900 border border-stone-800 rounded-2xl p-5">
-        <h3 className="text-sm font-semibold text-stone-300 mb-3">Ghi chú KTS</h3>
-        <textarea value={ktsNotes} onChange={(e) => setKtsNotes(e.target.value)} rows={4}
-          placeholder="Nhận xét của kiến trúc sư về brief này..."
-          className="w-full bg-stone-800 border border-stone-700 text-stone-200 placeholder-stone-600 text-sm rounded-xl px-4 py-3 focus:outline-none focus:border-stone-500 resize-none"
-        />
-        <button onClick={handleSaveNotes} disabled={saving}
-          className="mt-3 flex items-center gap-2 text-sm font-medium text-stone-900 bg-stone-200 hover:bg-white disabled:opacity-50 px-4 py-2 rounded-xl transition-colors"
-        >
-          {saving && <Loader2 size={13} className="animate-spin" />}
-          Lưu ghi chú
-        </button>
+      {/* Tóm tắt đáp án khảo sát */}
+      <div className="mt-8">
+        <h2 className="mb-3 font-display text-base text-accent">Đáp án khảo sát của khách hàng</h2>
+        <div className="space-y-5">
+          {SURVEY_SECTIONS.map((section) => {
+            const rows = section.questions
+              .map((q) => ({ q, a: answers[q.id] }))
+              .filter(({ a }) => a && (!Array.isArray(a) || a.length > 0));
+            if (rows.length === 0) return null;
+            return (
+              <div key={section.id} className="rounded-card border border-border bg-surface p-4">
+                <p className="mb-2 text-xs font-medium uppercase tracking-wide text-foreground-soft">
+                  {section.icon} {section.title}
+                </p>
+                <dl className="space-y-1.5">
+                  {rows.map(({ q, a }) => (
+                    <div key={q.id} className="flex flex-col gap-0.5 sm:flex-row sm:gap-3">
+                      <dt className="shrink-0 text-sm text-foreground-soft sm:w-56">{q.label}</dt>
+                      <dd className="text-sm text-foreground">{Array.isArray(a) ? a.join(", ") : a}</dd>
+                    </div>
+                  ))}
+                </dl>
+              </div>
+            );
+          })}
+        </div>
       </div>
     </div>
-  )
+  );
 }

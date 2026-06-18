@@ -55,7 +55,13 @@ const item: Variants = {
 
 export function Hero() {
   const [activeImage, setActiveImage] = useState(0);
-  const [quoteIndex, setQuoteIndex] = useState(() => Math.floor(Math.random() * QUOTES.length));
+  // Bắt đầu ở quote cố định để server và client render giống nhau (tránh lỗi
+  // hydration #418). Chọn ngẫu nhiên sau khi mount ở useEffect bên dưới.
+  const [quoteIndex, setQuoteIndex] = useState(0);
+
+  useEffect(() => {
+    setQuoteIndex(Math.floor(Math.random() * QUOTES.length));
+  }, []);
 
   useEffect(() => {
     const timer = setInterval(() => {

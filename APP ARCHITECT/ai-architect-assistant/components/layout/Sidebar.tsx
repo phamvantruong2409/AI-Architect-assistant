@@ -43,7 +43,7 @@ const studioItems = [
     gradient: "from-teal-600 to-cyan-500",
   },
   {
-    name: "Briefing AI",
+    name: "Khảo sát AI",
     href: "/studio/briefing",
     icon: PencilIcon,
     gradient: "from-amber-600 to-orange-500",
@@ -252,7 +252,7 @@ export function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
         )}
       </div>
 
-      <div className="space-y-3 px-3 pb-3">
+      <div className="space-y-3 px-3 pb-[50px]">
         <div className="rounded-card border border-sidebar-border bg-sidebar-surface p-4">
           <div className="flex items-center justify-between text-accent">
             <span className="flex items-center gap-2">

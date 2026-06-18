@@ -2,7 +2,7 @@ const fs = require("fs");
 const path = require("path");
 const sharp = require("sharp");
 
-const SRC = path.join(__dirname, "..", "public", "images", "logodark.png");
+const SRC = path.join(__dirname, "..", "public", "images", "logoiconhinhtron.png");
 const OUT_DIR = path.join(__dirname, "..", "build");
 const OUT = path.join(OUT_DIR, "icon.ico");
 const SIZES = [16, 32, 48, 64, 128, 256];
