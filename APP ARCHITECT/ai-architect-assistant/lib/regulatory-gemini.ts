@@ -1,4 +1,4 @@
-import { GoogleGenerativeAI } from '@google/generative-ai'
+import { getGeminiModel } from './gemini'
 import type { RegCheck, RegReport } from './regulatory-types'
 import {
   getSetbackRule,
@@ -11,13 +11,11 @@ import {
   ZONING_TYPE_LABELS,
 } from './regulatory-regulations'
 
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!)
-
 export async function analyzeRegulatory(
   check: RegCheck,
   imageBase64?: string
 ): Promise<Omit<RegReport, 'id' | 'check_id' | 'generated_at' | 'gemini_model'>> {
-  const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' })
+  const model = getGeminiModel()
 
   const setbackRule = getSetbackRule(check.floors)
   const maxDensity = MAX_DENSITY[check.building_type]

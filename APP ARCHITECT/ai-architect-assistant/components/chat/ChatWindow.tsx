@@ -4,7 +4,8 @@ import { useEffect, useRef, useState, type ReactNode } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useChat } from "@/hooks/useChat";
 import { useChatModel } from "@/hooks/useChatModel";
-import { getChatSession } from "@/lib/chat-sessions";
+import { useAiUsage } from "@/hooks/useAiUsage";
+import { getChatSession, type ChatSessionMessage } from "@/lib/chat-sessions";
 import { GEMINI_MODELS } from "@/lib/gemini-models";
 import { MessageBubble } from "./MessageBubble";
 import { ChatInput } from "./ChatInput";
@@ -32,9 +33,6 @@ interface ChatWindowProps {
 export function ChatWindow(props: ChatWindowProps) {
   const searchParams = useSearchParams();
   const sessionIdParam = searchParams.get("id");
-  // Stable id for a brand-new chat (no ?id= yet). Once the session adopts
-  // this id via router.replace, sessionIdParam === generatedId, so the key
-  // below stays the same and the chat doesn't remount mid-stream.
   const [generatedId] = useState(() => crypto.randomUUID());
   const key = sessionIdParam ?? generatedId;
 
@@ -61,21 +59,76 @@ function ChatSession({
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  const [sessionId] = useState(() => sessionIdParam ?? initialSessionId);
-  const [initialMessages] = useState(() =>
-    sessionIdParam ? getChatSession(sessionIdParam)?.messages ?? [] : []
+  // Load existing session messages async before mounting the chat UI
+  const [loadedMessages, setLoadedMessages] = useState<ChatSessionMessage[] | null>(
+    sessionIdParam ? null : []
   );
 
+  useEffect(() => {
+    if (!sessionIdParam) return;
+    getChatSession(sessionIdParam).then((s) => {
+      setLoadedMessages((s?.messages ?? []) as ChatSessionMessage[]);
+    });
+  }, [sessionIdParam]);
+
+  if (loadedMessages === null) {
+    return (
+      <div className="flex h-full items-center justify-center text-sm text-foreground-soft">
+        Đang tải...
+      </div>
+    );
+  }
+
+  return (
+    <ChatSessionInner
+      mode={mode}
+      suggestions={suggestions}
+      emptyTitle={emptyTitle}
+      emptyDescription={emptyDescription}
+      banner={banner}
+      sessionIdParam={sessionIdParam}
+      initialSessionId={initialSessionId}
+      initialMessages={loadedMessages}
+      pathname={pathname}
+      router={router}
+      searchParams={searchParams}
+    />
+  );
+}
+
+function ChatSessionInner({
+  mode,
+  suggestions,
+  emptyTitle,
+  emptyDescription,
+  banner,
+  sessionIdParam,
+  initialSessionId,
+  initialMessages,
+  pathname,
+  router,
+  searchParams,
+}: ChatWindowProps & {
+  sessionIdParam: string | null;
+  initialSessionId: string;
+  initialMessages: ChatSessionMessage[];
+  pathname: string;
+  router: ReturnType<typeof useRouter>;
+  searchParams: ReturnType<typeof useSearchParams>;
+}) {
+  const [sessionId] = useState(() => sessionIdParam ?? initialSessionId);
   const [model, setModel] = useChatModel();
-  const { messages, sendMessage, generateImage, stopGeneration, isStreaming, quotaExceeded } = useChat(
+  const { rateLimited } = useAiUsage();
+
+  const { messages, sendMessage, generateImage, stopGeneration, resetQuota, isStreaming, quotaExceeded } = useChat(
     mode,
-    {
-      id: sessionId,
-      path: pathname,
-      initialMessages,
-    },
+    { id: sessionId, path: pathname, initialMessages },
     model
   );
+
+  // Model còn lượt để gợi ý chuyển sang khi model hiện tại bị 429
+  const fallback = GEMINI_MODELS.find((m) => m.id !== model && !rateLimited[m.id]);
+  const currentLabel = GEMINI_MODELS.find((m) => m.id === model)?.label ?? model;
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -118,9 +171,9 @@ function ChatSession({
       <div ref={scrollRef} className="flex-1 overflow-y-auto">
         {messages.length === 0 ? (
           <EmptyState
-            title={emptyTitle}
-            description={emptyDescription}
-            suggestions={suggestions}
+            title={emptyTitle ?? DEFAULT_TITLE}
+            description={emptyDescription ?? DEFAULT_DESCRIPTION}
+            suggestions={suggestions ?? DEFAULT_SUGGESTIONS}
             onPick={sendMessage}
           />
         ) : (
@@ -132,9 +185,24 @@ function ChatSession({
         )}
       </div>
       {quotaExceeded && (
-        <div className="border-t border-amber-500/30 bg-amber-500/10 px-4 py-2 text-center text-xs font-medium text-amber-600">
-          Đã hết hạn mức sử dụng Gemini cho hôm nay. Vui lòng thử lại sau hoặc đổi sang model khác.
-        </div>
+        fallback ? (
+          <div className="flex flex-wrap items-center justify-center gap-2 border-t border-amber-500/30 bg-amber-500/10 px-4 py-2 text-center text-xs font-medium text-amber-600">
+            <span>{currentLabel} đã hết lượt hôm nay.</span>
+            <button
+              onClick={() => {
+                setModel(fallback.id);
+                resetQuota();
+              }}
+              className="rounded-card bg-amber-500/90 px-2.5 py-1 font-semibold text-white transition-colors hover:bg-amber-500"
+            >
+              Đổi sang {fallback.label}
+            </button>
+          </div>
+        ) : (
+          <div className="border-t border-red-500/30 bg-red-500/10 px-4 py-2 text-center text-xs font-medium text-red-500">
+            ⚠️ Đã hết lượt gọi AI hôm nay (tất cả model). Vui lòng thử lại sau.
+          </div>
+        )
       )}
       <ChatInput
         onSend={sendMessage}

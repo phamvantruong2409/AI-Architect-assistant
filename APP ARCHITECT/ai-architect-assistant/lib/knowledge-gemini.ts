@@ -1,10 +1,8 @@
-import { GoogleGenerativeAI } from '@google/generative-ai'
+import { getGeminiModel, getGeminiEmbeddingModel } from './gemini'
 import type { KnowledgeChatMessage, MatchedChunk } from './knowledge-types'
 
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!)
-
 export async function embedText(text: string): Promise<number[]> {
-  const model = genAI.getGenerativeModel({ model: 'text-embedding-004' })
+  const model = getGeminiEmbeddingModel()
   const result = await model.embedContent(text)
   return result.embedding.values
 }
@@ -14,7 +12,7 @@ export async function generateAnswer(
   chunks: MatchedChunk[],
   history: KnowledgeChatMessage[]
 ): Promise<string> {
-  const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' })
+  const model = getGeminiModel()
 
   const context = chunks
     .map((c, i) => `[${i + 1}] Nguồn: ${c.document_name}\n${c.content}`)

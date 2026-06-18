@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
@@ -12,9 +12,15 @@ import { ConfirmDeleteDialog } from "@/components/chat/ConfirmDeleteDialog";
 import { navItems } from "./nav-items";
 import { SettingsIcon, StarIcon, TrashIcon, CubeIcon, LayersIcon, WandIcon, ImageIcon, PencilIcon, ChevronDownIcon, BellIcon } from "./icons";
 import { ThemeToggle } from "./ThemeToggle";
+import { useAiUsage } from "@/hooks/useAiUsage";
+import { MODEL_LIMITS, DEFAULT_LIMIT } from "@/lib/ai-usage";
+import { GEMINI_MODELS, DEFAULT_GEMINI_MODEL } from "@/lib/gemini-models";
 
-const DAILY_LIMIT = 20;
-const MOCK_REMAINING = 14;
+function formatTokens(n: number): string {
+  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(n % 1_000_000 === 0 ? 0 : 1)}M`;
+  if (n >= 1_000) return `${(n / 1_000).toFixed(n % 1_000 === 0 ? 0 : 1)}K`;
+  return String(n);
+}
 
 const studioItems = [
   {
@@ -58,6 +64,24 @@ export function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
   const sessions = useChatSessions();
   const [pendingDelete, setPendingDelete] = useState<ChatSession | null>(null);
   const [isStudioOpen, setIsStudioOpen] = useState(true);
+  const [userName, setUserName] = useState("Người dùng");
+  const { stats, rateLimited } = useAiUsage();
+
+  const limit = MODEL_LIMITS[DEFAULT_GEMINI_MODEL] ?? DEFAULT_LIMIT;
+  const tpmCap = limit.tpm;
+  const rpdCap = limit.rpd;
+  const tpmPct = Math.min(100, Math.round((stats.tpm / tpmCap) * 100));
+  const rpdPct = rpdCap ? Math.min(100, Math.round((stats.rpd / rpdCap) * 100)) : Math.min(100, stats.rpd);
+  const rpdReached = rpdCap !== null && stats.rpd >= rpdCap;
+  const all429 = GEMINI_MODELS.every((m) => rateLimited[m.id]);
+  const allLimited = all429 || rpdReached; // hết lượt: do 429 hoặc chạm trần RPD/ngày
+  const primaryLimited = rateLimited[DEFAULT_GEMINI_MODEL];
+  const fallback = GEMINI_MODELS.find((m) => m.id !== DEFAULT_GEMINI_MODEL && !rateLimited[m.id]);
+
+  useEffect(() => {
+    const stored = localStorage.getItem("user-name");
+    if (stored) setUserName(stored);
+  }, []);
 
   const handleDelete = (e: React.MouseEvent, session: ChatSession) => {
     e.preventDefault();
@@ -65,13 +89,14 @@ export function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
     setPendingDelete(session);
   };
 
-  const confirmDelete = () => {
+  const confirmDelete = async () => {
     if (!pendingDelete) return;
-    deleteChatSession(pendingDelete.id);
-    if (pathname === pendingDelete.path && activeChatId === pendingDelete.id) {
-      router.push(pendingDelete.path);
-    }
+    const toDelete = pendingDelete;
     setPendingDelete(null);
+    await deleteChatSession(toDelete.id);
+    if (pathname === toDelete.path && activeChatId === toDelete.id) {
+      router.push(toDelete.path);
+    }
   };
 
   const isStudioActive = pathname.startsWith("/studio") || pathname === "/portfolio";
@@ -229,18 +254,57 @@ export function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
 
       <div className="space-y-3 px-3 pb-3">
         <div className="rounded-card border border-sidebar-border bg-sidebar-surface p-4">
-          <div className="flex items-center gap-2 text-accent">
-            <StarIcon className="h-4 w-4" />
-            <span className="text-sm font-medium text-sidebar-foreground">
-              Studio Pro
+          <div className="flex items-center justify-between text-accent">
+            <span className="flex items-center gap-2">
+              <StarIcon className="h-4 w-4" />
+              <span className="text-sm font-medium text-sidebar-foreground">
+                Lượng dùng AI hôm nay
+              </span>
             </span>
+            <span className="text-[10px] text-sidebar-foreground-soft">qua app</span>
           </div>
-          <p className="mt-1.5 text-xs text-sidebar-foreground-soft">
-            Còn {MOCK_REMAINING}/{DAILY_LIMIT} lượt AI hôm nay.
-          </p>
-          <button className="mt-3 w-full rounded-card bg-accent px-3 py-2 text-xs font-medium text-accent-foreground transition-colors hover:bg-accent/90">
-            Nâng cấp Studio Pro
-          </button>
+
+          {/* TPM — token/phút (cửa sổ 60s) */}
+          <div className="mt-3">
+            <div className="flex items-center justify-between text-[11px] text-sidebar-foreground-soft">
+              <span>TPM</span>
+              <span>
+                {formatTokens(stats.tpm)} / {formatTokens(tpmCap)}
+              </span>
+            </div>
+            <div className="mt-1 h-1.5 overflow-hidden rounded-full bg-sidebar-border">
+              <div className="h-full rounded-full bg-accent transition-all" style={{ width: `${tpmPct}%` }} />
+            </div>
+          </div>
+
+          {/* RPD — số request trong ngày */}
+          <div className="mt-2.5">
+            <div className="flex items-center justify-between text-[11px] text-sidebar-foreground-soft">
+              <span>RPD</span>
+              <span className={rpdReached ? "font-semibold text-red-500" : undefined}>
+                {stats.rpd} / {rpdCap ?? "∞"}
+              </span>
+            </div>
+            <div className="mt-1 h-1.5 overflow-hidden rounded-full bg-sidebar-border">
+              <div
+                className={cn(
+                  "h-full rounded-full transition-all",
+                  rpdReached ? "bg-red-500" : rpdPct >= 80 ? "bg-amber-500" : "bg-accent"
+                )}
+                style={{ width: `${rpdPct}%` }}
+              />
+            </div>
+          </div>
+
+          {allLimited ? (
+            <p className="mt-3 rounded-card border border-red-500/30 bg-red-500/10 px-2.5 py-1.5 text-[11px] font-medium text-red-500">
+              ⚠️ Đã hết lượt gọi AI hôm nay{rpdReached ? ` (${stats.rpd}/${rpdCap})` : ""}.
+            </p>
+          ) : primaryLimited && fallback ? (
+            <p className="mt-3 rounded-card border border-amber-500/30 bg-amber-500/10 px-2.5 py-1.5 text-[11px] font-medium text-amber-600">
+              Gemini 3 Flash đã hết lượt — chuyển sang {fallback.label}.
+            </p>
+          ) : null}
         </div>
 
         <div className="flex flex-col gap-1">
@@ -267,7 +331,7 @@ export function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
             <ThemeToggle />
           </div>
           <div className="px-3 py-1">
-            <p className="text-xs font-medium text-sidebar-foreground leading-tight">Trường Phạm</p>
+            <p className="text-xs font-medium text-sidebar-foreground leading-tight">{userName}</p>
             <p className="text-[10px] text-sidebar-foreground-soft">Studio Pro</p>
           </div>
         </div>

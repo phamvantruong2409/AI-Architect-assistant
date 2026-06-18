@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createServiceClient } from '@/lib/supabase'
 import { analyzeClientBrief } from '@/lib/briefing-gemini'
 import { calculateStyleScores } from '@/lib/briefing-quiz-data'
+import { DEFAULT_GEMINI_MODEL } from '@/lib/gemini-models'
 import type { QuizSession } from '@/lib/briefing-types'
 
 export async function POST(req: NextRequest) {
@@ -76,7 +77,7 @@ export async function POST(req: NextRequest) {
   if (existingBrief) {
     const { data } = await supabase
       .from('briefing_design_briefs')
-      .update({ ...briefData, generated_at: new Date().toISOString(), gemini_model: 'gemini-2.0-flash' })
+      .update({ ...briefData, generated_at: new Date().toISOString(), gemini_model: DEFAULT_GEMINI_MODEL })
       .eq('id', existingBrief.id)
       .select()
       .single()
@@ -84,7 +85,7 @@ export async function POST(req: NextRequest) {
   } else {
     const { data } = await supabase
       .from('briefing_design_briefs')
-      .insert({ project_id, ...briefData, gemini_model: 'gemini-2.0-flash' })
+      .insert({ project_id, ...briefData, gemini_model: DEFAULT_GEMINI_MODEL })
       .select()
       .single()
     brief = data

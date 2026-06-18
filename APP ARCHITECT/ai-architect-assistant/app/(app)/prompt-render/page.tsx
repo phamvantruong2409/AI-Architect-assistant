@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { GEMINI_MODELS } from "@/lib/gemini-models";
 import { useChatModel } from "@/hooks/useChatModel";
+import { recordAiCall, markRateLimited, estimateTokens } from "@/lib/ai-usage";
 import {
   RENDER_ENGINES,
   SPACE_OPTIONS,
@@ -71,7 +72,11 @@ export default function PromptRenderPage() {
         body: JSON.stringify({ ...form, model } satisfies PromptRenderFormData),
       });
       const json = await res.json();
-      if (!res.ok) throw new Error(json.error || "Sinh prompt thất bại");
+      if (!res.ok) {
+        if (json.code === "QUOTA_EXCEEDED") markRateLimited(model);
+        throw new Error(json.error || "Sinh prompt thất bại");
+      }
+      recordAiCall(model, estimateTokens(JSON.stringify(form)) + estimateTokens(JSON.stringify(json)));
       setResult(json);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Sinh prompt thất bại");

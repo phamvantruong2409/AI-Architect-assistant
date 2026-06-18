@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { GEMINI_MODELS } from "@/lib/gemini-models";
 import { useChatModel } from "@/hooks/useChatModel";
+import { recordAiCall, markRateLimited, estimateTokens } from "@/lib/ai-usage";
 import { MAX_IMAGE_BYTES, type ReviewResult } from "@/lib/review-types";
 
 const inputClass =
@@ -66,7 +67,12 @@ export default function ReviewPage() {
         body: JSON.stringify({ imageBase64, mimeType, context, model }),
       });
       const json = await res.json();
-      if (!res.ok) throw new Error(json.error || "Đánh giá thất bại");
+      if (!res.ok) {
+        if (json.code === "QUOTA_EXCEEDED") markRateLimited(model);
+        throw new Error(json.error || "Đánh giá thất bại");
+      }
+      // ảnh ~258 token + bối cảnh + kết quả
+      recordAiCall(model, 258 + estimateTokens(context) + estimateTokens(JSON.stringify(json)));
       setResult(json);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Đánh giá thất bại");

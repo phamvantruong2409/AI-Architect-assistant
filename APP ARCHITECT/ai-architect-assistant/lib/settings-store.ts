@@ -2,11 +2,13 @@ import fs from "fs";
 import os from "os";
 import path from "path";
 
-const SETTINGS_FILE = path.join(process.cwd(), "data", "settings.json");
 const DEFAULT_STORAGE_ROOT = path.join(os.homedir(), "Documents", "AI Architect");
+export const DATA_DIR = path.join(DEFAULT_STORAGE_ROOT, ".data");
+const SETTINGS_FILE = path.join(DATA_DIR, "settings.json");
 
 interface Settings {
   storageRoot?: string;
+  geminiApiKey?: string;
 }
 
 function readSettings(): Settings {
@@ -36,6 +38,18 @@ export function setStorageRoot(storageRoot: string): string {
   settings.storageRoot = storageRoot;
   writeSettings(settings);
   return storageRoot;
+}
+
+export function getGeminiApiKey(): string {
+  return readSettings().geminiApiKey?.trim() || "";
+}
+
+export function setGeminiApiKey(key: string): void {
+  const settings = readSettings();
+  const trimmed = key.trim();
+  if (trimmed) settings.geminiApiKey = trimmed;
+  else delete settings.geminiApiKey;
+  writeSettings(settings);
 }
 
 export function getProjectsRoot(): string {

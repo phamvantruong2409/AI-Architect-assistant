@@ -1,4 +1,5 @@
-import { geminiImage } from "@/lib/gemini";
+import { getGeminiImageModel } from "@/lib/gemini";
+import { geminiErrorCode, geminiErrorMessage } from "@/lib/gemini-error";
 
 export async function POST(req: Request) {
   const { prompt } = await req.json();
@@ -9,11 +10,11 @@ export async function POST(req: Request) {
 
   let result;
   try {
-    result = await geminiImage.generateContent(prompt);
+    result = await getGeminiImageModel().generateContent(prompt);
   } catch (error) {
     console.error("Gemini image error:", error);
     return Response.json(
-      { error: "Không thể tạo ảnh lúc này. Vui lòng thử lại." },
+      { error: geminiErrorMessage(error), code: geminiErrorCode(error) },
       { status: 502 }
     );
   }

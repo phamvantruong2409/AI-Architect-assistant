@@ -2,6 +2,8 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { saveChatSession } from "@/lib/chat-sessions";
+import { recordAiCall, markRateLimited, estimateTokens } from "@/lib/ai-usage";
+import { DEFAULT_GEMINI_MODEL } from "@/lib/gemini-models";
 
 export interface ChatMessage {
   id: string;
@@ -76,7 +78,10 @@ export function useChat(
 
         if (!res.ok || !res.body) {
           const data = await res.json().catch(() => null);
-          if (data?.code === "QUOTA_EXCEEDED") setQuotaExceeded(true);
+          if (data?.code === "QUOTA_EXCEEDED") {
+            setQuotaExceeded(true);
+            markRateLimited(model ?? DEFAULT_GEMINI_MODEL);
+          }
           throw new Error(data?.error ?? "Có lỗi xảy ra, vui lòng thử lại.");
         }
 
@@ -92,6 +97,10 @@ export function useChat(
             prev.map((m) => (m.id === assistantId ? { ...m, content: fullText } : m))
           );
         }
+
+        // Ghi nhận usage: token đầu vào (toàn bộ history gửi đi) + đầu ra
+        const inputText = history.map((m) => m.content).join("\n");
+        recordAiCall(model ?? DEFAULT_GEMINI_MODEL, estimateTokens(inputText) + estimateTokens(fullText));
       } catch (err) {
         if (err instanceof DOMException && err.name === "AbortError") {
           // user stopped generation — keep the partial response as-is
@@ -113,6 +122,8 @@ export function useChat(
   const stopGeneration = useCallback(() => {
     abortControllerRef.current?.abort();
   }, []);
+
+  const resetQuota = useCallback(() => setQuotaExceeded(false), []);
 
   const generateImage = useCallback(
     async (prompt: string) => {
@@ -145,6 +156,7 @@ export function useChat(
         const data = await res.json();
         if (!res.ok) throw new Error(data?.error ?? "Có lỗi xảy ra, vui lòng thử lại.");
 
+        recordAiCall("gemini-2.5-flash-image", estimateTokens(trimmed));
         setMessages((prev) =>
           prev.map((m) =>
             m.id === assistantId ? { ...m, content: "Đây là ảnh AI tạo cho bạn:", imageUrl: data.image } : m
@@ -163,5 +175,5 @@ export function useChat(
     []
   );
 
-  return { messages, sendMessage, generateImage, stopGeneration, isStreaming, error, quotaExceeded };
+  return { messages, sendMessage, generateImage, stopGeneration, resetQuota, isStreaming, error, quotaExceeded };
 }

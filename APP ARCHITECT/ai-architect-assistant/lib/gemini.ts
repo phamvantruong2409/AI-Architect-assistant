@@ -1,21 +1,40 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { GEMINI_MODELS, DEFAULT_GEMINI_MODEL, type GeminiModelId } from "@/lib/gemini-models";
+import { getGeminiApiKey } from "@/lib/settings-store";
 
-const apiKey = process.env.GEMINI_API_KEY;
-
-if (!apiKey) {
-  throw new Error("Missing GEMINI_API_KEY environment variable");
+function getGenAI(): GoogleGenerativeAI {
+  // Ưu tiên key do người dùng nhập (lưu trong settings, không nhúng vào .exe);
+  // fallback về biến môi trường .env.local cho môi trường dev.
+  const apiKey = getGeminiApiKey() || process.env.GEMINI_API_KEY;
+  if (!apiKey) {
+    const err = new Error("Chưa có API key Gemini.") as Error & { code?: string };
+    err.code = "NO_API_KEY";
+    throw err;
+  }
+  return new GoogleGenerativeAI(apiKey);
 }
 
-export const genAI = new GoogleGenerativeAI(apiKey);
-
 export function getGeminiModel(modelId?: string) {
+  const genAI = getGenAI();
   const id = GEMINI_MODELS.some((m) => m.id === modelId)
     ? (modelId as GeminiModelId)
     : DEFAULT_GEMINI_MODEL;
-  return genAI.getGenerativeModel({ model: id });
+
+  // Tắt "thinking" cho Gemini 2.5 Flash (model phụ) để tiết kiệm token — budget 0.
+  // Gemini 3 Flash (mặc định) giữ thinking: đo thực tế cho thấy nó nghĩ ít mà
+  // vẫn nhanh hơn và trả lời chính xác hơn, nên không tắt.
+  // thinkingConfig chưa có trong type của SDK 0.24.1 nhưng vẫn được gửi xuống REST API.
+  const generationConfig = id.includes("2.5-flash")
+    ? ({ thinkingConfig: { thinkingBudget: 0 } } as Record<string, unknown>)
+    : undefined;
+
+  return genAI.getGenerativeModel({ model: id, generationConfig });
 }
 
-export const geminiImage = genAI.getGenerativeModel({
-  model: "gemini-2.5-flash-image",
-});
+export function getGeminiImageModel() {
+  return getGenAI().getGenerativeModel({ model: "gemini-2.5-flash-image" });
+}
+
+export function getGeminiEmbeddingModel() {
+  return getGenAI().getGenerativeModel({ model: "text-embedding-004" });
+}

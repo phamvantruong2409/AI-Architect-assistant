@@ -17,16 +17,15 @@ export async function POST(req: Request) {
 
   const lastMessage = messages[messages.length - 1].content as string;
 
-  const chat = getGeminiModel(model).startChat({
-    systemInstruction: {
-      role: "system",
-      parts: [{ text: mode === "legal" ? legalPrompt : systemPrompt }],
-    },
-    history,
-  });
-
   let result;
   try {
+    const chat = getGeminiModel(model).startChat({
+      systemInstruction: {
+        role: "system",
+        parts: [{ text: mode === "legal" ? legalPrompt : systemPrompt }],
+      },
+      history,
+    });
     result = await chat.sendMessageStream(lastMessage);
   } catch (error) {
     console.error("Gemini error:", error);

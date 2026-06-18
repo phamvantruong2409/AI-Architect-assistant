@@ -1,13 +1,11 @@
-import { GoogleGenerativeAI } from '@google/generative-ai'
+import { getGeminiModel } from './gemini'
 import type { QuizSession, DesignBrief } from './briefing-types'
-
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!)
 
 export async function analyzeClientBrief(
   session: QuizSession,
   projectName: string
 ): Promise<Omit<DesignBrief, 'id' | 'project_id' | 'generated_at' | 'gemini_model'>> {
-  const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' })
+  const model = getGeminiModel()
 
   const styleLabels: Record<string, string> = {
     bac_au: 'Bắc Âu (Scandinavian)',

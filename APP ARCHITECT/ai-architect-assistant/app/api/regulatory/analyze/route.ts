@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServiceClient } from '@/lib/supabase'
 import { analyzeRegulatory } from '@/lib/regulatory-gemini'
+import { DEFAULT_GEMINI_MODEL } from '@/lib/gemini-models'
 import type { CheckFormData } from '@/lib/regulatory-types'
 
 export async function POST(req: NextRequest) {
@@ -90,7 +91,7 @@ export async function POST(req: NextRequest) {
       compliance_summary: analysisResult.compliance_summary,
       violations: analysisResult.violations,
       passed_checks: analysisResult.passed_checks,
-      gemini_model: 'gemini-2.0-flash',
+      gemini_model: DEFAULT_GEMINI_MODEL,
     })
     .select()
     .single()
