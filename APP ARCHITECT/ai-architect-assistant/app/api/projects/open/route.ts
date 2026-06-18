@@ -1,4 +1,5 @@
-import { spawn } from "child_process";
+import { spawnSync } from "child_process";
+import fs from "fs";
 import { getProjectById } from "@/lib/projects-store";
 
 export async function POST(request: Request) {
@@ -10,6 +11,12 @@ export async function POST(request: Request) {
     return Response.json({ error: "Không tìm thấy thư mục dự án" }, { status: 404 });
   }
 
-  spawn("explorer", [project.folderPath], { detached: true }).unref();
+  try { fs.mkdirSync(project.folderPath, { recursive: true }); } catch { /* ignore */ }
+
+  spawnSync("powershell", [
+    "-NoProfile", "-NonInteractive", "-Command",
+    `Start-Process -FilePath "explorer.exe" -ArgumentList "${project.folderPath.replace(/"/g, '""')}"`,
+  ]);
+
   return Response.json({ ok: true });
 }

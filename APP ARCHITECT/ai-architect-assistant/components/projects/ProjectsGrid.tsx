@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, type ChangeEvent, type FormEvent } from "react";
+import confetti from "canvas-confetti";
 import Link from "next/link";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
@@ -13,12 +14,18 @@ export function ProjectsGrid({ limit, title, viewAllHref }: { limit?: number; ti
   const [showForm, setShowForm] = useState(false);
   const [name, setName] = useState("");
   const [type, setType] = useState("");
+  const [folderMode, setFolderMode] = useState<"new" | "existing">("new");
+  const [linkedFolder, setLinkedFolder] = useState("");
   const [creating, setCreating] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
   const [coverError, setCoverError] = useState<string | null>(null);
   const [uploadingCoverId, setUploadingCoverId] = useState<string | null>(null);
   const [projectsRoot, setProjectsRoot] = useState("");
+  const [editingField, setEditingField] = useState<{ id: string; field: "name" | "type" } | null>(null);
+  const [editingProgress, setEditingProgress] = useState<string | null>(null); // project id
+  const [editingValue, setEditingValue] = useState("");
   const coverInputRefs = useRef<Record<string, HTMLInputElement | null>>({});
+  const editInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     fetch("/api/projects")
@@ -34,14 +41,22 @@ export function ProjectsGrid({ limit, title, viewAllHref }: { limit?: number; ti
   async function handleCreate(event: FormEvent) {
     event.preventDefault();
     if (!name.trim()) return;
+    if (folderMode === "existing" && !linkedFolder.trim()) {
+      setFormError("Vui lòng chọn thư mục dự án");
+      return;
+    }
 
     setCreating(true);
     setFormError(null);
     try {
+      const body: Record<string, string> = { name, type };
+      if (folderMode === "existing" && linkedFolder.trim()) {
+        body.folderPath = linkedFolder.trim();
+      }
       const res = await fetch("/api/projects", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, type }),
+        body: JSON.stringify(body),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? "Không thể tạo dự án");
@@ -49,6 +64,8 @@ export function ProjectsGrid({ limit, title, viewAllHref }: { limit?: number; ti
       setProjects((prev) => [data, ...prev]);
       setName("");
       setType("");
+      setFolderMode("new");
+      setLinkedFolder("");
       setShowForm(false);
     } catch (error) {
       setFormError(error instanceof Error ? error.message : "Đã xảy ra lỗi");
@@ -57,8 +74,13 @@ export function ProjectsGrid({ limit, title, viewAllHref }: { limit?: number; ti
     }
   }
 
+  async function handlePickFolder() {
+    const folder = await window.electronAPI?.selectFolder();
+    if (folder) setLinkedFolder(folder);
+  }
+
   async function handleDelete(id: string, name: string) {
-    if (!window.confirm(`Xóa dự án "${name}" khỏi danh sách? (thư mục trên ổ đĩa sẽ được giữ lại)`)) {
+    if (!window.confirm(`Xóa dự án "${name}"?\n\nThao tác này sẽ xóa vĩnh viễn toàn bộ thư mục và file bên trong. Không thể hoàn tác.`)) {
       return;
     }
 
@@ -89,14 +111,67 @@ export function ProjectsGrid({ limit, title, viewAllHref }: { limit?: number; ti
         method: "POST",
         body: formData,
       });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error ?? "Không thể đặt ảnh bìa");
+      const contentType = res.headers.get("content-type") ?? "";
+      const data = contentType.includes("application/json") ? await res.json() : null;
+      if (!res.ok) throw new Error(data?.error ?? "Không thể đặt ảnh bìa");
 
       setProjects((prev) => prev.map((project) => (project.id === id ? data : project)));
     } catch (error) {
       setCoverError(error instanceof Error ? error.message : "Đã xảy ra lỗi");
     } finally {
       setUploadingCoverId(null);
+    }
+  }
+
+  function startEdit(id: string, field: "name" | "type", currentValue: string, e: React.MouseEvent) {
+    e.preventDefault();
+    e.stopPropagation();
+    setEditingField({ id, field });
+    setEditingValue(currentValue);
+    setTimeout(() => editInputRef.current?.select(), 0);
+  }
+
+  async function handleProgressChange(id: string, value: number) {
+    const prev = projects.find((p) => p.id === id)?.progress ?? 0;
+    setProjects((all) => all.map((p) => p.id === id ? { ...p, progress: value } : p));
+    if (value === 100 && prev < 100) fireConfetti();
+    await fetch(`/api/projects/${id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ progress: value }),
+    });
+  }
+
+  function fireConfetti() {
+    const count = 180;
+    const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 9999 };
+    const randomInRange = (min: number, max: number) => Math.random() * (max - min) + min;
+    confetti({ ...defaults, particleCount: count * 0.25, origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 } });
+    confetti({ ...defaults, particleCount: count * 0.25, origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 } });
+    setTimeout(() => {
+      confetti({ ...defaults, particleCount: count * 0.25, origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 } });
+      confetti({ ...defaults, particleCount: count * 0.25, origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 } });
+    }, 200);
+  }
+
+  async function commitEdit() {
+    if (!editingField) return;
+    const { id, field } = editingField;
+    const value = editingValue.trim();
+    setEditingField(null);
+    if (!value) return;
+
+    const project = projects.find((p) => p.id === id);
+    if (!project || project[field] === value) return;
+
+    const res = await fetch(`/api/projects/${id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ [field]: value }),
+    });
+    if (res.ok) {
+      const updated = await res.json();
+      setProjects((prev) => prev.map((p) => (p.id === id ? updated : p)));
     }
   }
 
@@ -152,14 +227,54 @@ export function ProjectsGrid({ limit, title, viewAllHref }: { limit?: number; ti
                   className="mt-1.5 w-full rounded-card border border-border bg-surface-muted px-3 py-2.5 text-sm text-foreground placeholder:text-foreground-soft/50 focus:border-accent focus:outline-none"
                 />
               </div>
-              <p className="text-xs text-foreground-soft">
-                Thư mục sẽ được tạo tại {projectsRoot || "..."}\&lt;tên dự án&gt;
-              </p>
+
+              {/* Folder mode toggle */}
+              <div>
+                <label className="text-xs font-medium text-foreground-soft">Thư mục dự án</label>
+                <div className="mt-1.5 flex rounded-card border border-border overflow-hidden text-xs font-medium">
+                  <button
+                    type="button"
+                    onClick={() => setFolderMode("new")}
+                    className={`flex-1 py-2 transition-colors ${folderMode === "new" ? "bg-accent text-white" : "bg-surface-muted text-foreground-soft hover:text-foreground"}`}
+                  >
+                    Tạo thư mục mới
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setFolderMode("existing")}
+                    className={`flex-1 py-2 transition-colors ${folderMode === "existing" ? "bg-accent text-white" : "bg-surface-muted text-foreground-soft hover:text-foreground"}`}
+                  >
+                    Liên kết thư mục có sẵn
+                  </button>
+                </div>
+
+                {folderMode === "new" && (
+                  <p className="mt-2 text-xs text-foreground-soft">
+                    Thư mục sẽ được tạo tại {projectsRoot || "..."}\&lt;tên dự án&gt;
+                  </p>
+                )}
+
+                {folderMode === "existing" && (
+                  <div className="mt-2 flex gap-2 items-center">
+                    <div className="flex-1 min-w-0 rounded-card border border-border bg-surface-muted px-3 py-2 text-xs text-foreground truncate">
+                      {linkedFolder || <span className="text-foreground-soft/50">Chưa chọn thư mục...</span>}
+                    </div>
+                    <button
+                      type="button"
+                      onClick={handlePickFolder}
+                      className="shrink-0 rounded-card border border-border bg-surface-muted px-3 py-2 text-xs font-medium text-foreground-soft hover:text-foreground hover:bg-surface transition-colors"
+                    >
+                      Chọn...
+                    </button>
+                  </div>
+                )}
+              </div>
+
               {formError && <p className="text-xs text-red-500">{formError}</p>}
               <div className="flex gap-2 justify-end mt-1">
                 <button
                   type="button"
-                  onClick={() => setShowForm(false)}
+                  onClick={() => { setShowForm(false); setFolderMode("new"); setLinkedFolder(""); }}
                   className="rounded-card px-4 py-2 text-sm font-medium text-foreground-soft hover:bg-surface-muted transition-colors"
                 >
                   Huỷ
@@ -196,15 +311,68 @@ export function ProjectsGrid({ limit, title, viewAllHref }: { limit?: number; ti
               <div className="absolute inset-0 bg-black/20 opacity-0 transition-opacity group-hover:opacity-100" />
 
               {/* Bottom text overlay */}
-              <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent px-3 pb-3 pt-10">
-                <p className="inline-block text-sm font-semibold text-white leading-snug bg-white/10 backdrop-blur-md rounded px-1.5 py-0.5 border border-white/10">{project.name}</p>
-                <span className="mt-1 inline-block text-[10px] font-medium text-white/70 bg-white/10 px-2 py-0.5 rounded-full border border-white/15">
-                  {project.type}
-                </span>
-                <div className="mt-2 h-1 overflow-hidden rounded-full bg-white/20">
-                  <div className="h-full rounded-full bg-white/60" style={{ width: `${project.progress}%` }} />
-                </div>
-                <p className="mt-1 text-[10px] text-white/50">{project.progress}% hoàn thành</p>
+              <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent px-3 pb-3 pt-10 z-[2]">
+                {editingField?.id === project.id && editingField.field === "name" ? (
+                  <input
+                    ref={editInputRef}
+                    value={editingValue}
+                    onChange={(e) => setEditingValue(e.target.value)}
+                    onBlur={commitEdit}
+                    onKeyDown={(e) => { if (e.key === "Enter") commitEdit(); if (e.key === "Escape") setEditingField(null); }}
+                    onClick={(e) => e.stopPropagation()}
+                    className="w-full rounded-full bg-white/20 backdrop-blur-md border border-white/30 px-2.5 py-0.5 text-sm font-semibold text-white outline-none"
+                  />
+                ) : (
+                  <p
+                    onClick={(e) => startEdit(project.id, "name", project.name, e)}
+                    className="inline-block text-sm font-semibold text-white leading-snug bg-white/10 backdrop-blur-md rounded-full px-2.5 py-0.5 border border-white/10 cursor-text hover:bg-white/20 transition-colors"
+                  >
+                    {project.name}
+                  </p>
+                )}
+                {editingField?.id === project.id && editingField.field === "type" ? (
+                  <input
+                    ref={editInputRef}
+                    value={editingValue}
+                    onChange={(e) => setEditingValue(e.target.value)}
+                    onBlur={commitEdit}
+                    onKeyDown={(e) => { if (e.key === "Enter") commitEdit(); if (e.key === "Escape") setEditingField(null); }}
+                    onClick={(e) => e.stopPropagation()}
+                    className="mt-1 block w-full rounded-full bg-white/20 border border-white/30 px-2 py-0.5 text-[10px] font-medium text-white outline-none"
+                  />
+                ) : (
+                  <span
+                    onClick={(e) => startEdit(project.id, "type", project.type, e)}
+                    className="mt-1 inline-block text-[10px] font-medium text-white/70 bg-white/10 px-2 py-0.5 rounded-full border border-white/15 cursor-text hover:bg-white/20 transition-colors"
+                  >
+                    {project.type}
+                  </span>
+                )}
+                {editingProgress === project.id ? (
+                  <div className="mt-2" onClick={(e) => e.preventDefault()}>
+                    <input
+                      type="range" min={0} max={100} step={5}
+                      value={project.progress}
+                      onChange={(e) => handleProgressChange(project.id, Number(e.target.value))}
+                      onBlur={() => setEditingProgress(null)}
+                      onKeyDown={(e) => e.key === "Escape" && setEditingProgress(null)}
+                      autoFocus
+                      className="w-full accent-teal-400 h-1 cursor-pointer"
+                    />
+                    <p className="mt-1 text-[10px] text-white font-medium">{project.progress}%</p>
+                  </div>
+                ) : (
+                  <div
+                    className="mt-2 cursor-pointer"
+                    onClick={(e) => { e.preventDefault(); e.stopPropagation(); setEditingProgress(project.id); }}
+                    title="Click để chỉnh tiến độ"
+                  >
+                    <div className="h-1 overflow-hidden rounded-full bg-white/20">
+                      <div className="h-full rounded-full bg-white/60 transition-all duration-300" style={{ width: `${project.progress}%` }} />
+                    </div>
+                    <p className="mt-1 text-[10px] text-white/50 hover:text-white/80 transition-colors">{project.progress}% hoàn thành ✎</p>
+                  </div>
+                )}
               </div>
 
               {/* Full-card link (behind action buttons) */}

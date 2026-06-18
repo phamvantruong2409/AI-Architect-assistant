@@ -6,27 +6,29 @@ import Image from "next/image";
 import Link from "next/link";
 
 const QUOTES = [
-  { text: "Định hình thiết kế từ nét vẽ đầu tiên.", author: "KTS. Phạm Văn Trường" },
-  { text: "Kiến trúc là âm nhạc được đóng băng.", author: "Friedrich Schelling" },
-  { text: "Hình thức đi theo chức năng.", author: "Louis Sullivan" },
   { text: "Ít hơn là nhiều hơn.", author: "Ludwig Mies van der Rohe" },
-  { text: "Kiến trúc bắt đầu khi bạn đặt hai viên gạch lên nhau thật cẩn thận.", author: "Ludwig Mies van der Rohe" },
-  { text: "Ngôi nhà là cỗ máy để sống.", author: "Le Corbusier" },
-  { text: "Không gian, ánh sáng và trật tự — đó là những gì con người cần.", author: "Le Corbusier" },
-  { text: "Ánh sáng là nguyên liệu chính của kiến trúc.", author: "Louis Kahn" },
-  { text: "Khoảng không giữa các bức tường quan trọng không kém bản thân bức tường.", author: "Louis Kahn" },
-  { text: "Chi tiết không phải là chi tiết — chúng tạo nên thiết kế.", author: "Charles Eames" },
-  { text: "Hãy đọc thiên nhiên như một cuốn sách mở.", author: "Antoni Gaudí" },
-  { text: "Kiến trúc là cuộc đối thoại giữa con người và không gian họ sinh sống.", author: "Tadao Ando" },
-  { text: "Tôi không thiết kế công trình — tôi thiết kế những giấc mơ.", author: "Zaha Hadid" },
-  { text: "Kiến trúc nên nói về thời đại của nó, nhưng khao khát sự trường tồn.", author: "Frank Gehry" },
-  { text: "Ngôi nhà tốt nhất là ngôi nhà bạn luôn muốn trở về.", author: "Frank Lloyd Wright" },
-  { text: "Kiến trúc là nghệ thuật cư trú — cách con người hiện diện trên trái đất.", author: "Martin Heidegger" },
-  { text: "Vật liệu thô sơ nhất cũng tạo nên vẻ đẹp khi được đặt đúng chỗ.", author: "Peter Zumthor" },
-  { text: "Mỗi công trình là một câu hỏi về cách sống.", author: "Peter Zumthor" },
-  { text: "Kiến trúc phải chạm đến mặt đất bằng sự khiêm nhường.", author: "Alvar Aalto" },
-  { text: "Kiến trúc tốt cho phép con người sống với phẩm giá hơn.", author: "Renzo Piano" },
-  { text: "Ngôi nhà là thơ ca được xây dựng bằng vật liệu.", author: "John Ruskin" },
+  { text: "Hình thức đi sau công năng.", author: "Louis Sullivan" },
+  { text: "Nhà là một cỗ máy để ở.", author: "Le Corbusier" },
+  { text: "Kiến trúc là một trò chơi bậc thầy, chính xác và lộng lẫy của các khối hình được kết hợp với nhau dưới ánh sáng.", author: "Le Corbusier" },
+  { text: "Hình thức và công năng là một.", author: "Frank Lloyd Wright" },
+  { text: "Có đến 360 độ, tại sao cứ phải bám lấy một độ?", author: "Zaha Hadid" },
+  { text: "Bạn hỏi viên gạch: 'Mày muốn gì hở gạch?' và viên gạch trả lời: 'Tôi thích một vòm cuốn'.", author: "Louis Kahn" },
+  { text: "Kiến trúc nên nói lên tiếng nói của thời gian và không gian nơi nó đứng, nhưng phải khao khát sự trường tồn.", author: "Frank Gehry" },
+  { text: "Chúng ta định hình các tòa nhà; sau đó chúng định hình chúng ta.", author: "Winston Churchill" },
+  { text: "Kiến trúc là âm nhạc đóng băng.", author: "Johann Wolfgang von Goethe" },
+  { text: "Chúa ngự trị trong các chi tiết.", author: "Ludwig Mies van der Rohe" },
+  { text: "Bất kỳ công trình kiến trúc nào không thể hiện được sự thanh bình đều là một sai lầm.", author: "Luis Barragán" },
+  { text: "Một căn phòng không phải là một căn phòng nếu thiếu đi ánh sáng tự nhiên.", author: "Louis Kahn" },
+  { text: "Đường thẳng thuộc về con người, đường cong thuộc về Thượng đế.", author: "Antoni Gaudí" },
+  { text: "Kiến trúc là nỗ lực làm cho thế giới giống với những giấc mơ của chúng ta hơn một chút.", author: "Bjarke Ingels" },
+  { text: "Là một kiến trúc sư, bạn thiết kế cho hiện tại, với sự nhận thức về quá khứ, hướng tới một tương lai về cơ bản là chưa biết trước.", author: "Norman Foster" },
+  { text: "Kiến trúc là ý chí của một thời đại được chuyển hóa vào không gian.", author: "Ludwig Mies van der Rohe" },
+  { text: "Nghệ thuật nguyên thủy chính là kiến trúc. Không có một nền kiến trúc của riêng mình, chúng ta không có linh hồn của nền văn minh chính mình.", author: "Frank Lloyd Wright" },
+  { text: "Kiến trúc là một công việc rất nguy hiểm. Nếu bạn tạo ra một kiến trúc tồi, bạn sẽ áp đặt sự xấu xí lên một nơi nào đó trong cả trăm năm.", author: "Renzo Piano" },
+  { text: "Tôi không tin kiến trúc phải nói quá nhiều. Nó nên giữ im lặng và để thiên nhiên trong vỏ bọc của gió và ánh sáng mặt trời.", author: "Tadao Ando" },
+  { text: "Trong tất cả các tác phẩm của tôi, ánh sáng là yếu tố kiểm soát quan trọng.", author: "Tadao Ando" },
+  { text: "Tôi thích vẽ hơn trò chuyện. Vẽ thì nhanh hơn và lại có ít chỗ cho sự dối trá.", author: "Le Corbusier" },
+  { text: "Không gian là hơi thở của nghệ thuật.", author: "Frank Lloyd Wright" },
 ];
 
 const HERO_IMAGES = [
@@ -104,8 +106,8 @@ export function Hero() {
           <AnimatePresence mode="wait">
             <motion.h1
               key={quoteIndex}
-              className="font-display italic tracking-tight text-white whitespace-nowrap"
-              style={{ fontSize: "clamp(1rem, 1.6vw, 2.4rem)" }}
+              className="font-display italic tracking-tight text-white"
+              style={{ fontSize: "clamp(0.78rem, 1.25vw, 1.87rem)" }}
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}

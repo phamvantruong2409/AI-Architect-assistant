@@ -14,6 +14,7 @@
   "dependencies": {
     "@google/generative-ai": "^0.24.1",
     "@supabase/supabase-js": "^2.108.2",
+    "canvas-confetti": "^1.9.4",
     "framer-motion": "^12.40.0",
     "lucide-react": "^0.468.0",
     "mammoth": "^1.12.0",
@@ -21,10 +22,12 @@
     "pdf-parse": "^1.1.4",
     "react": "19.2.4",
     "react-dom": "19.2.4",
-    "react-hot-toast": "^2.6.0"
+    "react-hot-toast": "^2.6.0",
+    "trash": "^10.1.1"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
+    "@types/canvas-confetti": "^1.9.0",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
@@ -49,7 +52,8 @@
     ],
     "win": {
       "target": "portable",
-      "icon": "build/icon.ico"
+      "icon": "build/icon.ico",
+      "signAndEditExecutable": false
     }
   },
   "allowScripts": {

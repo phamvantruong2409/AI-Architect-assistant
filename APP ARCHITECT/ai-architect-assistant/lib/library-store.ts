@@ -1,8 +1,8 @@
 import fs from "fs";
 import path from "path";
-import { getLibraryRoot } from "./settings-store";
+import { DATA_DIR, getLibraryRoot } from "./settings-store";
 
-const DATA_FILE = path.join(process.cwd(), "data", "library.json");
+const DATA_FILE = path.join(DATA_DIR, "library.json");
 
 export interface LibraryInfo {
   folderPath: string;

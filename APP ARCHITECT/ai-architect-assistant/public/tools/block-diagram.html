@@ -8,42 +8,52 @@
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
   :root {
-    --bg: #F7F5F1;
+    --bg: #F7F5F0;
     --surface: #FFFFFF;
-    --border: #E4DED3;
-    --border-light: #EFEBE3;
-    --text: #211F1C;
-    --text-2: #5D574E;
-    --text-3: #9A9388;
-    --accent: #B1592F;
-    --accent-light: #F0DDD1;
+    --border: #E0DDD6;
+    --border-light: #ECECEC;
+    --text: #1A1A18;
+    --text-2: #5A5852;
+    --text-3: #9A9790;
+    --accent: #2D6A4F;
+    --accent-light: #E8F4EE;
     --danger: #C0392B;
     --shadow: 0 2px 8px rgba(0,0,0,.08);
     --shadow-lg: 0 4px 20px rgba(0,0,0,.13);
     --radius: 8px;
     --toolbar-h: 56px;
-    --canvas-bg: #FAFAF8;
+    --canvas-bg: #FAF6E4;
     --grid-dot: var(--border-light);
     --grid-line: rgba(0,0,0,.045);
+    --canvas-line-major: rgba(100,80,40,.45);
+    --canvas-line-minor: rgba(100,80,40,.18);
+    --canvas-frame: #DAD5CB;
+    --room-shadow: 0 1px 0 rgba(255,255,255,.6) inset, 0 1px 3px rgba(20,20,18,.07);
+    --room-shadow-selected: 0 1px 0 rgba(255,255,255,.6) inset, 0 8px 24px rgba(20,20,18,.16);
   }
 
   /* ── DARK MODE ── */
   body.dark {
-    --bg: #0C0F13;
-    --surface: #15191E;
-    --border: #262C34;
-    --border-light: #1C2127;
-    --text: #EEF1F3;
-    --text-2: #98A1AB;
-    --text-3: #6B7480;
-    --accent: #2DD4BF;
-    --accent-light: #103330;
+    --bg: #272522;
+    --surface: #302D29;
+    --border: #3E3A35;
+    --border-light: #383430;
+    --text: #E8E2D9;
+    --text-2: #A89F94;
+    --text-3: #716B62;
+    --accent: #4AAF7A;
+    --accent-light: #1E2E24;
     --danger: #D96060;
     --shadow: 0 2px 8px rgba(0,0,0,.22);
     --shadow-lg: 0 4px 20px rgba(0,0,0,.35);
-    --canvas-bg: #10141A;
-    --grid-dot: #1C2127;
+    --canvas-bg: #2C2926;
+    --grid-dot: #383430;
     --grid-line: rgba(255,255,255,.045);
+    --canvas-line-major: rgba(100,80,40,.45);
+    --canvas-line-minor: rgba(100,80,40,.18);
+    --canvas-frame: #4A453F;
+    --room-shadow: 0 1px 0 rgba(255,255,255,.04) inset, 0 1px 3px rgba(0,0,0,.3);
+    --room-shadow-selected: 0 1px 0 rgba(255,255,255,.05) inset, 0 8px 24px rgba(0,0,0,.45);
   }
 
   *, *::before, *::after { transition: background-color .2s, border-color .2s, color .15s, box-shadow .2s; }
@@ -60,15 +70,13 @@
 
   /* ─── TOOLBAR ─── */
   #toolbar {
-    min-height: var(--toolbar-h);
+    height: var(--toolbar-h);
     background: var(--surface);
     border-bottom: 1px solid var(--border);
     display: flex;
     align-items: center;
-    flex-wrap: wrap;
-    gap: 8px;
-    row-gap: 6px;
-    padding: 8px 16px;
+    gap: 10px;
+    padding: 0 16px;
     flex-shrink: 0;
     box-shadow: var(--shadow);
     z-index: 100;
@@ -98,9 +106,9 @@
     transition: background .12s, border-color .12s;
     white-space: nowrap;
   }
-  .btn:hover { background: var(--border-light); }
+  .btn:hover { background: #F3F1ED; }
   .btn.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
-  .btn.primary:hover { background: #8F4424; }
+  .btn.primary:hover { background: #255C44; }
   .btn.danger { color: var(--danger); border-color: #F3C6C2; }
   .btn.danger:hover { background: #FDF0EE; }
   .btn svg { flex-shrink: 0; }
@@ -121,6 +129,32 @@
     flex: 1;
     overflow: hidden;
   }
+
+  /* ─── RIGHT AI TOOLBAR (vertical) ─── */
+  #ai-toolbar-right {
+    width: 92px;
+    background: var(--surface);
+    border-left: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 8px;
+    flex-shrink: 0;
+    overflow: hidden;
+  }
+  #ai-toolbar-right .btn {
+    width: 100%;
+    flex-direction: column;
+    gap: 4px !important;
+    padding: 12px 4px !important;
+    font-size: 11px !important;
+    text-align: center;
+    line-height: 1.25;
+    white-space: normal;
+  }
+  #ai-toolbar-right .btn svg { width: 20px; height: 20px; }
+  body.dark #ai-toolbar-right { background: #2C2926; border-left-color: var(--border); }
 
   /* ─── SIDEBAR ─── */
   #sidebar {
@@ -157,6 +191,85 @@
   }
   .greenery-item:hover { background: var(--accent-light); border-color: var(--accent); }
   .greenery-item svg { pointer-events: none; }
+
+  /* ─── TREE BRUSH PANEL ─── */
+  #tree-brush-panel {
+    position: fixed;
+    right: 104px; top: 80px;
+    width: 220px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    box-shadow: var(--shadow-lg);
+    z-index: 200;
+    display: none;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  #tree-brush-panel.open { display: flex; }
+  #tb-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 10px 12px;
+    background: linear-gradient(135deg,#4d7c3e,#2f5223);
+    color: #fff;
+    font-size: 13px; font-weight: 700;
+  }
+  #tb-close {
+    background: none; border: none; color: #fff; font-size: 16px;
+    cursor: pointer; line-height: 1; padding: 0 2px; opacity: .85;
+  }
+  #tb-close:hover { opacity: 1; }
+  #tb-body { padding: 12px; }
+  #tb-style-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 6px;
+    margin-bottom: 10px;
+  }
+  .tb-style-item {
+    border: 1.5px solid var(--border-light);
+    border-radius: 6px;
+    padding: 3px;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    background: var(--bg);
+    transition: border-color .12s, background .12s;
+  }
+  .tb-style-item:hover { border-color: var(--accent); }
+  .tb-style-item.active { border-color: var(--accent); background: var(--accent-light); box-shadow: 0 0 0 1px var(--accent) inset; }
+  .tb-style-item svg { display: block; pointer-events: none; width: 100%; height: 100%; }
+  .tb-row {
+    display: flex; align-items: center; justify-content: space-between;
+    font-size: 12px; color: var(--text-2); margin-bottom: 4px;
+  }
+  #tb-size { width: 100%; accent-color: var(--accent); }
+  #tb-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-top: 10px;
+  }
+  .tb-action-btn {
+    display: flex; align-items: center; justify-content: center; gap: 6px;
+    width: 100%;
+    padding: 7px 10px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: var(--bg);
+    color: var(--text);
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background .12s, border-color .12s, color .12s;
+  }
+  .tb-action-btn:hover { background: var(--accent-light); border-color: var(--accent); }
+  .tb-action-btn.active { background: var(--accent-light); border-color: var(--accent); color: var(--accent); }
+  .tb-action-btn.danger { color: var(--danger); border-color: #F3C6C2; }
+  .tb-action-btn.danger:hover { background: #FDF0EE; border-color: var(--danger); }
+  #tb-hint {
+    margin-top: 10px; font-size: 11px; color: var(--text-3);
+    line-height: 1.5;
+  }
 
   /* Room list */
   #room-list { padding: 0 12px 6px; flex: 1; overflow-y: auto; }
@@ -208,9 +321,21 @@
     justify-content: flex-start;
     padding: 36px 36px 36px 52px;
     background-color: var(--bg);
-    background-image: radial-gradient(circle, var(--grid-dot) 1px, transparent 1px);
-    background-size: 20px 20px;
+    background-image:
+      linear-gradient(var(--canvas-line-minor) 1px, transparent 1px),
+      linear-gradient(90deg, var(--canvas-line-minor) 1px, transparent 1px),
+      linear-gradient(var(--canvas-line-major) 1px, transparent 1px),
+      linear-gradient(90deg, var(--canvas-line-major) 1px, transparent 1px);
+    background-size: 20px 20px, 20px 20px, 100px 100px, 100px 100px;
+    background-position: -1px -1px, -1px -1px, -1px -1px, -1px -1px;
     position: relative;
+    scrollbar-width: thin;
+    scrollbar-color: var(--border) transparent;
+  }
+  #canvas-wrap::-webkit-scrollbar { width: 8px; height: 8px; }
+  #canvas-wrap::-webkit-scrollbar-track { background: transparent; }
+  #canvas-wrap::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+  #canvas-wrap::-webkit-scrollbar-thumb:hover { background: var(--text-3); }
   }
 
   #canvas-container {
@@ -245,45 +370,86 @@
     position: relative;
     overflow: hidden;
     border: 1.5px solid var(--accent);
-    border-radius: 4px;
-    background: var(--canvas-bg);
-    box-shadow: var(--shadow-lg);
+    border-radius: 2px;
+    background:
+      linear-gradient(135deg, rgba(255,255,255,.5) 0%, rgba(255,255,255,0) 35%),
+      var(--canvas-bg);
+    box-shadow:
+      0 0 0 1px var(--canvas-frame),
+      0 12px 32px rgba(20,20,18,.10),
+      0 2px 8px rgba(20,20,18,.06);
+  }
+  body.dark #floor-canvas {
+    background:
+      linear-gradient(135deg, rgba(255,255,255,.4) 0%, rgba(255,255,255,0) 35%),
+      #FAF6E4;
+    box-shadow:
+      0 0 0 1px var(--canvas-frame),
+      0 12px 32px rgba(0,0,0,.4),
+      0 2px 8px rgba(0,0,0,.25);
   }
 
   /* Grid lines inside canvas */
   .grid-line-h, .grid-line-v {
     position: absolute;
     pointer-events: none;
-    background: var(--grid-line);
+    background: var(--canvas-line-minor);
   }
-  .grid-line-h { height: .5px; left: 0; right: 0; }
-  .grid-line-v { width: .5px; top: 0; bottom: 0; }
+  .grid-line-h { height: 1px; left: 0; right: 0; }
+  .grid-line-v { width: 1px; top: 0; bottom: 0; }
+  .grid-line-h.major, .grid-line-v.major { background: var(--canvas-line-major); }
 
   .room-block {
     position: absolute;
-    border-radius: 4px;
-    border: 1.5px solid;
+    border-radius: 2px;
+    border: none;
     display: flex; flex-direction: column;
     align-items: center; justify-content: center;
     cursor: grab;
     text-align: center;
     padding: 4px;
     z-index: 2;
-    transition: box-shadow .1s;
+    transition: box-shadow .15s, transform .1s;
     min-width: 40px; min-height: 32px;
     user-select: none;
+    box-shadow: var(--room-shadow);
   }
-  .room-block:active { cursor: grabbing; box-shadow: 0 4px 16px rgba(0,0,0,.2); }
-  .room-block.selected { box-shadow: 0 0 0 2px var(--accent), 0 4px 16px rgba(0,0,0,.15); }
-  .room-block .r-name { font-size: 10px; font-weight: 600; line-height: 1.3; pointer-events: none; }
-  .room-block .r-area { font-size: 8.5px; opacity: .7; pointer-events: none; margin-top: 1px; }
+  .room-block:hover { box-shadow: var(--room-shadow), 0 4px 14px rgba(20,20,18,.10); }
+  .room-block:active { cursor: grabbing; box-shadow: var(--room-shadow-selected); }
+  .room-block.selected { box-shadow: var(--room-shadow-selected); }
+  .room-block .r-name { font-size: 10.5px; font-weight: 600; letter-spacing: .1px; line-height: 1.3; pointer-events: none; }
+  .room-block .r-area { font-size: 8.5px; opacity: .65; font-weight: 500; pointer-events: none; margin-top: 2px; letter-spacing: .2px; }
+
+  /* ─── HAND-DRAWN SKETCH BORDER ─── */
+  .room-block .r-sketch {
+    position: absolute;
+    top: -4px; left: -4px; right: -4px; bottom: -4px;
+    width: calc(100% + 8px);
+    height: calc(100% + 8px);
+    pointer-events: none;
+    z-index: 1;
+    overflow: visible;
+  }
+  .room-block .r-sketch path {
+    fill: none;
+    stroke-width: 1.75;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    vector-effect: non-scaling-stroke;
+  }
+  .room-block .r-sketch path.r-sketch-2 { stroke-width: 1.1; opacity: .45; }
+  .room-block.selected .r-sketch path { stroke-width: 2.25; }
+  .room-block.selected .r-sketch path.r-sketch-2 { stroke-width: 1.4; opacity: .55; }
+
 
   /* ─── EDGE DIMENSION LABELS ─── */
   .r-dim {
     position: absolute;
     font-size: 8px; font-weight: 700;
+    font-family: 'Courier New', monospace;
+    letter-spacing: .3px;
     color: #fff;
-    background: var(--accent);
+    background: #2D6A4F;
     border-radius: 3px;
     padding: 1px 5px;
     pointer-events: none;
@@ -292,6 +458,7 @@
     opacity: 0;
     transition: opacity .15s;
     z-index: 10;
+    box-shadow: 0 2px 6px rgba(0,0,0,.18);
   }
   .room-block.selected .r-dim { opacity: 1; }
   /* top edge — horizontal label */
@@ -308,14 +475,14 @@
     position: absolute;
     width: 7px; height: 7px;
     z-index: 5;
-    background: rgba(177,89,47,.55);
+    background: rgba(45,106,79,.55);
     border-radius: 2px;
     opacity: 0;
     transition: opacity .15s;
   }
   .room-block:hover .r-resize,
   .room-block.selected .r-resize { opacity: 1; }
-  .room-block .r-resize:hover { background: rgba(177,89,47,.9) !important; opacity: 1 !important; }
+  .room-block .r-resize:hover { background: rgba(45,106,79,.9) !important; opacity: 1 !important; }
   .room-block .r-resize.nw { top: 0; left: 0; cursor: nw-resize; }
   .room-block .r-resize.ne { top: 0; right: 0; cursor: ne-resize; }
   .room-block .r-resize.sw { bottom: 0; left: 0; cursor: sw-resize; }
@@ -528,7 +695,7 @@
     z-index: 500;
     display: none;
     transform: translate(-50%, -50%);
-    box-shadow: 0 0 0 3px rgba(177,89,47,.25);
+    box-shadow: 0 0 0 3px rgba(45,106,79,.25);
   }
 
   /* ─── FLOOR TABS ─── */
@@ -713,27 +880,27 @@
 
   /* ── DARK MODE — component overrides ── */
   body.dark #floor-canvas { border-color: var(--accent); }
-  body.dark .room-block { box-shadow: none; }
-  body.dark .room-block.selected { box-shadow: 0 0 0 2px var(--accent), 0 4px 16px rgba(0,0,0,.3); }
-  body.dark .modal { background: var(--surface); }
+  body.dark .room-block:hover { box-shadow: var(--room-shadow), 0 4px 14px rgba(0,0,0,.35); }
+  body.dark .room-block.selected { box-shadow: 0 0 0 2px var(--accent), var(--room-shadow-selected); }
+  body.dark .modal { background: #353129; }
   body.dark .modal input[type=text],
-  body.dark .modal input[type=number] { background: var(--bg); color: var(--text); border-color: var(--border); }
-  body.dark #toolbar { background: var(--surface); border-bottom-color: var(--border); }
-  body.dark #sidebar { background: var(--surface); border-right-color: var(--border); }
-  body.dark #floor-tabs-bar { background: var(--surface); border-bottom-color: var(--border); }
+  body.dark .modal input[type=number] { background: #2C2926; color: var(--text); border-color: var(--border); }
+  body.dark #toolbar { background: #302D29; border-bottom-color: var(--border); }
+  body.dark #sidebar { background: #2C2926; border-right-color: var(--border); }
+  body.dark #floor-tabs-bar { background: #302D29; border-bottom-color: var(--border); }
   body.dark .floor-tab.active { background: var(--bg); }
-  body.dark #hint { background: var(--bg); border-top-color: var(--border); color: var(--text-3); }
-  body.dark .zoom-btn { background: var(--surface); color: var(--text-2); border-color: var(--border); }
-  body.dark #zoom-level { background: var(--surface); border-color: var(--border); color: var(--text-3); }
-  body.dark .ap-preview-card { background: var(--surface); border-color: var(--border); }
-  body.dark .ap-loading-card { background: var(--surface); }
-  body.dark #overlap-menu { background: var(--surface); border-color: var(--border); }
+  body.dark #hint { background: #272522; border-top-color: var(--border); color: var(--text-3); }
+  body.dark .zoom-btn { background: #353129; color: var(--text-2); border-color: var(--border); }
+  body.dark #zoom-level { background: #353129; border-color: var(--border); color: var(--text-3); }
+  body.dark .ap-preview-card { background: #302D29; border-color: var(--border); }
+  body.dark .ap-loading-card { background: #302D29; }
+  body.dark #overlap-menu { background: #353129; border-color: var(--border); }
   body.dark .overlap-menu-item:hover { background: var(--accent-light); }
-  body.dark .land-fields input { background: var(--bg); color: var(--text); border-color: var(--border); }
-  body.dark .ssnap-opt { background: var(--surface); }
-  body.dark .ssnap-opt:hover { background: var(--border-light); }
-  body.dark #compass-widget .compass-ring { fill: rgba(21,25,30,0.97); }
-  body.dark #compass-rotate-handle { background: var(--surface); border-color: var(--accent); color: var(--accent); }
+  body.dark .land-fields input { background: #2C2926; color: var(--text); border-color: var(--border); }
+  body.dark .ssnap-opt { background: #302D29; }
+  body.dark .ssnap-opt:hover { background: #3A3630; }
+  body.dark #compass-widget .compass-ring { fill: rgba(44,41,38,0.97); }
+  body.dark #compass-rotate-handle { background: #353129; border-color: var(--accent); color: var(--accent); }
 
   /* Theme button */
   #theme-btn { gap: 5px; font-size: 12px; }
@@ -753,7 +920,7 @@
     top: 60px;
   }
   #compass-widget:active { cursor: grabbing; }
-  #compass-widget.selected { filter: drop-shadow(0 0 5px rgba(177,89,47,.55)); }
+  #compass-widget.selected { filter: drop-shadow(0 0 5px rgba(45,106,79,.55)); }
   #compass-svg { display: block; width: 86px; height: 86px; }
   #compass-rotate-handle {
     position: absolute;
@@ -789,6 +956,94 @@
   }
   #compass-widget:hover #compass-angle-label,
   #compass-widget.selected #compass-angle-label { display: block; }
+
+  /* ─── BACKGROUND IMAGE PANEL ─── */
+  #bg-img-panel {
+    position: fixed;
+    top: calc(var(--toolbar-h) + 8px);
+    right: 104px;
+    width: 260px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    box-shadow: var(--shadow-lg);
+    z-index: 300;
+    display: none;
+    flex-direction: column;
+    overflow: hidden;
+    font-family: 'Segoe UI', system-ui, sans-serif;
+  }
+  #bg-img-panel.open { display: flex; }
+  #bg-img-panel-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 10px 13px;
+    background: linear-gradient(135deg, #3d6b8e, #2d4e6a);
+    color: #fff; font-size: 13px; font-weight: 700;
+  }
+  #bg-img-panel-close {
+    background: none; border: none; color: #fff; font-size: 17px;
+    cursor: pointer; line-height: 1; padding: 0 2px; opacity: .8;
+  }
+  #bg-img-panel-close:hover { opacity: 1; }
+  #bg-img-panel-body { padding: 12px 13px; display: flex; flex-direction: column; gap: 10px; }
+  .bgi-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; font-size: 12px; color: var(--text-2); }
+  .bgi-row label { white-space: nowrap; font-weight: 500; flex-shrink: 0; }
+  .bgi-row input[type=range] { flex: 1; accent-color: #3d6b8e; }
+  .bgi-row select { flex: 1; padding: 4px 6px; border: 1px solid var(--border); border-radius: 5px; background: var(--bg); color: var(--text); font-size: 12px; }
+  .bgi-upload-label {
+    display: flex; align-items: center; justify-content: center; gap: 6px;
+    width: 100%; padding: 9px 12px;
+    border: 1.5px dashed var(--border); border-radius: 8px;
+    cursor: pointer; font-size: 12.5px; font-weight: 600;
+    color: var(--text-2); background: var(--bg);
+    transition: border-color .12s, background .12s;
+  }
+  .bgi-upload-label:hover { border-color: #3d6b8e; background: var(--accent-light); color: #3d6b8e; }
+  .bgi-remove-btn {
+    width: 100%; padding: 7px; border: 1px solid #F3C6C2; border-radius: 7px;
+    background: none; color: var(--danger); font-size: 12px; font-weight: 600;
+    cursor: pointer; transition: background .1s;
+  }
+  .bgi-remove-btn:hover { background: #FDF0EE; }
+  #bg-img-preview-row {
+    display: none; align-items: center; gap: 8px;
+    padding: 7px 8px; border-radius: 7px; background: var(--bg);
+    border: 1px solid var(--border-light);
+  }
+  #bg-img-preview-row.has-img { display: flex; }
+  #bg-img-thumb {
+    width: 40px; height: 40px; border-radius: 5px; object-fit: cover;
+    border: 1px solid var(--border); flex-shrink: 0;
+  }
+  #bg-img-filename { font-size: 11px; color: var(--text-2); flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+  /* ─── EXPORT DROPDOWN ─── */
+  .export-dropdown { position: relative; flex-shrink: 0; }
+  .export-dropdown-menu {
+    display: none;
+    position: absolute;
+    top: calc(100% + 6px);
+    right: 0;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    box-shadow: var(--shadow-lg);
+    min-width: 180px;
+    z-index: 9999;
+    overflow: hidden;
+  }
+  .export-dropdown-menu.open { display: block; }
+  .export-dropdown-item {
+    display: flex; align-items: center; gap: 8px;
+    padding: 9px 14px;
+    font-size: 12.5px; font-weight: 500;
+    cursor: pointer; color: var(--text);
+    transition: background .1s;
+    white-space: nowrap;
+  }
+  .export-dropdown-item:hover { background: var(--bg); }
+  .export-dropdown-item.dwg { color: #2d5a8e; font-weight: 600; }
+  .export-dropdown-item.mb  { color: #9B6547; font-weight: 600; }
 </style>
 </head>
 <body>
@@ -916,52 +1171,27 @@
 
   <div class="tool-sep"></div>
 
-  <button class="btn" id="auto-plan-btn" onclick="openAutoPlan()" style="font-size:12px;padding:6px 11px;gap:5px;background:var(--accent-light);color:var(--accent);border-color:var(--accent);" title="Tự động bố trí phòng theo AI">
-    <svg width="13" height="13" viewBox="0 0 14 14" fill="none"><path d="M7 1l1.5 3.5L12 6l-3.5 1.5L7 11l-1.5-3.5L2 6l3.5-1.5z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round" fill="none"/></svg>
-    Auto Plan
-  </button>
-
-  <button class="btn" onclick="openCirculationPanel()" id="circ-toolbar-btn" style="font-size:12px;padding:6px 11px;gap:5px;background:var(--accent-light);color:var(--accent);border-color:var(--accent);" title="Phân tích luồng giao thông">
-    <svg width="13" height="13" viewBox="0 0 14 14" fill="none"><path d="M1 3h3v3H1zM10 8h3v3h-3zM4 4.5h3.5a2 2 0 012 2V8" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/><path d="M10.5 7l2 1-2 1" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-    Luồng GT
-  </button>
-
-  <button class="btn" onclick="openAIPanel()" id="ai-toolbar-btn" style="font-size:12px;padding:6px 11px;gap:5px;background:var(--accent-light);color:var(--accent);border-color:var(--accent);" title="Hỏi AI tư vấn bố cục">
-    <svg width="13" height="13" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="5.5" r="3.5" stroke="currentColor" stroke-width="1.3"/><path d="M7 9v1.5M4.5 13h5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><path d="M5.5 5.5h.01M7 5.5h.01M8.5 5.5h.01" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
-    AI Tư Vấn
-  </button>
-
-  <button class="btn" onclick="exportImage()" style="font-size:12px;padding:6px 10px;margin-left:auto;" title="Xuất PNG">
-    <svg width="13" height="13" viewBox="0 0 14 14" fill="none"><path d="M7 1v8M4 6l3 3 3-3M2 11h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
-    Xuất PNG
-  </button>
-
-  <!-- Dark/Light mode toggle -->
-  <button class="btn" id="theme-btn" onclick="toggleTheme()" title="Chuyển giao diện tối/sáng" style="padding:6px 10px;font-size:13px;flex-shrink:0;">
-    <svg id="theme-icon-sun" width="15" height="15" viewBox="0 0 16 16" fill="none" style="display:none">
-      <circle cx="8" cy="8" r="3.2" stroke="currentColor" stroke-width="1.5"/>
-      <path d="M8 1v1.5M8 13.5V15M1 8h1.5M13.5 8H15M3.05 3.05l1.06 1.06M11.89 11.89l1.06 1.06M3.05 12.95l1.06-1.06M11.89 4.11l1.06-1.06" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
-    </svg>
-    <svg id="theme-icon-moon" width="14" height="14" viewBox="0 0 16 16" fill="none">
-      <path d="M13.5 10.5A6.5 6.5 0 015.5 2.5a6.5 6.5 0 108 8z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
-    </svg>
-    <span id="theme-label">Tối</span>
-  </button>
-
-  <button class="btn" id="export-mb-btn" onclick="openExportFloorPlan()"
-    style="font-size:12px;padding:6px 12px;gap:5px;
-    background:linear-gradient(135deg,#5C3D2E,#9B6547);
-    color:#fff;border-color:#5C3D2E;" title="Xuất mặt bằng công năng kiến trúc với AI">
-    <svg width="13" height="13" viewBox="0 0 14 14" fill="none">
-      <rect x="1" y="1" width="12" height="12" rx="1.5" stroke="currentColor" stroke-width="1.3" fill="none"/>
-      <rect x="3" y="3" width="4" height="4" rx=".5" stroke="currentColor" stroke-width="1" fill="rgba(255,255,255,0.3)"/>
-      <rect x="8" y="3" width="3" height="2.5" rx=".5" stroke="currentColor" stroke-width="1" fill="rgba(255,255,255,0.3)"/>
-      <rect x="3" y="8" width="3" height="3" rx=".5" stroke="currentColor" stroke-width="1" fill="rgba(255,255,255,0.3)"/>
-      <rect x="7.5" y="7" width="3.5" height="4" rx=".5" stroke="currentColor" stroke-width="1" fill="rgba(255,255,255,0.3)"/>
-      <path d="M12 6l-1 .5-.5-1" stroke="rgba(255,255,255,0.7)" stroke-width="1" stroke-linecap="round"/>
-    </svg>
-    Mặt bằng công năng
-  </button>
+  <div class="export-dropdown" style="margin-left:auto;">
+    <button class="btn" onclick="toggleExportDropdown()" id="export-drop-btn" style="font-size:12px;padding:6px 11px;gap:5px;">
+      <svg width="13" height="13" viewBox="0 0 14 14" fill="none"><path d="M7 1v8M4 6l3 3 3-3M2 11h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+      Xuất
+      <svg width="9" height="9" viewBox="0 0 10 10" fill="none"><path d="M2 3.5l3 3 3-3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+    <div class="export-dropdown-menu" id="export-drop-menu">
+      <div class="export-dropdown-item" onclick="exportImage();closeExportDropdown()">
+        <svg width="13" height="13" viewBox="0 0 14 14" fill="none"><path d="M7 1v8M4 6l3 3 3-3M2 11h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        Xuất PNG
+      </div>
+      <div class="export-dropdown-item dwg" onclick="exportDWG();closeExportDropdown()">
+        <svg width="13" height="13" viewBox="0 0 14 14" fill="none"><rect x="1" y="1" width="12" height="12" rx="1.5" stroke="currentColor" stroke-width="1.3" fill="none"/><path d="M3 4h4.5M3 6.5h6M3 9h4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/><path d="M10 7l2 2-2 2" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Xuất DWG / DXF
+      </div>
+      <div class="export-dropdown-item" id="bg-img-btn" onclick="toggleBgImgPanel();closeExportDropdown()">
+        <svg width="13" height="13" viewBox="0 0 14 14" fill="none"><rect x="1" y="2" width="12" height="10" rx="1.5" stroke="currentColor" stroke-width="1.4" fill="none"/><circle cx="4.5" cy="5.5" r="1.2" stroke="currentColor" stroke-width="1.2" fill="none"/><path d="M1 10l3.5-3.5 2.5 2.5 2-2L13 10" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Ảnh nền
+      </div>
+    </div>
+  </div>
 </div>
 
 <!-- ─── FLOOR TABS BAR ─── -->
@@ -990,6 +1220,12 @@
       <div class="ruler-v" id="ruler-v"></div>
       <div id="canvas-zoom-wrap">
         <div id="floor-canvas">
+          <!-- Background reference image — sits below grid, above canvas bg -->
+          <img id="bg-canvas-img" src="" alt=""
+            style="position:absolute;top:0;left:0;width:100%;height:100%;
+                   object-fit:cover;object-position:center;
+                   opacity:0.35;z-index:0;pointer-events:none;display:none;
+                   user-select:none;-webkit-user-drag:none;">
           <svg id="poly-svg" style="position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:100;overflow:visible;"></svg>
           <svg id="circ-svg-overlay" style="position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:51;overflow:visible;"></svg>
           <div id="scale-bar"><div class="bar"></div><span id="scale-txt"></span></div>
@@ -1032,10 +1268,74 @@
       <div id="compass-rotate-handle" title="Kéo để xoay hướng Bắc">↻</div>
     </div>
   </div>
+
+  <!-- RIGHT AI TOOLBAR (vertical) -->
+  <div id="ai-toolbar-right">
+    <button class="btn" id="auto-plan-btn" onclick="openAutoPlan()" style="background:linear-gradient(135deg,#2D6A4F,#1B4332);color:#fff;border-color:#1B4332;" title="Tự động bố trí phòng theo AI">
+      <svg width="18" height="18" viewBox="0 0 14 14" fill="none"><path d="M7 1l1.5 3.5L12 6l-3.5 1.5L7 11l-1.5-3.5L2 6l3.5-1.5z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round" fill="rgba(255,255,255,0.3)"/></svg>
+      Auto Plan
+    </button>
+
+    <button class="btn" onclick="openCirculationPanel()" id="circ-toolbar-btn" style="background:linear-gradient(135deg,#7B3F00,#C47B2B);color:#fff;border-color:#7B3F00;" title="Phân tích luồng giao thông">
+      <svg width="18" height="18" viewBox="0 0 14 14" fill="none"><path d="M1 3h3v3H1zM10 8h3v3h-3zM4 4.5h3.5a2 2 0 012 2V8" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/><path d="M10.5 7l2 1-2 1" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Luồng GT
+    </button>
+
+    <button class="btn" onclick="openAIPanel()" id="ai-toolbar-btn" style="background:linear-gradient(135deg,#1a3a5c,#2d5a8e);color:#fff;border-color:#1a3a5c;" title="Hỏi AI tư vấn bố cục">
+      <svg width="18" height="18" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="5.5" r="3.5" stroke="currentColor" stroke-width="1.3"/><path d="M7 9v1.5M4.5 13h5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><path d="M5.5 5.5h.01M7 5.5h.01M8.5 5.5h.01" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+      AI Tư Vấn
+    </button>
+
+    <button class="btn" id="export-mb-btn" onclick="openExportFloorPlan()" style="background:linear-gradient(135deg,#5C3D2E,#9B6547);color:#fff;border-color:#5C3D2E;" title="Xuất mặt bằng công năng kiến trúc với AI">
+      <svg width="18" height="18" viewBox="0 0 14 14" fill="none"><rect x="1" y="1" width="12" height="12" rx="1.5" stroke="currentColor" stroke-width="1.3" fill="none"/><rect x="3" y="3" width="4" height="4" rx=".5" stroke="currentColor" stroke-width="1" fill="rgba(255,255,255,0.3)"/><rect x="8" y="3" width="3" height="2.5" rx=".5" stroke="currentColor" stroke-width="1" fill="rgba(255,255,255,0.3)"/><rect x="3" y="8" width="3" height="3" rx=".5" stroke="currentColor" stroke-width="1" fill="rgba(255,255,255,0.3)"/><rect x="7.5" y="7" width="3.5" height="4" rx=".5" stroke="currentColor" stroke-width="1" fill="rgba(255,255,255,0.3)"/></svg>
+      Mặt bằng
+    </button>
+
+    <button class="btn" onclick="toggleTreeBrushPanel()" id="tree-brush-btn" style="background:linear-gradient(135deg,#4d7c3e,#2f5223);color:#fff;border-color:#2f5223;" title="Công cụ vẽ cây mặt bằng">
+      <svg width="18" height="18" viewBox="0 0 14 14" fill="none">
+        <circle cx="7" cy="6" r="5" stroke="currentColor" stroke-width="1.2"/>
+        <line x1="7" y1="6" x2="2.5" y2="2" stroke="currentColor" stroke-width="0.7"/>
+        <line x1="7" y1="6" x2="11.5" y2="2.2" stroke="currentColor" stroke-width="0.7"/>
+        <line x1="7" y1="6" x2="7" y2="0.8" stroke="currentColor" stroke-width="0.7"/>
+        <line x1="7" y1="6" x2="3" y2="9.5" stroke="currentColor" stroke-width="0.7"/>
+        <line x1="7" y1="6" x2="11.5" y2="9.6" stroke="currentColor" stroke-width="0.7"/>
+        <line x1="7" y1="6" x2="7" y2="11" stroke="currentColor" stroke-width="0.7"/>
+      </svg>
+      Cây
+    </button>
+  </div>
+</div>
+
+<!-- ─── TREE BRUSH PANEL ─── -->
+<div id="tree-brush-panel">
+  <div id="tb-header">
+    <span>🌳 Vẽ cây mặt bằng</span>
+    <button id="tb-close" onclick="closeTreeBrushPanel()" title="Đóng">×</button>
+  </div>
+  <div id="tb-body">
+    <div id="tb-style-grid"></div>
+    <div class="tb-row">
+      <label for="tb-size">Cỡ ngòi bút</label>
+      <span id="tb-size-val">52px</span>
+    </div>
+    <input type="range" id="tb-size" min="16" max="160" value="52" oninput="onTreeBrushSizeChange(this.value)">
+    <div id="tb-actions">
+      <button class="tb-action-btn" id="tb-toggle-visibility-btn" onclick="toggleAllTreesVisibility()" title="Ẩn/hiện toàn bộ cây">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M1 7s2.2-4 6-4 6 4 6 4-2.2 4-6 4-6-4-6-4z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/><circle cx="7" cy="7" r="1.6" stroke="currentColor" stroke-width="1.2"/></svg>
+        <span id="tb-toggle-visibility-label">Ẩn cây</span>
+      </button>
+      <button class="tb-action-btn danger" id="tb-clear-all-btn" onclick="clearAllTrees()" title="Xoá toàn bộ cây trên mặt bằng">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2.5 3.5h9M5.5 3.5V2h3v1.5M3.5 3.5l.5 8.5h6l.5-8.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span>Xoá toàn bộ cây</span>
+      </button>
+    </div>
+    <p id="tb-hint">Chọn kiểu cây, chỉnh cỡ rồi bấm (hoặc kéo) trên mặt bằng để vẽ. Bấm lại nút "Cây" để tắt.</p>
+  </div>
 </div>
 
 <!-- Toast -->
 <div id="toast"></div>
+
 
 <!-- ─── CIRCULATION ANALYSIS PANEL ─── -->
 <div id="circ-overlay" onclick="handleCircOverlayClick(event)">
@@ -1180,12 +1480,12 @@
   }
   .ap-preview-card:hover {
     border-color: var(--accent);
-    box-shadow: 0 2px 12px rgba(177,89,47,.18);
+    box-shadow: 0 2px 12px rgba(45,106,79,.18);
     transform: translateY(-1px);
   }
   .ap-preview-card.selected {
     border-color: var(--accent);
-    box-shadow: 0 0 0 3px rgba(177,89,47,.22), 0 2px 12px rgba(177,89,47,.15);
+    box-shadow: 0 0 0 3px rgba(45,106,79,.22), 0 2px 12px rgba(45,106,79,.15);
   }
   .ap-card-header {
     display: flex; align-items: center; justify-content: space-between;
@@ -1312,18 +1612,18 @@
 
 <script>
 const COLORS = [
-  { key:'teal',   bg:'#E1F5EE', bd:'#1D9E75', tx:'#085041', label:'Phòng ngủ' },
-  { key:'amber',  bg:'#FAEEDA', bd:'#BA7517', tx:'#633806', label:'Phòng khách' },
-  { key:'coral',  bg:'#FAECE7', bd:'#D85A30', tx:'#4A1B0C', label:'Bếp / Ăn' },
-  { key:'blue',   bg:'#E6F1FB', bd:'#378ADD', tx:'#0C447C', label:'Hồ bơi / Thông tầng' },
-  { key:'purple', bg:'#EEEDFE', bd:'#7F77DD', tx:'#26215C', label:'WC / Tiện ích' },
-  { key:'green',  bg:'#EAF3DE', bd:'#639922', tx:'#27500A', label:'Sân vườn' },
-  { key:'gray',   bg:'#F1EFE8', bd:'#888780', tx:'#2C2C2A', label:'Cầu thang / Hành lang' },
-  { key:'pink',   bg:'#FBEAF0', bd:'#D4537E', tx:'#4B1528', label:'Sauna / Thư giãn' },
-  { key:'yellow', bg:'#FEFBE6', bd:'#C9A80C', tx:'#4A3800', label:'Tiền sảnh' },
-  { key:'rose',   bg:'#FDE8F0', bd:'#C2416E', tx:'#5A0028', label:'Phòng sinh hoạt' },
-  { key:'sky',    bg:'#E3F3FC', bd:'#1A8FC1', tx:'#084563', label:'Ban công / Sân thượng' },
-  { key:'slate',  bg:'#ECEEF2', bd:'#5B6785', tx:'#1C2540', label:'Kho / Phòng phụ' },
+  { key:'teal',   bg:'#C8EAD8', bd:'#1D9E75', tx:'#085041', label:'Phòng ngủ' },
+  { key:'amber',  bg:'#EEDABB', bd:'#BA7517', tx:'#633806', label:'Phòng khách' },
+  { key:'coral',  bg:'#EED5CC', bd:'#D85A30', tx:'#4A1B0C', label:'Bếp / Ăn' },
+  { key:'blue',   bg:'#C8DCEE', bd:'#378ADD', tx:'#0C447C', label:'Hồ bơi / Thông tầng' },
+  { key:'purple', bg:'#D8D6F5', bd:'#7F77DD', tx:'#26215C', label:'WC / Tiện ích' },
+  { key:'green',  bg:'#D2E8BC', bd:'#639922', tx:'#27500A', label:'Sân vườn' },
+  { key:'gray',   bg:'#D8D5CC', bd:'#888780', tx:'#2C2C2A', label:'Cầu thang / Hành lang' },
+  { key:'pink',   bg:'#EEC8D8', bd:'#D4537E', tx:'#4B1528', label:'Sauna / Thư giãn' },
+  { key:'yellow', bg:'#F0E8BE', bd:'#C9A80C', tx:'#4A3800', label:'Tiền sảnh' },
+  { key:'rose',   bg:'#F0C8D8', bd:'#C2416E', tx:'#5A0028', label:'Phòng sinh hoạt' },
+  { key:'sky',    bg:'#C4DFEE', bd:'#1A8FC1', tx:'#084563', label:'Ban công / Sân thượng' },
+  { key:'slate',  bg:'#D4D8E4', bd:'#5B6785', tx:'#1C2540', label:'Kho / Phòng phụ' },
 ];
 
 // ─── GREENERY ICONS (mặt bằng chuẩn, 2 loại, có thể resize) ───
@@ -1358,6 +1658,112 @@ const GREENERY = [
       <circle cx="62" cy="60" r="13" fill="#DCEDC8" fill-opacity=".6"/>
       <circle cx="50" cy="52" r="10" fill="#8BC34A" fill-opacity=".5"/>
     `
+  }
+];
+
+// ─── TREE BRUSH STYLES (mặt bằng cây, nét vẽ tay, kích thước tùy chỉnh) ───
+// Each generator returns inner SVG content for a 0-100 viewBox, given a seed
+// for slight per-instance variation.
+const TREE_BRUSHES = [
+  {
+    id: 'tb_radial',
+    label: 'Tia tròn',
+    gen: (seed) => {
+      const rand = seededRand(seed);
+      let lines = '';
+      const n = 28;
+      for (let i = 0; i < n; i++) {
+        const a = (i / n) * Math.PI * 2 + rand() * 0.05;
+        const len = 44 + rand() * 4;
+        const x = 50 + Math.cos(a) * len, y = 50 + Math.sin(a) * len;
+        lines += `<line x1="50" y1="50" x2="${x.toFixed(1)}" y2="${y.toFixed(1)}" stroke="#3A3A28" stroke-width="0.8"/>`;
+      }
+      return `<circle cx="50" cy="50" r="48" fill="#C9D6A0"/>
+        <circle cx="42" cy="44" r="30" fill="#B8C98A" fill-opacity=".6"/>
+        ${lines}`;
+    }
+  },
+  {
+    id: 'tb_fan',
+    label: 'Quạt nan',
+    gen: (seed) => {
+      const rand = seededRand(seed);
+      let lines = '';
+      const n = 24;
+      for (let i = 0; i < n; i++) {
+        const a = (i / n) * Math.PI * 2;
+        const wob = (rand() - 0.5) * 6;
+        const x = 50 + Math.cos(a) * (47 + wob), y = 50 + Math.sin(a) * (47 + wob);
+        const cx = 50 + Math.cos(a) * 22, cy = 50 + Math.sin(a) * 22;
+        lines += `<path d="M50 50 Q${cx.toFixed(1)} ${cy.toFixed(1)} ${x.toFixed(1)} ${y.toFixed(1)}" fill="none" stroke="#3A3A28" stroke-width="0.9"/>`;
+      }
+      return `<circle cx="50" cy="50" r="48" fill="#D7E0A8"/>
+        <circle cx="55" cy="56" r="28" fill="#C3D08C" fill-opacity=".55"/>
+        ${lines}`;
+    }
+  },
+  {
+    id: 'tb_scribble',
+    label: 'Cụm nguệch',
+    gen: (seed) => {
+      const rand = seededRand(seed);
+      let blobs = '';
+      const n = 16;
+      for (let i = 0; i < n; i++) {
+        const a = rand() * Math.PI * 2;
+        const r = rand() * 36;
+        const x = 50 + Math.cos(a) * r, y = 50 + Math.sin(a) * r;
+        const rx = 4 + rand() * 6, ry = 3 + rand() * 5;
+        const rot = rand() * 360;
+        blobs += `<ellipse cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" rx="${rx.toFixed(1)}" ry="${ry.toFixed(1)}" transform="rotate(${rot.toFixed(0)} ${x.toFixed(1)} ${y.toFixed(1)})" fill="none" stroke="#3A3A28" stroke-width="0.8"/>`;
+      }
+      return `<circle cx="50" cy="50" r="48" fill="#C7D49A"/>
+        <circle cx="45" cy="58" r="26" fill="#B6C684" fill-opacity=".55"/>
+        ${blobs}`;
+    }
+  },
+  {
+    id: 'tb_branch',
+    label: 'Cành cây',
+    gen: (seed) => {
+      const rand = seededRand(seed);
+      let paths = '';
+      function branch(x, y, ang, len, depth) {
+        if (depth > 4 || len < 5) return;
+        const x2 = x + Math.cos(ang) * len, y2 = y + Math.sin(ang) * len;
+        const w = Math.max(0.6, (5 - depth) * 1.1);
+        paths += `<line x1="${x.toFixed(1)}" y1="${y.toFixed(1)}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}" stroke="#2E2E1C" stroke-width="${w.toFixed(1)}" stroke-linecap="round"/>`;
+        const nBranches = depth === 0 ? 4 : (rand() > 0.4 ? 2 : 1);
+        for (let i = 0; i < nBranches; i++) {
+          const da = (rand() - 0.5) * 1.6;
+          branch(x2, y2, ang + da, len * (0.62 + rand() * 0.15), depth + 1);
+        }
+      }
+      branch(50, 50, -Math.PI / 2, 28, 0);
+      return `<circle cx="50" cy="50" r="48" fill="#CBD8A0"/>
+        <circle cx="50" cy="50" r="32" fill="#BCCB8C" fill-opacity=".5"/>
+        ${paths}`;
+    }
+  },
+  {
+    id: 'tb_dotted',
+    label: 'Lốm đốm',
+    gen: (seed) => {
+      const rand = seededRand(seed);
+      let dots = '';
+      const n = 30;
+      for (let i = 0; i < n; i++) {
+        const a = rand() * Math.PI * 2;
+        const r = rand() * 42;
+        const x = 50 + Math.cos(a) * r, y = 50 + Math.sin(a) * r;
+        const rx = 1.5 + rand() * 3, ry = 1.5 + rand() * 3;
+        dots += `<ellipse cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" rx="${rx.toFixed(1)}" ry="${ry.toFixed(1)}" fill="none" stroke="#3A3A28" stroke-width="0.7"/>`;
+      }
+      let arc = `<path d="M6 38 A 44 44 0 0 0 56 90" fill="none" stroke="#3A3A28" stroke-width="1.2"/>`;
+      return `<circle cx="50" cy="50" r="48" fill="#D2DCA6"/>
+        <circle cx="56" cy="56" r="26" fill="#C3D08C" fill-opacity=".5"/>
+        ${arc}${dots}`;
+    }
   }
 ];
 
@@ -1690,13 +2096,13 @@ function buildCanvas() {
   const GRID_STEP = 1000;
   for (let x = 0; x <= LAND_W; x += GRID_STEP) {
     const l = document.createElement('div');
-    l.className = 'grid-line-v';
+    l.className = 'grid-line-v' + (x % 5000 === 0 ? ' major' : '');
     l.style.left = mm2px(x) + 'px';
     cv.appendChild(l);
   }
   for (let y = 0; y <= LAND_H; y += GRID_STEP) {
     const l = document.createElement('div');
-    l.className = 'grid-line-h';
+    l.className = 'grid-line-h' + (y % 5000 === 0 ? ' major' : '');
     l.style.top = mm2px(y) + 'px';
     cv.appendChild(l);
   }
@@ -1803,6 +2209,73 @@ function buildColorPicker(containerId, mode) {
 }
 
 // ─── RENDER ROOMS ───
+// ─── HAND-DRAWN SKETCH BORDER ───
+// Draws 4 independent side-strokes that slightly overshoot past each corner
+// (crossing lines, like hand-drawn architecture sketches), with gentle
+// mid-segment wobble that doesn't distort the overall room shape.
+function seededRand(seed) {
+  let s = seed % 2147483647;
+  if (s <= 0) s += 2147483646;
+  return function() {
+    s = (s * 16807) % 2147483647;
+    return (s - 1) / 2147483646;
+  };
+}
+function hashStr(str) {
+  let h = 0;
+  for (let i = 0; i < str.length; i++) { h = (h * 31 + str.charCodeAt(i)) | 0; }
+  return Math.abs(h) || 1;
+}
+// One side: from (x1,y1) to (x2,y2), overshoot past both ends by `over`,
+// wobble only the interior points by a small amount along the perpendicular.
+function sketchLine(x1, y1, x2, y2, rand, jitter, over, segs) {
+  const dx = x2 - x1, dy = y2 - y1;
+  const len = Math.hypot(dx, dy) || 1;
+  const ux = dx / len, uy = dy / len;     // unit along
+  const nx = -uy, ny = ux;                // unit normal
+  // extend both ends slightly so adjacent sides visibly cross/overshoot
+  const sx1 = x1 - ux * over, sy1 = y1 - uy * over;
+  const sx2 = x2 + ux * over, sy2 = y2 + uy * over;
+  const pts = [];
+  for (let i = 0; i <= segs; i++) {
+    const t = i / segs;
+    let px = sx1 + (sx2 - sx1) * t;
+    let py = sy1 + (sy2 - sy1) * t;
+    if (i > 0 && i < segs) {
+      const w = (rand() - 0.5) * jitter;
+      px += nx * w;
+      py += ny * w;
+    }
+    pts.push([px, py]);
+  }
+  let d = `M ${pts[0][0].toFixed(2)} ${pts[0][1].toFixed(2)}`;
+  for (let i = 1; i < pts.length; i++) d += ` L ${pts[i][0].toFixed(2)} ${pts[i][1].toFixed(2)}`;
+  return d;
+}
+function sketchRectPaths(w, h, rand, jitter, over, segs) {
+  const inset = over + 1.5; // keep strokes within the padded viewBox
+  let d = '';
+  d += sketchLine(inset, inset, w - inset, inset, rand, jitter, over, segs) + ' '; // top
+  d += sketchLine(w - inset, inset, w - inset, h - inset, rand, jitter, over, segs) + ' '; // right
+  d += sketchLine(w - inset, h - inset, inset, h - inset, rand, jitter, over, segs) + ' '; // bottom
+  d += sketchLine(inset, h - inset, inset, inset, rand, jitter, over, segs); // left
+  return d;
+}
+function drawSketchBorder(el, w, h, seed, color) {
+  const svg = el.querySelector('.r-sketch');
+  if (!svg || w <= 0 || h <= 0) return;
+  const PAD = 4;
+  const W = w + PAD * 2, H = h + PAD * 2;
+  svg.setAttribute('viewBox', `${-PAD} ${-PAD} ${W} ${H}`);
+  const rand1 = seededRand(seed);
+  const rand2 = seededRand(seed + 7919);
+  const d1 = sketchRectPaths(w, h, rand1, 0.6, 2.5, 4);
+  const d2 = sketchRectPaths(w, h, rand2, 0.5, 1.5, 4);
+  svg.innerHTML =
+    `<path class="r-sketch-2" d="${d2}" stroke="${color}"/>` +
+    `<path d="${d1}" stroke="${color}"/>`;
+}
+
 function renderRoom(r) {
   const cv = document.getElementById('floor-canvas');
   let el = document.getElementById(r.id);
@@ -1810,7 +2283,8 @@ function renderRoom(r) {
     el = document.createElement('div');
     el.id = r.id;
     el.className = 'room-block';
-    el.innerHTML = `<div class="r-name"></div><div class="r-area"></div>
+    el.innerHTML = `<svg class="r-sketch" preserveAspectRatio="none"></svg>
+      <div class="r-name"></div><div class="r-area"></div>
       <div class="r-resize nw"></div><div class="r-resize ne"></div>
       <div class="r-resize sw"></div><div class="r-resize se"></div>
       <div class="r-dim top"></div>
@@ -1884,6 +2358,7 @@ function renderRoom(r) {
   el.querySelector('.r-dim.top').textContent = fmtMm(r.wMm);
   el.querySelector('.r-dim.left').textContent = fmtMm(r.hMm);
   el.classList.toggle('selected', selectedId === r.id);
+  drawSketchBorder(el, mm2px(r.wMm), mm2px(r.hMm), hashStr(r.id), col.bd);
 }
 
 function redrawAll() {
@@ -2101,6 +2576,101 @@ function placeIcon(gId) {
   selectIcon(id);
 }
 
+// ─── TREE BRUSH TOOL ───
+let treeBrushActive = false;
+let treeBrushStyle = TREE_BRUSHES[0].id;
+let treeBrushSize = 52;
+
+function buildTreeBrushGrid() {
+  const grid = document.getElementById('tb-style-grid');
+  grid.innerHTML = '';
+  TREE_BRUSHES.forEach(tb => {
+    const item = document.createElement('div');
+    item.className = 'tb-style-item' + (tb.id === treeBrushStyle ? ' active' : '');
+    item.title = tb.label;
+    item.innerHTML = `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">${tb.gen(1)}</svg>`;
+    item.addEventListener('click', () => {
+      treeBrushStyle = tb.id;
+      grid.querySelectorAll('.tb-style-item').forEach(el => el.classList.remove('active'));
+      item.classList.add('active');
+    });
+    grid.appendChild(item);
+  });
+}
+
+function onTreeBrushSizeChange(val) {
+  treeBrushSize = parseInt(val);
+  document.getElementById('tb-size-val').textContent = treeBrushSize + 'px';
+}
+
+function toggleTreeBrushPanel() {
+  const panel = document.getElementById('tree-brush-panel');
+  const btn = document.getElementById('tree-brush-btn');
+  treeBrushActive = !panel.classList.contains('open');
+  panel.classList.toggle('open', treeBrushActive);
+  btn.style.boxShadow = treeBrushActive ? '0 0 0 2px #fff inset' : '';
+  if (treeBrushActive) {
+    buildTreeBrushGrid();
+    document.getElementById('floor-canvas').style.cursor = 'crosshair';
+  } else {
+    document.getElementById('floor-canvas').style.cursor = '';
+  }
+}
+function closeTreeBrushPanel() {
+  treeBrushActive = false;
+  document.getElementById('tree-brush-panel').classList.remove('open');
+  document.getElementById('tree-brush-btn').style.boxShadow = '';
+  document.getElementById('floor-canvas').style.cursor = '';
+}
+
+// Place a tree-brush icon centered at the given canvas-local pixel coords
+function placeTreeBrushAt(px, py) {
+  const id = 'icon-' + (nextIconId++);
+  const size = treeBrushSize;
+  const pxX = Math.round(px - size / 2);
+  const pxY = Math.round(py - size / 2);
+  const seed = Math.floor(Math.random() * 100000) + 1;
+  icons.push({ id, gId: treeBrushStyle, pxX, pxY, pxW: size, pxH: size, seed });
+  renderIcon(icons[icons.length - 1]);
+  if (treesHidden) {
+    const el = document.getElementById(id);
+    if (el) el.style.display = 'none';
+  }
+}
+
+function isTreeIcon(ic) {
+  return TREE_BRUSHES.some(tb => tb.id === ic.gId);
+}
+
+let treesHidden = false;
+
+function clearAllTrees() {
+  const treeIcons = icons.filter(isTreeIcon);
+  if (treeIcons.length === 0) { showToast('Không có cây nào trên mặt bằng'); return; }
+  if (!confirm(`Xoá toàn bộ ${treeIcons.length} cây trên mặt bằng?`)) return;
+  saveUndo();
+  treeIcons.forEach(ic => {
+    const el = document.getElementById(ic.id);
+    if (el) el.remove();
+    if (selectedId === ic.id) { selectedId = null; document.getElementById('del-btn').style.display = 'none'; }
+  });
+  icons = icons.filter(ic => !isTreeIcon(ic));
+  updateRoomList();
+  showToast('🌳 Đã xoá toàn bộ cây');
+}
+
+function toggleAllTreesVisibility() {
+  treesHidden = !treesHidden;
+  icons.filter(isTreeIcon).forEach(ic => {
+    const el = document.getElementById(ic.id);
+    if (el) el.style.display = treesHidden ? 'none' : '';
+  });
+  const btn = document.getElementById('tb-toggle-visibility-btn');
+  const label = document.getElementById('tb-toggle-visibility-label');
+  btn.classList.toggle('active', treesHidden);
+  label.textContent = treesHidden ? 'Hiện cây' : 'Ẩn cây';
+}
+
 function iconSvg(g, w, h) {
   return `<svg width="${w}" height="${h}" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" style="pointer-events:none;display:block;">${g.svgContent}</svg>`;
 }
@@ -2109,6 +2679,8 @@ function renderIcon(ic) {
   const cv = document.getElementById('floor-canvas');
   let el = document.getElementById(ic.id);
   const g = GREENERY.find(x => x.id === ic.gId);
+  const tb = !g ? TREE_BRUSHES.find(x => x.id === ic.gId) : null;
+  const svgContent = g ? g.svgContent : (tb ? tb.gen(ic.seed || 1) : '');
 
   if (!el) {
     el = document.createElement('div');
@@ -2143,7 +2715,7 @@ function renderIcon(ic) {
     // Resize handle
     const rh = document.createElement('div');
     rh.className = 'g-resize';
-    rh.style.cssText = 'position:absolute;right:0;bottom:0;width:10px;height:10px;cursor:se-resize;z-index:5;background:rgba(177,89,47,.35);border-radius:3px 0 4px 0;';
+    rh.style.cssText = 'position:absolute;right:0;bottom:0;width:10px;height:10px;cursor:se-resize;z-index:5;background:rgba(45,106,79,.35);border-radius:3px 0 4px 0;';
     el.appendChild(rh);
     rh.addEventListener('mousedown', (e) => {
       e.preventDefault(); e.stopPropagation();
@@ -2183,7 +2755,7 @@ function renderIcon(ic) {
   newSvg.setAttribute('viewBox', '0 0 100 100');
   newSvg.setAttribute('fill', 'none');
   newSvg.style.cssText = 'pointer-events:none;display:block;position:absolute;top:0;left:0;';
-  newSvg.innerHTML = g.svgContent;
+  newSvg.innerHTML = svgContent;
   if (existing) el.replaceChild(newSvg, existing);
   else el.insertBefore(newSvg, el.firstChild);
 
@@ -2292,6 +2864,8 @@ function handleMove(cx, cy) {
       el.querySelector('.r-area').textContent = areaSqm + ' m²';
       el.querySelector('.r-dim.top').textContent = fmtMm(r.wMm);
       el.querySelector('.r-dim.left').textContent = fmtMm(r.hMm);
+      const col = COLORS.find(c => c.key === r.colorKey) || COLORS[0];
+      drawSketchBorder(el, el.offsetWidth, el.offsetHeight, hashStr(r.id), col.bd);
       updateRoomList();
       updateDimLines();
     }
@@ -2323,6 +2897,42 @@ document.getElementById('floor-canvas').addEventListener('mousedown', (e) => {
   }
 });
 
+// ─── TREE BRUSH DRAWING (click or drag to stamp trees) ───
+let treeBrushPainting = false;
+let treeBrushLastPt = null;
+function treeBrushPointFromEvent(e) {
+  const cv = document.getElementById('floor-canvas');
+  const rect = cv.getBoundingClientRect();
+  return { x: e.clientX - rect.left, y: e.clientY - rect.top };
+}
+function treeBrushStamp(pt) {
+  if (pt.x < -treeBrushSize/2 || pt.y < -treeBrushSize/2 || pt.x > CANVAS_W + treeBrushSize/2 || pt.y > CANVAS_H + treeBrushSize/2) return;
+  placeTreeBrushAt(pt.x, pt.y);
+  treeBrushLastPt = pt;
+}
+document.getElementById('floor-canvas').addEventListener('mousedown', (e) => {
+  if (!treeBrushActive) return;
+  if (e.target.closest('.del-btn') || e.target.closest('.g-resize')) return;
+  e.preventDefault(); e.stopPropagation();
+  treeBrushPainting = true;
+  treeBrushLastPt = null;
+  saveUndo();
+  treeBrushStamp(treeBrushPointFromEvent(e));
+});
+document.addEventListener('mousemove', (e) => {
+  if (!treeBrushActive || !treeBrushPainting) return;
+  const pt = treeBrushPointFromEvent(e);
+  const minDist = Math.max(10, treeBrushSize * 0.6);
+  if (treeBrushLastPt) {
+    const d = Math.hypot(pt.x - treeBrushLastPt.x, pt.y - treeBrushLastPt.y);
+    if (d < minDist) return;
+  }
+  treeBrushStamp(pt);
+});
+document.addEventListener('mouseup', () => {
+  if (treeBrushPainting) { treeBrushPainting = false; updateRoomList(); }
+});
+
 // Keyboard shortcuts
 document.addEventListener('keydown', (e) => {
   const active = document.activeElement.tagName;
@@ -2336,6 +2946,7 @@ document.addEventListener('keydown', (e) => {
     updateRoomList();
     document.getElementById('modal-add').classList.remove('open');
     document.getElementById('modal-edit').classList.remove('open');
+    if (treeBrushActive) closeTreeBrushPanel();
   }
   if ((e.key === 'Delete' || e.key === 'Backspace') && selectedId) {
     if (!isTyping) clearSelected();
@@ -2488,7 +3099,7 @@ function renderPolySvg() {
       const polyline = document.createElementNS('http://www.w3.org/2000/svg', 'polyline');
       polyline.setAttribute('points', pointsStr);
       polyline.setAttribute('fill', 'none');
-      polyline.setAttribute('stroke', '#B1592F');
+      polyline.setAttribute('stroke', '#2D6A4F');
       polyline.setAttribute('stroke-width', '2');
       polyline.setAttribute('stroke-dasharray', '6,3');
       polyline.setAttribute('opacity', '0.8');
@@ -2500,7 +3111,7 @@ function renderPolySvg() {
       circle.setAttribute('cx', mm2px(p.xMm));
       circle.setAttribute('cy', mm2px(p.yMm));
       circle.setAttribute('r', i === 0 ? '7' : '5');
-      circle.setAttribute('fill', i === 0 ? '#E25822' : '#B1592F');
+      circle.setAttribute('fill', i === 0 ? '#E25822' : '#2D6A4F');
       circle.setAttribute('stroke', '#fff');
       circle.setAttribute('stroke-width', '1.5');
       svg.appendChild(circle);
@@ -2509,8 +3120,8 @@ function renderPolySvg() {
     // Filled polygon as land boundary
     const polygon = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
     polygon.setAttribute('points', pointsStr);
-    polygon.setAttribute('fill', 'rgba(177,89,47,0.07)');
-    polygon.setAttribute('stroke', '#B1592F');
+    polygon.setAttribute('fill', 'rgba(45,106,79,0.07)');
+    polygon.setAttribute('stroke', '#2D6A4F');
     polygon.setAttribute('stroke-width', '2');
     polygon.setAttribute('stroke-linejoin', 'round');
     svg.appendChild(polygon);
@@ -2530,7 +3141,7 @@ function renderPolySvg() {
       label.setAttribute('text-anchor', 'middle');
       label.setAttribute('dominant-baseline', 'middle');
       label.setAttribute('font-size', '10');
-      label.setAttribute('fill', '#B1592F');
+      label.setAttribute('fill', '#2D6A4F');
       label.setAttribute('font-weight', '600');
       label.setAttribute('paint-order', 'stroke');
       label.setAttribute('stroke', 'rgba(255,255,255,0.9)');
@@ -2596,7 +3207,7 @@ function renderPolyVertices() {
     btn.style.height = '18px';
     btn.style.transform = 'translate(-50%, -50%)';
     btn.style.background = '#fff';
-    btn.style.border = '2px dashed #B1592F';
+    btn.style.border = '2px dashed #2D6A4F';
     btn.style.borderRadius = '50%';
     btn.style.cursor = 'pointer';
     btn.style.zIndex = '155';
@@ -2605,7 +3216,7 @@ function renderPolyVertices() {
     btn.style.justifyContent = 'center';
     btn.style.fontSize = '15px';
     btn.style.lineHeight = '1';
-    btn.style.color = '#B1592F';
+    btn.style.color = '#2D6A4F';
     btn.style.fontWeight = '700';
     btn.style.opacity = '0.65';
     btn.style.transition = 'opacity .15s, background .15s, transform .1s';
@@ -2615,7 +3226,7 @@ function renderPolyVertices() {
 
     btn.addEventListener('mouseenter', () => {
       btn.style.opacity = '1';
-      btn.style.background = '#F0DDD1';
+      btn.style.background = '#E8F4EE';
       btn.style.transform = 'translate(-50%, -50%) scale(1.25)';
     });
     btn.addEventListener('mouseleave', () => {
@@ -2928,6 +3539,146 @@ function exportImage() {
 
 // ─── EXPORT ───
 function exportPNG() { exportImage(); }
+
+// ─── EXPORT DXF (AutoCAD DWG-compatible) ───
+function exportDWG() {
+  showToast('⏳ Đang tạo file DXF...');
+  try {
+    saveCurrentFloor();
+
+    // Color map for room types (AutoCAD ACI colors)
+    const typeColorDXF = {
+      tien_sanh: 2, phong_khach: 3, bep_an: 1, wc_chung: 6, wc_rieng: 6,
+      phong_ngu: 4, phong_ngu_master: 5, cau_thang: 7, san_vuon: 3,
+      kho: 8, phong_sinh_hoat: 2, ban_cong: 4, garage: 9, _default: 7
+    };
+
+    // Collect unique layers
+    const layerMap = {}; // layerName -> color
+    layerMap['0'] = 7;
+    layerMap['LAND_BOUNDARY'] = 5;
+    layerMap['DIMENSIONS'] = 8;
+    layerMap['TEXT_ROOMS'] = 7;
+    (floors || [{ rooms: rooms }]).forEach(f => {
+      (f.rooms || []).forEach(r => {
+        const ln = 'ROOM_' + (r.type || 'default').toUpperCase().replace(/[^A-Z0-9_]/g, '_');
+        layerMap[ln] = typeColorDXF[r.type] || 7;
+      });
+    });
+
+    // ── DXF header ──
+    let dxf = '0\nSECTION\n2\nHEADER\n9\n$ACADVER\n1\nAC1015\n9\n$INSUNITS\n70\n4\n0\nENDSEC\n';
+
+    // ── TABLES (layers) ──
+    const layerNames = Object.keys(layerMap);
+    dxf += '0\nSECTION\n2\nTABLES\n0\nTABLE\n2\nLAYER\n70\n' + layerNames.length + '\n';
+    layerNames.forEach(name => {
+      dxf += '0\nLAYER\n2\n' + name + '\n70\n0\n62\n' + layerMap[name] + '\n6\nCONTINUOUS\n';
+    });
+    dxf += '0\nENDTAB\n0\nENDSEC\n';
+
+    // ── ENTITIES ──
+    dxf += '0\nSECTION\n2\nENTITIES\n';
+    let hnd = 100;
+    const nh = () => (hnd++).toString(16).toUpperCase();
+
+    // Closed rectangle (LWPOLYLINE with width)
+    function dxfRect(x, y, w, h, layer, lw) {
+      lw = lw || 0;
+      const y1 = -y, y2 = -(y + h);
+      return '0\nLWPOLYLINE\n5\n' + nh() + '\n8\n' + layer + '\n90\n4\n70\n1\n43\n' + lw + '\n' +
+        '10\n' + x.toFixed(2) + '\n20\n' + y1.toFixed(2) + '\n' +
+        '10\n' + (x+w).toFixed(2) + '\n20\n' + y1.toFixed(2) + '\n' +
+        '10\n' + (x+w).toFixed(2) + '\n20\n' + y2.toFixed(2) + '\n' +
+        '10\n' + x.toFixed(2) + '\n20\n' + y2.toFixed(2) + '\n';
+    }
+
+    // Text entity (centered horizontally)
+    function dxfText(x, y, height, text, layer) {
+      const safe = (text || '').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[đĐ]/gi,'d').replace(/[^\x20-\x7E]/g,'?');
+      return '0\nTEXT\n5\n' + nh() + '\n8\n' + layer + '\n10\n' + x.toFixed(2) + '\n20\n' + (-y).toFixed(2) + '\n30\n0\n40\n' + height.toFixed(2) + '\n1\n' + safe + '\n72\n1\n11\n' + x.toFixed(2) + '\n21\n' + (-y).toFixed(2) + '\n';
+    }
+
+    // Line entity
+    function dxfLine(x1, y1, x2, y2, layer) {
+      return '0\nLINE\n5\n' + nh() + '\n8\n' + layer + '\n10\n' + x1.toFixed(2) + '\n20\n' + (-y1).toFixed(2) + '\n30\n0\n11\n' + x2.toFixed(2) + '\n21\n' + (-y2).toFixed(2) + '\n31\n0\n';
+    }
+
+    // ── Land boundary ──
+    if (polyPts && polyPts.length >= 3) {
+      dxf += '0\nLWPOLYLINE\n5\n' + nh() + '\n8\nLAND_BOUNDARY\n90\n' + polyPts.length + '\n70\n1\n43\n300\n';
+      polyPts.forEach(p => { dxf += '10\n' + p.xMm.toFixed(2) + '\n20\n' + (-p.yMm).toFixed(2) + '\n'; });
+    } else {
+      dxf += dxfRect(0, 0, LAND_W, LAND_H, 'LAND_BOUNDARY', 300);
+    }
+
+    // ── Outer dimensions ──
+    const DIM_GAP = 1500;
+    // Width (top)
+    dxf += dxfLine(0, -DIM_GAP, LAND_W, -DIM_GAP, 'DIMENSIONS');
+    dxf += dxfLine(0, 0, 0, -DIM_GAP, 'DIMENSIONS');
+    dxf += dxfLine(LAND_W, 0, LAND_W, -DIM_GAP, 'DIMENSIONS');
+    dxf += dxfText(LAND_W / 2, -DIM_GAP - 300, 350, (LAND_W/1000).toFixed(3) + 'm', 'DIMENSIONS');
+    // Height (right)
+    dxf += dxfLine(LAND_W + DIM_GAP, 0, LAND_W + DIM_GAP, LAND_H, 'DIMENSIONS');
+    dxf += dxfLine(LAND_W, 0, LAND_W + DIM_GAP, 0, 'DIMENSIONS');
+    dxf += dxfLine(LAND_W, LAND_H, LAND_W + DIM_GAP, LAND_H, 'DIMENSIONS');
+    dxf += dxfText(LAND_W + DIM_GAP + 250, LAND_H / 2, 350, (LAND_H/1000).toFixed(3) + 'm', 'DIMENSIONS');
+
+    // ── Rooms per floor ──
+    (floors || [{ rooms: rooms, name: 'Tang 1' }]).forEach((floor, fi) => {
+      const floorRooms = floor.rooms || [];
+      const offsetY = fi * (LAND_H + 5000);
+
+      // Floor title
+      if ((floors || []).length > 1) {
+        dxf += dxfText(0, offsetY - 2000, 700, floor.name || ('Tang ' + (fi+1)), 'TEXT_ROOMS');
+      }
+
+      floorRooms.forEach(r => {
+        const ln = 'ROOM_' + (r.type || 'default').toUpperCase().replace(/[^A-Z0-9_]/g, '_');
+        const rx = r.xMm, ry = r.yMm + offsetY;
+        const rw = r.wMm, rh = r.hMm;
+        const cx = rx + rw / 2, cy = ry + rh / 2;
+        const fs = Math.max(150, Math.min(450, Math.min(rw, rh) * 0.12));
+
+        // Room wall rectangle
+        dxf += dxfRect(rx, ry, rw, rh, ln, 200);
+
+        // Room name label (center)
+        dxf += dxfText(cx, cy - fs * 0.5, fs, r.name, 'TEXT_ROOMS');
+
+        // Area label
+        const area = (rw * rh / 1e6).toFixed(1);
+        dxf += dxfText(cx, cy + fs * 0.2, fs * 0.75, area + ' m2', 'TEXT_ROOMS');
+
+        // Width dim (just inside top edge)
+        const wL = rw >= 1000 ? (rw/1000).toFixed(2)+'m' : rw+'mm';
+        dxf += dxfText(cx, ry + fs * 0.4, fs * 0.65, wL, 'DIMENSIONS');
+
+        // Height dim (just inside left edge)
+        const hL = rh >= 1000 ? (rh/1000).toFixed(2)+'m' : rh+'mm';
+        dxf += dxfText(rx + fs * 0.4, cy, fs * 0.65, hL, 'DIMENSIONS');
+      });
+    });
+
+    dxf += '0\nENDSEC\n0\nEOF\n';
+
+    // ── Download ──
+    const blob = new Blob([dxf], { type: 'application/dxf' });
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement('a');
+    const safe = (projectName || 'mat-bang').replace(/[^\w\-]/g, '_');
+    a.download = safe + '_' + Date.now() + '.dxf';
+    a.href = url;
+    a.click();
+    URL.revokeObjectURL(url);
+    showToast('✅ Đã xuất DXF! Mở bằng AutoCAD, LibreCAD hoặc QCAD.');
+  } catch(err) {
+    console.error('DXF export error:', err);
+    showToast('❌ Lỗi xuất DXF: ' + err.message);
+  }
+}
 
 
 // ═══════════════════════════════════════════════════════════
@@ -3394,7 +4145,7 @@ function drawPreviewSvg(layout, svgEl, landW, landH) {
   const bg = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
   bg.setAttribute('x', PAD); bg.setAttribute('y', PAD);
   bg.setAttribute('width', landW * sc); bg.setAttribute('height', landH * sc);
-  bg.setAttribute('fill', '#F7F5F1'); bg.setAttribute('stroke', '#B1592F');
+  bg.setAttribute('fill', '#F7F5F0'); bg.setAttribute('stroke', '#2D6A4F');
   bg.setAttribute('stroke-width', '1.5'); bg.setAttribute('rx', '2');
   svgEl.appendChild(bg);
 
@@ -4682,7 +5433,42 @@ function parseAICanvasBlocks(raw) {
   let allActions = [];
   let cleanText = raw;
 
-  // Ưu tiên: parse ```canvas blocks
+  // Fallback 0: ```canvas block KHÔNG có dấu đóng ``` (response bị cắt giữa đường)
+  if (allActions.length === 0) {
+    const openRe = /```canvas\s*([\s\S]*)$/i;
+    const om = openRe.exec(raw);
+    if (om) {
+      let jsonText = om[1].trim();
+      // Bỏ dấu ``` lẻ ở cuối nếu có
+      jsonText = jsonText.replace(/```+\s*$/,'').trim();
+      // Thử parse trực tiếp trước
+      let parsed = null;
+      try { parsed = JSON.parse(jsonText); } catch(e) {}
+      // Nếu fail, thử cắt dần phần tử cuối trong "actions": [ ... ] để lấy các action hoàn chỉnh
+      if (!parsed) {
+        const actionsIdx = jsonText.indexOf('"actions"');
+        if (actionsIdx !== -1) {
+          const arrStart = jsonText.indexOf('[', actionsIdx);
+          if (arrStart !== -1) {
+            // Tìm từng object { ... } hoàn chỉnh trong array bằng cách đếm dấu ngoặc
+            let depth = 0, objStart = -1, objs = [];
+            for (let i = arrStart + 1; i < jsonText.length; i++) {
+              const ch = jsonText[i];
+              if (ch === '{') { if (depth === 0) objStart = i; depth++; }
+              else if (ch === '}') { depth--; if (depth === 0 && objStart !== -1) { objs.push(jsonText.slice(objStart, i+1)); objStart = -1; } }
+            }
+            objs.forEach(o => { try { allActions.push(JSON.parse(o)); } catch(e) {} });
+          }
+        }
+      } else {
+        const acts = parsed.actions || (Array.isArray(parsed) ? parsed : [parsed]);
+        allActions = allActions.concat(acts);
+      }
+      if (allActions.length > 0) cleanText = cleanText.replace(om[0], '');
+    }
+  }
+
+  // Ưu tiên: parse ```canvas blocks (đã đóng đầy đủ)
   while ((match = canvasBlockRe.exec(raw)) !== null) {
     try {
       const parsed = JSON.parse(match[1].trim());
@@ -4802,7 +5588,7 @@ Tọa độ x,y tính bằng mét (m), từ góc trên-trái (0,0). Kích thư�
       body: JSON.stringify({
         model: AI_CONFIG.model,
         stream: false,
-        options: { temperature: 0.4, num_predict: 700 },
+        options: { temperature: 0.4, num_predict: 2000 },
         messages: [
           { role: 'system', content: systemPrompt },
           { role: 'user', content: userMsg }
@@ -5159,7 +5945,7 @@ function showAIPresetConfirm(preset, userDesc) {
           style="padding:9px 14px;border:1px solid #d0dae6;border-radius:9px;background:#fff;font-size:12.5px;cursor:pointer;color:#5a5852;">← Sửa yêu cầu</button>
         <button onclick="applyAIPresetToAutoPlan(window._aiCurrentPreset)"
           style="padding:9px 20px;border:none;border-radius:9px;
-          background:linear-gradient(135deg,#B1592F,#1B4332);color:#fff;
+          background:linear-gradient(135deg,#2D6A4F,#1B4332);color:#fff;
           font-size:13px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:7px;">
           ✨ Bố trí ngay
         </button>
@@ -6636,6 +7422,16 @@ function updateRoomList() {
   }
 }
 
+  // Expose circulation panel functions to global scope (needed for inline onclick handlers)
+  window.openCirculationPanel = openCirculationPanel;
+  window.closeCirculationPanel = closeCirculationPanel;
+  window.handleCircOverlayClick = handleCircOverlayClick;
+  window.circSetFrom = circSetFrom;
+  window.circSetTo = circSetTo;
+  window.circToggleVia = circToggleVia;
+  window.clearCirculation = clearCirculation;
+  window.analyzeCirculation = analyzeCirculation;
+
   window.setCompassAngle = function(deg) {
     compassAngle = deg;
     window._compassAngle = deg;
@@ -6674,6 +7470,10 @@ function updateRoomList() {
     applyTheme(!body.classList.contains('dark'));
   };
 
+  window.addEventListener('message', function(e){
+    if(e.data && e.data.type === 'theme') applyTheme(e.data.dark);
+  });
+
   // Init: saved preference → system preference → light
   let saved = null;
   try { saved = localStorage.getItem('theme'); } catch(e){}
@@ -6686,6 +7486,159 @@ function updateRoomList() {
   }
 })();
 
+// ══════════════════════════════════════════════
+//  EXPORT DROPDOWN
+// ══════════════════════════════════════════════
+(function(){
+  const menu = document.getElementById('export-drop-menu');
+  window.toggleExportDropdown = function(){
+    menu.classList.toggle('open');
+  };
+  window.closeExportDropdown = function(){
+    menu.classList.remove('open');
+  };
+  document.addEventListener('click', function(e){
+    if(!e.target.closest('.export-dropdown')) menu.classList.remove('open');
+  });
+})();
+
+// ══════════════════════════════════════════════
+//  BACKGROUND REFERENCE IMAGE
+// ══════════════════════════════════════════════
+(function(){
+  let bgOpacity   = 0.35;
+  let bgFit       = 'cover';
+  let bgPanelOpen = false;
+
+  function toggleBgImgPanel() {
+    bgPanelOpen = !bgPanelOpen;
+    const panel = document.getElementById('bg-img-panel');
+    panel.classList.toggle('open', bgPanelOpen);
+    document.getElementById('bg-img-btn').classList.toggle('active', bgPanelOpen);
+  }
+  window.toggleBgImgPanel = toggleBgImgPanel;
+
+  function closeBgPanel() {
+    bgPanelOpen = false;
+    document.getElementById('bg-img-panel').classList.remove('open');
+    document.getElementById('bg-img-btn').classList.remove('active');
+  }
+  window.closeBgPanel = closeBgPanel;
+
+  function handleBgImageUpload(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      const src = e.target.result;
+      const img = document.getElementById('bg-canvas-img');
+      img.src = src;
+      img.style.display = 'block';
+      img.style.opacity = bgOpacity;
+      img.style.objectFit = bgFit;
+
+      // Update thumbnail + filename in panel
+      document.getElementById('bg-img-thumb').src = src;
+      document.getElementById('bg-img-filename').textContent = file.name;
+      document.getElementById('bg-img-preview-row').classList.add('has-img');
+      document.getElementById('bg-remove-section').style.display = 'block';
+
+      showToast('✅ Đã chèn ảnh nền vào khung khu đất');
+    };
+    reader.readAsDataURL(file);
+    event.target.value = '';
+  }
+  window.handleBgImageUpload = handleBgImageUpload;
+
+  function updateBgOpacity(val) {
+    bgOpacity = parseFloat(val);
+    document.getElementById('bg-opacity-val').textContent = Math.round(bgOpacity * 100) + '%';
+    const img = document.getElementById('bg-canvas-img');
+    if (img.src) img.style.opacity = bgOpacity;
+  }
+  window.updateBgOpacity = updateBgOpacity;
+
+  function updateBgFit(val) {
+    bgFit = val;
+    const img = document.getElementById('bg-canvas-img');
+    img.style.objectFit = val;
+    if (val === 'fill') {
+      img.style.objectPosition = 'center';
+      img.style.width  = '100%';
+      img.style.height = '100%';
+    } else if (val === 'contain') {
+      img.style.objectFit = 'contain';
+      img.style.width  = '100%';
+      img.style.height = '100%';
+    } else { // cover
+      img.style.objectFit = 'cover';
+      img.style.width  = '100%';
+      img.style.height = '100%';
+    }
+  }
+  window.updateBgFit = updateBgFit;
+
+  function removeBgImage() {
+    const img = document.getElementById('bg-canvas-img');
+    img.src = '';
+    img.style.display = 'none';
+    document.getElementById('bg-img-preview-row').classList.remove('has-img');
+    document.getElementById('bg-remove-section').style.display = 'none';
+    showToast('🗑 Đã xóa ảnh nền');
+  }
+  window.removeBgImage = removeBgImage;
+})();
+
 </script>
+
+<!-- ─── BACKGROUND IMAGE PANEL ─── -->
+<div id="bg-img-panel">
+  <div id="bg-img-panel-header">
+    <span>🖼 Ảnh nền tham chiếu</span>
+    <button id="bg-img-panel-close" onclick="closeBgPanel()">✕</button>
+  </div>
+  <div id="bg-img-panel-body">
+    <p style="font-size:11px;color:var(--text-3);margin:0;line-height:1.5;">
+      Ảnh được chèn vào <b>dưới lưới</b>, mờ dần để dùng làm nền tham chiếu khi vẽ sơ đồ.
+    </p>
+
+    <!-- Upload -->
+    <label class="bgi-upload-label">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 1v8M4 4l3-3 3 3M2 11h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Chọn ảnh từ máy
+      <input type="file" accept="image/*" onchange="handleBgImageUpload(event)" style="display:none;">
+    </label>
+
+    <!-- Thumbnail preview row -->
+    <div id="bg-img-preview-row">
+      <img id="bg-img-thumb" src="" alt="preview" style="width:40px;height:40px;border-radius:5px;object-fit:cover;border:1px solid var(--border);flex-shrink:0;">
+      <span id="bg-img-filename" style="font-size:11px;color:var(--text-2);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"></span>
+    </div>
+
+    <!-- Opacity slider -->
+    <div class="bgi-row">
+      <label>Độ mờ</label>
+      <input type="range" min="0.05" max="0.95" step="0.05" value="0.35"
+        oninput="updateBgOpacity(this.value)" style="flex:1;">
+      <span id="bg-opacity-val" style="width:32px;text-align:right;font-size:11px;color:var(--text-3);">35%</span>
+    </div>
+
+    <!-- Fit mode -->
+    <div class="bgi-row">
+      <label>Hiển thị</label>
+      <select onchange="updateBgFit(this.value)">
+        <option value="cover">Phủ toàn khung (Cover)</option>
+        <option value="contain">Vừa khung (Contain)</option>
+        <option value="fill">Kéo căng (Fill)</option>
+      </select>
+    </div>
+
+    <!-- Remove button -->
+    <div id="bg-remove-section" style="display:none;">
+      <button class="bgi-remove-btn" onclick="removeBgImage()">🗑 Xóa ảnh nền</button>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>

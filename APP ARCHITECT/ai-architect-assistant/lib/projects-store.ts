@@ -1,9 +1,9 @@
 import fs from "fs";
 import path from "path";
-import { recentProjects as seedProjects, type RecentProject } from "./dashboard-data";
-import { getProjectsRoot } from "./settings-store";
+import { type RecentProject } from "./dashboard-data";
+import { DATA_DIR, getProjectsRoot, getStorageRoot } from "./settings-store";
 
-const DATA_FILE = path.join(process.cwd(), "data", "projects.json");
+const DATA_FILE = path.join(DATA_DIR, "projects.json");
 
 const GRADIENTS = [
   "from-[#d9c7a8] to-[#8a7559]",
@@ -33,17 +33,18 @@ function uniqueFolderPath(name: string): string {
 function ensureDataFile(): RecentProject[] {
   if (!fs.existsSync(DATA_FILE)) {
     fs.mkdirSync(path.dirname(DATA_FILE), { recursive: true });
-    const seeded = seedProjects.map((project) => {
-      const folderPath = uniqueFolderPath(project.name);
-      fs.mkdirSync(folderPath, { recursive: true });
-      return { ...project, folderPath };
-    });
-    fs.writeFileSync(DATA_FILE, JSON.stringify(seeded, null, 2), "utf-8");
-    return seeded;
+    fs.writeFileSync(DATA_FILE, "[]", "utf-8");
+    return [];
   }
 
-  const raw = fs.readFileSync(DATA_FILE, "utf-8");
-  return JSON.parse(raw) as RecentProject[];
+  const raw = fs.readFileSync(DATA_FILE, "utf-8").trim();
+  if (!raw) return [];
+  try {
+    return JSON.parse(raw) as RecentProject[];
+  } catch {
+    fs.writeFileSync(DATA_FILE, "[]", "utf-8");
+    return [];
+  }
 }
 
 function saveProjects(projects: RecentProject[]) {
@@ -51,17 +52,58 @@ function saveProjects(projects: RecentProject[]) {
 }
 
 export function getProjects(): RecentProject[] {
-  return ensureDataFile();
+  const projects = ensureDataFile();
+  const existing = projects.filter((p) => p.folderPath && fs.existsSync(p.folderPath));
+  if (existing.length !== projects.length) {
+    const removed = projects.filter((p) => !existing.includes(p));
+    for (const p of removed) {
+      if (p.coverImagePath && fs.existsSync(p.coverImagePath)) {
+        try { fs.unlinkSync(p.coverImagePath); } catch { /* ignore */ }
+      }
+    }
+    saveProjects(existing);
+  }
+  return existing;
 }
 
 export function getProjectById(id: string): RecentProject | undefined {
   return ensureDataFile().find((project) => project.id === id);
 }
 
-export function createProject(input: { name: string; type: string }): RecentProject {
+export function updateProject(id: string, input: { name?: string; type?: string; progress?: number }): RecentProject | null {
   const projects = ensureDataFile();
-  const folderPath = uniqueFolderPath(input.name);
-  fs.mkdirSync(folderPath, { recursive: true });
+  const project = projects.find((p) => p.id === id);
+  if (!project) return null;
+
+  if (input.name !== undefined) project.name = input.name.trim() || project.name;
+  if (input.type !== undefined) project.type = input.type.trim() || "Chưa phân loại";
+  if (input.progress !== undefined) project.progress = Math.min(100, Math.max(0, Math.round(input.progress)));
+
+  saveProjects(projects);
+  return project;
+}
+
+export function createProject(input: { name: string; type: string; folderPath?: string }): RecentProject {
+  const projects = ensureDataFile();
+
+  let resolvedFolderPath: string;
+  if (input.folderPath) {
+    if (!path.isAbsolute(input.folderPath)) {
+      throw new Error("Đường dẫn thư mục không hợp lệ");
+    }
+    const normalized = path.resolve(input.folderPath);
+    const duplicate = projects.find(
+      (p) => p.folderPath && path.resolve(p.folderPath) === normalized
+    );
+    if (duplicate) {
+      throw new Error(`Thư mục này đã được liên kết với dự án "${duplicate.name}"`);
+    }
+    fs.mkdirSync(input.folderPath, { recursive: true });
+    resolvedFolderPath = input.folderPath;
+  } else {
+    resolvedFolderPath = uniqueFolderPath(input.name);
+    fs.mkdirSync(resolvedFolderPath, { recursive: true });
+  }
 
   const project: RecentProject = {
     id: `project-${Date.now()}`,
@@ -69,7 +111,7 @@ export function createProject(input: { name: string; type: string }): RecentProj
     type: input.type.trim() || "Chưa phân loại",
     progress: 0,
     gradient: GRADIENTS[projects.length % GRADIENTS.length],
-    folderPath,
+    folderPath: resolvedFolderPath,
   };
 
   projects.unshift(project);
@@ -80,13 +122,13 @@ export function createProject(input: { name: string; type: string }): RecentProj
 export function saveCoverImage(id: string, buffer: Buffer, originalName: string): RecentProject | null {
   const projects = ensureDataFile();
   const project = projects.find((p) => p.id === id);
-  if (!project?.folderPath) return null;
+  if (!project) return null;
 
-  const assetsDir = path.join(project.folderPath, ".assets");
-  fs.mkdirSync(assetsDir, { recursive: true });
+  const coversDir = path.join(DATA_DIR, "covers");
+  fs.mkdirSync(coversDir, { recursive: true });
 
   const ext = path.extname(originalName).toLowerCase() || ".jpg";
-  const dest = path.join(assetsDir, `cover${ext}`);
+  const dest = path.join(coversDir, `${id}${ext}`);
   fs.writeFileSync(dest, buffer);
 
   project.coverImagePath = dest;
@@ -95,12 +137,24 @@ export function saveCoverImage(id: string, buffer: Buffer, originalName: string)
   return project;
 }
 
-export function deleteProject(id: string): boolean {
+export async function deleteProject(id: string): Promise<boolean> {
   const projects = ensureDataFile();
   const index = projects.findIndex((p) => p.id === id);
   if (index === -1) return false;
 
-  projects.splice(index, 1);
+  const [removed] = projects.splice(index, 1);
+
+  if (removed.coverImagePath && fs.existsSync(removed.coverImagePath)) {
+    try { fs.unlinkSync(removed.coverImagePath); } catch { /* ignore */ }
+  }
+
+  if (removed.folderPath && fs.existsSync(removed.folderPath)) {
+    try {
+      const { default: trash } = await import("trash");
+      await trash(removed.folderPath);
+    } catch { /* ignore */ }
+  }
+
   saveProjects(projects);
   return true;
 }
@@ -303,4 +357,72 @@ export function getEntryAbsolutePath(id: string, relativePath: string): string |
   } catch {
     return null;
   }
+}
+
+function copyFolderRecursive(src: string, dest: string) {
+  fs.mkdirSync(dest, { recursive: true });
+  for (const entry of fs.readdirSync(src, { withFileTypes: true })) {
+    const srcPath = path.join(src, entry.name);
+    const destPath = path.join(dest, entry.name);
+    if (entry.isDirectory()) {
+      copyFolderRecursive(srcPath, destPath);
+    } else {
+      fs.copyFileSync(srcPath, destPath);
+    }
+  }
+}
+
+function moveFolder(src: string, dest: string) {
+  try {
+    fs.renameSync(src, dest);
+  } catch (err) {
+    if ((err as NodeJS.ErrnoException).code === "EXDEV") {
+      copyFolderRecursive(src, dest);
+      fs.rmSync(src, { recursive: true, force: true });
+    } else {
+      throw err;
+    }
+  }
+}
+
+export function migrateProjectFolders(newStorageRoot: string): { moved: number; skipped: number } {
+  const projects = ensureDataFile();
+  const oldStorageRoot = getStorageRoot();
+  const newProjectsRoot = path.join(newStorageRoot, "Dự án");
+
+  let moved = 0;
+  let skipped = 0;
+
+  const updated = projects.map((project) => {
+    if (!project.folderPath) { skipped++; return project; }
+
+    const normalizedOld = path.resolve(project.folderPath);
+    const normalizedRoot = path.resolve(oldStorageRoot);
+
+    const isUnderOldRoot = normalizedOld.startsWith(normalizedRoot + path.sep) ||
+      normalizedOld === normalizedRoot;
+
+    if (!isUnderOldRoot || !fs.existsSync(project.folderPath)) {
+      skipped++;
+      return project;
+    }
+
+    const folderName = path.basename(project.folderPath);
+    const newFolderPath = path.join(newProjectsRoot, folderName);
+
+    if (fs.existsSync(newFolderPath)) { skipped++; return project; }
+
+    try {
+      fs.mkdirSync(newProjectsRoot, { recursive: true });
+      moveFolder(project.folderPath, newFolderPath);
+      moved++;
+      return { ...project, folderPath: newFolderPath };
+    } catch {
+      skipped++;
+      return project;
+    }
+  });
+
+  saveProjects(updated);
+  return { moved, skipped };
 }

@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: #050B14;
+      color: #fff;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      user-select: none;
+      -webkit-user-select: none;
+      overflow: hidden;
+    }
+
+    .logo-mark {
+      width: 56px;
+      height: 56px;
+      border-radius: 16px;
+      background: linear-gradient(135deg, #14B8A6 0%, #0891B2 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 18px;
+      box-shadow: 0 0 40px rgba(20, 184, 166, 0.35);
+    }
+
+    .logo-mark svg {
+      width: 30px;
+      height: 30px;
+    }
+
+    .title {
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: -0.4px;
+      color: #ffffff;
+    }
+
+    .subtitle {
+      font-size: 13px;
+      font-weight: 400;
+      color: #94A3B8;
+      margin-top: 3px;
+      letter-spacing: 0.1px;
+    }
+
+    .loader {
+      margin-top: 36px;
+      width: 140px;
+      height: 2px;
+      background: rgba(255, 255, 255, 0.07);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+
+    .loader-bar {
+      height: 100%;
+      width: 50%;
+      background: linear-gradient(90deg, transparent, #14B8A6, #0891B2, transparent);
+      border-radius: 2px;
+      animation: slide 1.6s ease-in-out infinite;
+    }
+
+    @keyframes slide {
+      0%   { transform: translateX(-200%); }
+      100% { transform: translateX(400%); }
+    }
+
+    .status {
+      margin-top: 14px;
+      font-size: 11px;
+      color: rgba(148, 163, 184, 0.5);
+      letter-spacing: 0.5px;
+    }
+  </style>
+</head>
+<body>
+  <div class="logo-mark">
+    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M3 9.5L12 3l9 6.5V20a1 1 0 01-1 1H4a1 1 0 01-1-1V9.5z" fill="white" opacity="0.9"/>
+      <rect x="9" y="13" width="6" height="8" rx="0.5" fill="#0891B2"/>
+    </svg>
+  </div>
+  <div class="title">AI Architect</div>
+  <div class="subtitle">Assistant</div>
+  <div class="loader">
+    <div class="loader-bar"></div>
+  </div>
+  <div class="status">Đang khởi động...</div>
+</body>
+</html>

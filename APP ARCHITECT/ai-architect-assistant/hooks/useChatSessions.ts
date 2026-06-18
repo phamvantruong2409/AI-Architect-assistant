@@ -11,7 +11,7 @@ export function useChatSessions(): ChatSession[] {
   const [sessions, setSessions] = useState<ChatSession[]>([]);
 
   const refresh = useCallback(() => {
-    setSessions(getChatSessions());
+    getChatSessions().then(setSessions);
   }, []);
 
   useEffect(() => {

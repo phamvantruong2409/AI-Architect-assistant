@@ -49,18 +49,63 @@ function waitForServer(callback) {
   tryConnect();
 }
 
+function createSplashWindow() {
+  // Đọc logo từ filesystem và nhúng thẳng vào HTML dưới dạng base64
+  // để không cần file I/O sau khi HTML load — xuất hiện ngay lập tức
+  const logoPath = app.isPackaged
+    ? path.join(process.resourcesPath, "standalone", "public", "images", "logodark.png")
+    : path.join(__dirname, "..", "public", "images", "logodark.png");
+
+  let logoSrc = "";
+  try {
+    const buf = fs.readFileSync(logoPath);
+    logoSrc = `data:image/png;base64,${buf.toString("base64")}`;
+  } catch {
+    // logo không tìm thấy — splash vẫn hiện, chỉ không có ảnh
+  }
+
+  const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><style>
+    *{margin:0;padding:0;box-sizing:border-box;}
+    body{
+      background:#050B14;
+      display:flex;align-items:center;justify-content:center;
+      height:100vh;
+      user-select:none;-webkit-user-select:none;
+    }
+    img{width:120px;height:120px;object-fit:contain;}
+  </style></head><body>
+    ${logoSrc ? `<img src="${logoSrc}" alt="AI Architect" draggable="false"/>` : ""}
+  </body></html>`;
+
+  const splash = new BrowserWindow({
+    width: 260,
+    height: 260,
+    frame: false,
+    transparent: false,
+    backgroundColor: "#050B14",
+    center: true,
+    resizable: false,
+    skipTaskbar: true,
+    alwaysOnTop: true,
+    webPreferences: { nodeIntegration: false, contextIsolation: true },
+  });
+
+  splash.loadURL(`data:text/html;charset=utf-8,${encodeURIComponent(html)}`);
+  return splash;
+}
+
 function createWindow() {
   mainWindow = new BrowserWindow({
     width: 1280,
     height: 800,
+    show: false,
     autoHideMenuBar: true,
     webPreferences: {
       preload: path.join(__dirname, "preload.js"),
     },
   });
-  mainWindow.webContents.session.clearCache().then(() => {
-    mainWindow.loadURL(`http://127.0.0.1:${PORT}`);
-  });
+
+  mainWindow.loadURL(`http://127.0.0.1:${PORT}`);
 }
 
 ipcMain.handle("select-folder", async () => {
@@ -70,9 +115,21 @@ ipcMain.handle("select-folder", async () => {
   return result.canceled ? null : result.filePaths[0];
 });
 
+// Khởi động server ngay khi main.js load — song song với Electron init
+// thay vì chờ app.whenReady() mới bắt đầu, tiết kiệm 2-4 giây
+startServer();
+
 app.whenReady().then(() => {
-  startServer();
-  waitForServer(createWindow);
+  const splash = createSplashWindow();
+
+  waitForServer(() => {
+    createWindow();
+
+    mainWindow.webContents.once("did-finish-load", () => {
+      mainWindow.show();
+      splash.destroy();
+    });
+  });
 });
 
 app.on("window-all-closed", () => {

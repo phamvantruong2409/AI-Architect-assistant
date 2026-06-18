@@ -3,7 +3,6 @@ import { Greeting } from "@/components/dashboard/Greeting";
 import { PromptBar } from "@/components/dashboard/PromptBar";
 import { QuickActions } from "@/components/dashboard/QuickActions";
 import { RecentProjects } from "@/components/dashboard/RecentProjects";
-import { RecentChats } from "@/components/dashboard/RecentChats";
 import { NewsUpdates } from "@/components/dashboard/NewsUpdates";
 import { InspirationToday } from "@/components/dashboard/InspirationToday";
 import { AnalyticsBar } from "@/components/dashboard/AnalyticsBar";
@@ -47,7 +46,6 @@ export default function DashboardPage() {
 
         {/* Right panel */}
         <div className="border-l border-border bg-surface/30 px-4 py-5 space-y-5">
-          <RecentChats />
           <InspirationToday />
           <NewsUpdates />
         </div>

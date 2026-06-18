@@ -49,8 +49,12 @@ function pickRandom<T>(arr: T[]): T {
 export function Greeting() {
   const [greeting, setGreeting] = useState("Chào bạn");
   const [title, setTitle] = useState(TIPS[0]);
+  const [userName, setUserName] = useState("bạn");
 
   useEffect(() => {
+    const stored = localStorage.getItem("user-name");
+    if (stored) setUserName(stored);
+
     const hour = new Date().getHours();
     if (hour < 11) setGreeting("Chào buổi sáng");
     else if (hour < 14) setGreeting("Chào buổi trưa");
@@ -78,7 +82,7 @@ export function Greeting() {
   return (
     <div>
       <p className="text-sm font-medium text-white/70">
-        Xin chào <span className="text-white font-semibold">Trường</span> 👋
+        Xin chào <span className="text-white font-semibold">{userName}</span> 👋
       </p>
       <h1 className="font-display mt-1 text-2xl tracking-tight text-white sm:text-3xl">
         {title}

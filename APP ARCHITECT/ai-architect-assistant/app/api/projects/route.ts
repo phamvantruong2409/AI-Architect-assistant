@@ -15,13 +15,14 @@ export async function POST(request: Request) {
   const body = await request.json();
   const name = typeof body.name === "string" ? body.name.trim() : "";
   const type = typeof body.type === "string" ? body.type.trim() : "";
+  const folderPath = typeof body.folderPath === "string" && body.folderPath.trim() ? body.folderPath.trim() : undefined;
 
   if (!name) {
     return Response.json({ error: "Tên dự án không được để trống" }, { status: 400 });
   }
 
   try {
-    const project = createProject({ name, type });
+    const project = createProject({ name, type, folderPath });
     return Response.json(project, { status: 201 });
   } catch (error) {
     return Response.json(
