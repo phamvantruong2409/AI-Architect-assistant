@@ -1,13 +1,20 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { Card } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import type { Concept } from "@/types/concept";
 
 export function ConceptCard({ concept }: { concept: Concept }) {
+  const router = useRouter();
   const [expanded, setExpanded] = useState(false);
+
+  const developInChat = () => {
+    const prompt = `Tôi muốn phát triển sâu hơn hướng concept "${concept.name}" (${concept.tagline}). ${concept.description} Vật liệu gợi ý: ${concept.materials.join(", ")}. Hãy giúp tôi cụ thể hoá phương án: tổ chức mặt bằng, hình khối mặt đứng và các lưu ý kỹ thuật.`;
+    router.push(`/chat?q=${encodeURIComponent(prompt)}`);
+  };
 
   return (
     <Card className="flex flex-col p-6">
@@ -60,7 +67,7 @@ export function ConceptCard({ concept }: { concept: Concept }) {
       )}
 
       <div className="mt-6 flex gap-2">
-        <Button size="sm" className="flex-1">
+        <Button size="sm" className="flex-1" onClick={developInChat}>
           Chọn hướng này
         </Button>
         <Button
