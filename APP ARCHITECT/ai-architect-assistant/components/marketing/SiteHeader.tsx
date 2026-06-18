@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { Logo } from "./Logo";
-import { LinkButton } from "@/components/ui/Button";
 
 export function SiteHeader() {
   return (
@@ -9,11 +8,12 @@ export function SiteHeader() {
         <Link href="/" className="text-white">
           <Logo forceLight />
         </Link>
-        <div className="flex items-center gap-3">
-          <LinkButton href="/dashboard" size="sm">
-            Đăng nhập
-          </LinkButton>
-        </div>
+        <Link
+          href="/login"
+          className="rounded-full border border-white/20 bg-white/10 px-5 py-1.5 text-sm font-medium text-white backdrop-blur-md transition-all hover:bg-white/20 hover:border-white/35"
+        >
+          Đăng nhập
+        </Link>
       </div>
     </header>
   );
