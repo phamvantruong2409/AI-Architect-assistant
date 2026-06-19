@@ -322,8 +322,11 @@ ipcMain.handle("open-external", async (_e, url) => {
   return false;
 });
 
+let autoUpdateInitialized = false;
 function setupAutoUpdate() {
   if (!app.isPackaged) return;
+  if (autoUpdateInitialized) return; // chỉ chạy 1 lần, tránh đăng ký handler lặp khi trang nạp lại
+  autoUpdateInitialized = true;
 
   const { autoUpdater } = require("electron-updater");
   autoUpdater.autoDownload = true;
