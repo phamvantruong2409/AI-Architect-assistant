@@ -332,7 +332,35 @@ function setupAutoUpdate() {
   autoUpdater.autoDownload = true;
   autoUpdater.autoInstallOnAppQuit = true;
 
+  const sendToUI = (channel, payload) => {
+    if (mainWindow && !mainWindow.isDestroyed()) {
+      mainWindow.webContents.send(channel, payload);
+    }
+  };
+
+  autoUpdater.on("update-available", (info) => {
+    sendToUI("update-status", { state: "available", version: info.version });
+  });
+
+  autoUpdater.on("download-progress", (p) => {
+    const percent = Math.round(p.percent);
+    // Thanh tiến trình trên icon ở taskbar Windows (0..1)
+    if (mainWindow && !mainWindow.isDestroyed()) {
+      mainWindow.setProgressBar(percent / 100);
+    }
+    sendToUI("update-progress", {
+      percent,
+      transferred: p.transferred,
+      total: p.total,
+      bytesPerSecond: p.bytesPerSecond,
+    });
+  });
+
   autoUpdater.on("update-downloaded", async (info) => {
+    if (mainWindow && !mainWindow.isDestroyed()) {
+      mainWindow.setProgressBar(-1); // tắt thanh tiến trình ở taskbar
+    }
+    sendToUI("update-status", { state: "downloaded", version: info.version });
     const { response } = await dialog.showMessageBox(mainWindow, {
       type: "info",
       buttons: ["Cập nhật & khởi động lại", "Để sau"],
@@ -349,6 +377,10 @@ function setupAutoUpdate() {
 
   autoUpdater.on("error", (err) => {
     console.error("Auto-update error:", err);
+    if (mainWindow && !mainWindow.isDestroyed()) {
+      mainWindow.setProgressBar(-1);
+    }
+    sendToUI("update-status", { state: "error" });
   });
 
   autoUpdater.checkForUpdates().catch((err) => console.error("checkForUpdates failed:", err));
