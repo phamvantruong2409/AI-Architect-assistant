@@ -48,6 +48,29 @@ export default function LoginPage() {
     setGoogleLoading(true);
     setError(null);
     const supabase = createClient();
+
+    // Trong app desktop (Electron): mở trình duyệt mặc định của người dùng để
+    // đăng nhập, KHÔNG điều hướng cửa sổ app. Sau khi xong, Supabase quay về
+    // deep link aiarchitect://auth/callback → app nhận "code" và đổi lấy phiên.
+    if (typeof window !== "undefined" && window.electronAPI) {
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider: "google",
+        options: {
+          redirectTo: "aiarchitect://auth/callback",
+          skipBrowserRedirect: true, // không tự chuyển cửa sổ — ta tự mở trình duyệt ngoài
+        },
+      });
+      if (error || !data?.url) {
+        setError("Không mở được đăng nhập Google. Vui lòng thử lại.");
+        setGoogleLoading(false);
+        return;
+      }
+      await window.electronAPI.openExternal(data.url);
+      // Chờ người dùng đăng nhập xong ở trình duyệt; code sẽ về qua onAuthCode (đăng ký ở useEffect).
+      return;
+    }
+
+    // Trên web thường: giữ luồng cũ — trình duyệt tự chuyển sang Google.
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
       options: { redirectTo: `${window.location.origin}/auth/callback` },
@@ -56,7 +79,6 @@ export default function LoginPage() {
       setError("Không mở được đăng nhập Google. Vui lòng thử lại.");
       setGoogleLoading(false);
     }
-    // Nếu thành công, trình duyệt tự chuyển sang Google.
   }
 
   useEffect(() => {
@@ -74,6 +96,23 @@ export default function LoginPage() {
       .then((d) => setHasKey(Boolean(d.hasKey)))
       .catch(() => {});
   }, []);
+
+  useEffect(() => {
+    // Desktop: lắng nghe "code" trả về từ trình duyệt (qua deep link), đổi lấy
+    // phiên đăng nhập ngay trong app rồi vào dashboard.
+    if (typeof window === "undefined" || !window.electronAPI) return;
+    const unsubscribe = window.electronAPI.onAuthCode(async (code) => {
+      const supabase = createClient();
+      const { error } = await supabase.auth.exchangeCodeForSession(code);
+      if (error) {
+        setError("Đăng nhập Google thất bại. Vui lòng thử lại.");
+        setGoogleLoading(false);
+        return;
+      }
+      router.push("/dashboard");
+    });
+    return unsubscribe;
+  }, [router]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();

@@ -9,8 +9,9 @@
     "start": "next start",
     "lint": "eslint",
     "build:electron": "next build && node scripts/prepare-electron.js",
+    "predist": "npm run build:electron",
     "dist": "electron-builder",
-    "release": "electron-builder --publish always"
+    "release": "npm run build:electron && electron-builder --publish always"
   },
   "dependencies": {
     "@google/generative-ai": "^0.24.1",
@@ -34,7 +35,7 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
-    "electron": "^33.0.0",
+    "electron": "^33.4.11",
     "electron-builder": "^25.1.8",
     "eslint": "^9",
     "eslint-config-next": "16.2.9",
@@ -46,6 +47,20 @@
     "productName": "AI Architect Assistant",
     "files": [
       "electron/**/*"
+    ],
+    "extraResources": [
+      {
+        "from": ".next/standalone",
+        "to": "standalone"
+      }
+    ],
+    "protocols": [
+      {
+        "name": "AI Architect Assistant",
+        "schemes": [
+          "aiarchitect"
+        ]
+      }
     ],
     "publish": [
       {
