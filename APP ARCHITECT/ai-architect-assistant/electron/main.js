@@ -4,7 +4,7 @@ const fs = require("fs");
 const os = require("os");
 const net = require("net");
 const http = require("http");
-const { spawn } = require("child_process");
+const { spawn, spawnSync } = require("child_process");
 
 let mainWindow;
 let serverProcess;
@@ -156,8 +156,16 @@ async function startLocalServer() {
 
 function stopLocalServer() {
   if (serverProcess && !serverProcess.killed) {
+    const pid = serverProcess.pid;
     try {
-      serverProcess.kill();
+      if (process.platform === "win32" && pid) {
+        // Server chạy bằng chính file .exe của Electron (ELECTRON_RUN_AS_NODE).
+        // Phải kill cả cây tiến trình con và ÉP BUỘC, nếu không installer NSIS
+        // vẫn thấy tiến trình dùng file .exe → báo "cannot be closed".
+        spawnSync("taskkill", ["/pid", String(pid), "/T", "/F"]);
+      } else {
+        serverProcess.kill();
+      }
     } catch {
       // process có thể đã thoát
     }
@@ -371,7 +379,10 @@ function setupAutoUpdate() {
       detail: "Bấm cập nhật để cài ngay, hoặc để sau — bản mới sẽ tự cài khi bạn thoát ứng dụng.",
     });
     if (response === 0) {
-      setImmediate(() => autoUpdater.quitAndInstall());
+      // Dừng hẳn server con (cùng file .exe) trước, nếu không installer
+      // sẽ báo "cannot be closed" rồi đòi đóng tay.
+      stopLocalServer();
+      setTimeout(() => autoUpdater.quitAndInstall(), 500);
     }
   });
 

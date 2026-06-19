@@ -1,33 +1,23 @@
 'use client'
 
 import { useCallback, useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { Plus, Copy, Check, ExternalLink, Loader2, ClipboardList, Trash2 } from 'lucide-react'
+import { Plus, ArrowRight, Loader2, ClipboardList, Trash2 } from 'lucide-react'
 import type { BriefingProject } from '@/lib/briefing-types'
 import { formatDate } from '@/lib/briefing-utils'
 
-// Trang khảo sát công khai (đã deploy lên Vercel) để khách điền từ điện thoại
-const PUBLIC_BRIEF_BASE = 'https://ai-architect-assistant.vercel.app'
-
 const STATUS_CONFIG = {
-  pending:   { label: 'Chờ KH', className: 'bg-stone-800 text-stone-400' },
+  pending:   { label: 'Chờ làm', className: 'bg-stone-800 text-stone-400' },
   active:    { label: 'Đang làm', className: 'bg-amber-900/40 text-amber-400' },
-  completed: { label: 'Hoàn thành', className: 'bg-emerald-900/40 text-emerald-400' },
+  completed: { label: 'Đã có nhiệm vụ', className: 'bg-emerald-900/40 text-emerald-400' },
 }
 
 function ProjectCard({ project, onDelete }: { project: BriefingProject; onDelete: (id: string) => void }) {
-  const [copied, setCopied] = useState(false)
   const status = STATUS_CONFIG[project.status as keyof typeof STATUS_CONFIG] ?? STATUS_CONFIG.pending
 
-  async function copyLink() {
-    const url = `${PUBLIC_BRIEF_BASE}/brief/${project.client_token}`
-    await navigator.clipboard.writeText(url)
-    setCopied(true)
-    setTimeout(() => setCopied(false), 2000)
-  }
-
   function handleDelete() {
-    if (!window.confirm(`Xoá khảo sát "${project.project_name}"? Không thể hoàn tác.`)) return
+    if (!window.confirm(`Xoá nhiệm vụ "${project.project_name}"? Không thể hoàn tác.`)) return
     onDelete(project.id)
   }
 
@@ -42,7 +32,7 @@ function ProjectCard({ project, onDelete }: { project: BriefingProject; onDelete
           <span className={`text-xs px-2 py-1 rounded-full ${status.className}`}>{status.label}</span>
           <button
             onClick={handleDelete}
-            aria-label="Xoá khảo sát"
+            aria-label="Xoá nhiệm vụ"
             className="rounded-lg p-1.5 text-stone-600 opacity-0 transition-all hover:bg-stone-800 hover:text-red-400 group-hover:opacity-100"
           >
             <Trash2 size={14} />
@@ -51,21 +41,12 @@ function ProjectCard({ project, onDelete }: { project: BriefingProject; onDelete
       </div>
 
       <div className="flex items-center gap-2 mt-4">
-        {project.status === 'completed' ? (
-          <Link href={`/studio/briefing/${project.id}`}
-            className="flex-1 flex items-center justify-center gap-1.5 text-xs bg-stone-200 hover:bg-white text-stone-900 py-2 rounded-xl font-medium transition-colors"
-          >
-            <ExternalLink size={13} />
-            Xem brief
-          </Link>
-        ) : (
-          <button onClick={copyLink}
-            className="flex-1 flex items-center justify-center gap-1.5 text-xs bg-stone-800 hover:bg-stone-700 text-stone-300 py-2 rounded-xl transition-colors"
-          >
-            {copied ? <Check size={13} className="text-emerald-400" /> : <Copy size={13} />}
-            {copied ? 'Đã copy link!' : 'Copy link KH'}
-          </button>
-        )}
+        <Link href={`/studio/briefing/${project.id}`}
+          className="flex-1 flex items-center justify-center gap-1.5 text-xs bg-stone-800 hover:bg-stone-700 text-stone-300 py-2 rounded-xl transition-colors"
+        >
+          <ArrowRight size={13} />
+          Mở nhiệm vụ
+        </Link>
       </div>
     </div>
   )
@@ -101,9 +82,9 @@ function CreateProjectModal({ onCreated, onClose }: { onCreated: (p: BriefingPro
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
       <div className="w-full max-w-md bg-stone-950 border border-stone-800 rounded-2xl p-6">
-        <h2 className="font-semibold text-stone-100 mb-1">Dự án mới</h2>
+        <h2 className="font-semibold text-stone-100 mb-1">Nhiệm vụ mới</h2>
         <p className="text-xs text-stone-500 mb-5">
-          Sau khi tạo, bạn nhận một đường link khảo sát để gửi khách hàng — họ tự điền nhu cầu, mong muốn thiết kế &amp; xây dựng.
+          Tạo nhiệm vụ thiết kế cho một dự án. Sau khi tạo, bạn tự điền thông tin chi tiết &amp; để AI đề xuất nhiệm vụ thiết kế.
         </p>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
@@ -125,7 +106,7 @@ function CreateProjectModal({ onCreated, onClose }: { onCreated: (p: BriefingPro
               className="flex-1 py-3 text-sm font-medium text-stone-900 bg-stone-200 hover:bg-white disabled:opacity-40 rounded-xl transition-colors flex items-center justify-center gap-2"
             >
               {loading && <Loader2 size={14} className="animate-spin" />}
-              Tạo & lấy link
+              Tạo nhiệm vụ
             </button>
           </div>
         </form>
@@ -135,6 +116,7 @@ function CreateProjectModal({ onCreated, onClose }: { onCreated: (p: BriefingPro
 }
 
 export default function BriefingDashboard() {
+  const router = useRouter()
   const [projects, setProjects] = useState<BriefingProject[]>([])
   const [loading, setLoading] = useState(true)
   const [showModal, setShowModal] = useState(false)
@@ -153,6 +135,7 @@ export default function BriefingDashboard() {
   function handleCreated(project: BriefingProject) {
     setProjects((prev) => [project, ...prev])
     setShowModal(false)
+    router.push(`/studio/briefing/${project.id}`)
   }
 
   async function handleDelete(id: string) {
@@ -164,16 +147,16 @@ export default function BriefingDashboard() {
     <div className="mx-auto max-w-5xl px-4 py-8">
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-xl font-display font-semibold text-stone-100">Khảo sát AI</h1>
+          <h1 className="text-xl font-display font-semibold text-stone-100">Nhiệm vụ thiết kế</h1>
           <p className="text-sm text-stone-500 mt-1">
-            Tạo đường link khảo sát gửi khách hàng — khách tự điền nhu cầu, mong muốn khi thiết kế &amp; xây dựng; AI tự tổng hợp thành brief.
+            Tự điền thông tin chi tiết của dự án — AI đề xuất bản nhiệm vụ thiết kế để bạn bắt tay vào concept.
           </p>
         </div>
         <button onClick={() => setShowModal(true)}
           className="flex items-center gap-2 bg-stone-200 hover:bg-white text-stone-900 px-4 py-2.5 rounded-xl text-sm font-medium transition-colors"
         >
           <Plus size={16} />
-          Dự án mới
+          Nhiệm vụ mới
         </button>
       </div>
 
@@ -184,8 +167,8 @@ export default function BriefingDashboard() {
       ) : projects.length === 0 ? (
         <div className="text-center py-24 border border-dashed border-stone-800 rounded-2xl">
           <ClipboardList size={40} className="mx-auto text-stone-700 mb-3" />
-          <p className="text-stone-500 text-sm mb-1">Chưa có dự án nào</p>
-          <p className="text-stone-600 text-xs">Tạo dự án mới để lấy link khảo sát gửi cho khách hàng</p>
+          <p className="text-stone-500 text-sm mb-1">Chưa có nhiệm vụ nào</p>
+          <p className="text-stone-600 text-xs">Tạo nhiệm vụ mới để điền thông tin &amp; để AI đề xuất nhiệm vụ thiết kế</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">

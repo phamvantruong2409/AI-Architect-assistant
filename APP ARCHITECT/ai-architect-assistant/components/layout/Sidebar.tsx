@@ -43,7 +43,7 @@ const studioItems = [
     gradient: "from-teal-600 to-cyan-500",
   },
   {
-    name: "Khảo sát AI",
+    name: "Nhiệm vụ thiết kế",
     href: "/studio/briefing",
     icon: PencilIcon,
     gradient: "from-amber-600 to-orange-500",

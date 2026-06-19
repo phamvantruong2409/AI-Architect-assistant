@@ -146,7 +146,7 @@ export function deepseekErrorCode(
 export function deepseekErrorMessage(error: unknown): string {
   switch (deepseekErrorCode(error)) {
     case "NO_API_KEY":
-      return "Tính năng DeepSeek tạm thời chưa sẵn sàng. Vui lòng thử lại sau hoặc chọn model Gemini.";
+      return "Chưa cấu hình API key DeepSeek (thiếu DEEPSEEK_API_KEY). Vui lòng thêm key hoặc chọn model Gemini.";
     case "QUOTA_EXCEEDED":
       return "DeepSeek đã hết hạn mức hoặc hết số dư tài khoản. Vui lòng nạp thêm hoặc thử lại sau.";
     case "AUTH_ERROR":
