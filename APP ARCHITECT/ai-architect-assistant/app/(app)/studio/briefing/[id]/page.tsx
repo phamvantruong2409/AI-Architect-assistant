@@ -7,6 +7,8 @@ import { ArrowLeft, Loader2, Sparkles } from "lucide-react";
 import { MarkdownLite } from "@/components/chat/MarkdownLite";
 import { SURVEY_SECTIONS } from "@/lib/briefing-survey";
 import type { BriefRecord } from "@/lib/briefing-store";
+import { DOC_MODELS } from "@/lib/ai-models";
+import { useChatModel } from "@/hooks/useChatModel";
 
 export default function BriefingDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -15,6 +17,7 @@ export default function BriefingDetailPage() {
   const [error, setError] = useState<string | null>(null);
   const [generating, setGenerating] = useState(false);
   const [genError, setGenError] = useState<string | null>(null);
+  const [model, setModel] = useChatModel(DOC_MODELS);
 
   useEffect(() => {
     fetch(`/api/briefing/brief/${id}`)
@@ -31,7 +34,11 @@ export default function BriefingDetailPage() {
     setGenerating(true);
     setGenError(null);
     try {
-      const res = await fetch(`/api/briefing/brief/${id}`, { method: "POST" });
+      const res = await fetch(`/api/briefing/brief/${id}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ model }),
+      });
       const d = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(d.error || "Tạo brief thất bại");
       setRecord((r) => (r ? { ...r, brief: d.brief } : r));
@@ -91,14 +98,26 @@ export default function BriefingDetailPage() {
           <p className="text-sm text-foreground-soft">
             Khách hàng đã hoàn thành khảo sát. Tạo bản brief thiết kế bằng AI từ các đáp án bên dưới.
           </p>
-          <button
-            onClick={generateBrief}
-            disabled={generating}
-            className="inline-flex items-center gap-2 rounded-lg bg-accent px-4 py-2 text-sm font-medium text-accent-foreground transition-opacity hover:opacity-90 disabled:opacity-50"
-          >
-            {generating ? <Loader2 size={16} className="animate-spin" /> : <Sparkles size={16} />}
-            {generating ? "Đang tạo brief..." : "Tạo brief bằng AI"}
-          </button>
+          <div className="flex flex-wrap items-center gap-2">
+            <select
+              value={model}
+              onChange={(e) => setModel(e.target.value as typeof model)}
+              disabled={generating}
+              className="rounded-lg border border-border bg-surface px-3 py-2 text-xs font-medium text-foreground focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring disabled:opacity-50"
+            >
+              {DOC_MODELS.map((m) => (
+                <option key={m.id} value={m.id}>{m.label}</option>
+              ))}
+            </select>
+            <button
+              onClick={generateBrief}
+              disabled={generating}
+              className="inline-flex items-center gap-2 rounded-lg bg-accent px-4 py-2 text-sm font-medium text-accent-foreground transition-opacity hover:opacity-90 disabled:opacity-50"
+            >
+              {generating ? <Loader2 size={16} className="animate-spin" /> : <Sparkles size={16} />}
+              {generating ? "Đang tạo brief..." : "Tạo brief bằng AI"}
+            </button>
+          </div>
           {genError && <p className="text-sm text-red-400">{genError}</p>}
         </div>
       )}

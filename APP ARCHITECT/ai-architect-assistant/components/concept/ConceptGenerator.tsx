@@ -9,7 +9,7 @@ import { recordAiCall, markRateLimited, estimateTokens } from "@/lib/ai-usage";
 import type { Concept, ProjectBrief } from "@/types/concept";
 
 export function ConceptGenerator() {
-  const [model, setModel] = useChatModel();
+  const [model, setModel] = useChatModel(GEMINI_MODELS);
   const [concepts, setConcepts] = useState<Concept[] | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);

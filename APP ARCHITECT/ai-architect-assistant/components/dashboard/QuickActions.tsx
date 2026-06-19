@@ -8,6 +8,7 @@ import {
   LayersIcon,
   ImageIcon,
   DocumentIcon,
+  ArchiveIcon,
 } from "@/components/layout/icons";
 
 const ICONS = {
@@ -16,6 +17,7 @@ const ICONS = {
   layers: LayersIcon,
   image: ImageIcon,
   document: DocumentIcon,
+  archive: ArchiveIcon,
 };
 
 const ICON_GLOWS = {
@@ -24,6 +26,7 @@ const ICON_GLOWS = {
   layers: "shadow-[0_0_16px_rgba(20,184,166,0.25)]",
   image: "shadow-[0_0_16px_rgba(20,184,166,0.25)]",
   document: "shadow-[0_0_16px_rgba(20,184,166,0.25)]",
+  archive: "shadow-[0_0_16px_rgba(20,184,166,0.25)]",
 };
 
 function handleMouseMove(e: React.MouseEvent<HTMLAnchorElement>) {

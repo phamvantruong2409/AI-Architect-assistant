@@ -1,4 +1,4 @@
-import { getGeminiModel, generateContentRetry } from "./gemini";
+import { generateTextLLM } from "./ai";
 import { SURVEY_SECTIONS } from "./briefing-survey";
 import type { SurveyAnswers } from "./briefing-store";
 
@@ -46,7 +46,7 @@ export async function generateBriefFromSurvey(
   answers: SurveyAnswers,
   modelId?: string
 ): Promise<string> {
-  const model = getGeminiModel(modelId);
-  const result = await generateContentRetry(model, buildPrompt(projectName, clientName, formatAnswers(answers)));
-  return result.response.text().trim();
+  const prompt = buildPrompt(projectName, clientName, formatAnswers(answers));
+  const text = await generateTextLLM({ model: modelId, prompt });
+  return text.trim();
 }

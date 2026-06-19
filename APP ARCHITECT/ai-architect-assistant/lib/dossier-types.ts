@@ -1,4 +1,4 @@
-import type { GeminiModelId } from "@/lib/gemini-models";
+import type { AiModelId } from "@/lib/ai-models";
 
 export type DossierDocType = "phuong_an" | "concept" | "xin_phep";
 export type DossierLength = "ngan" | "tieu_chuan" | "chi_tiet";
@@ -16,7 +16,7 @@ export interface DossierFormData {
   materials: string;
   docType: DossierDocType;
   length: DossierLength;
-  model: GeminiModelId;
+  model: AiModelId;
 }
 
 export interface DossierSection {

@@ -1,23 +1,32 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { GEMINI_MODELS, DEFAULT_GEMINI_MODEL, type GeminiModelId } from "@/lib/gemini-models";
+import { AI_MODELS, DEFAULT_GEMINI_MODEL, type AiModelId } from "@/lib/ai-models";
 
 const STORAGE_KEY = "ai-architect:chat-model";
 
-function isGeminiModelId(value: string | null): value is GeminiModelId {
-  return GEMINI_MODELS.some((m) => m.id === value);
-}
-
-export function useChatModel() {
-  const [model, setModel] = useState<GeminiModelId>(DEFAULT_GEMINI_MODEL);
+/**
+ * Lựa chọn model dùng chung (lưu localStorage). `allowed` giới hạn danh sách
+ * model hợp lệ cho trang hiện tại — trang chỉ hỗ trợ Gemini truyền GEMINI_MODELS
+ * để không hiển thị/nhận model DeepSeek đã lưu từ tính năng khác.
+ */
+export function useChatModel<T extends string = AiModelId>(
+  allowed: readonly { id: T }[] = AI_MODELS as unknown as readonly { id: T }[]
+) {
+  const [model, setModel] = useState<T>(DEFAULT_GEMINI_MODEL as T);
 
   useEffect(() => {
     const stored = window.localStorage.getItem(STORAGE_KEY);
-    if (isGeminiModelId(stored)) setModel(stored);
+    if (stored && allowed.some((m) => m.id === stored)) {
+      // Đọc lựa chọn đã lưu sau khi mount để tránh lệch hydration (server không
+      // có localStorage). setState ở đây là cố ý.
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setModel(stored as T);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const updateModel = (value: GeminiModelId) => {
+  const updateModel = (value: T) => {
     setModel(value);
     window.localStorage.setItem(STORAGE_KEY, value);
   };

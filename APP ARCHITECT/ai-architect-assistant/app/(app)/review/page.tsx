@@ -20,7 +20,7 @@ function scoreColor(score: number, max: number): string {
 }
 
 export default function ReviewPage() {
-  const [model, setModel] = useChatModel();
+  const [model, setModel] = useChatModel(GEMINI_MODELS);
   const [preview, setPreview] = useState<string | null>(null);
   const [imageBase64, setImageBase64] = useState<string | null>(null);
   const [mimeType, setMimeType] = useState<string>("image/jpeg");

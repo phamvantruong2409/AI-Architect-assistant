@@ -2,7 +2,7 @@ export interface QuickAction {
   label: string;
   description: string;
   href: string;
-  icon: "chat" | "wand" | "layers" | "image" | "document";
+  icon: "chat" | "wand" | "layers" | "image" | "document" | "archive";
   cta: string;
 }
 
@@ -15,14 +15,21 @@ export const quickActions: QuickAction[] = [
     cta: "Bắt đầu chat",
   },
   {
-    label: "Prompt AI",
-    description: "Tạo prompt render với AI siêu nhanh",
-    href: "/prompt-render",
-    icon: "wand",
-    cta: "Tạo prompt",
+    label: "Lưu trữ Prompt",
+    description: "Cất giữ prompt kèm ảnh, lưu vĩnh viễn",
+    href: "/prompt-library",
+    icon: "archive",
+    cta: "Mở kho",
   },
   {
-    label: "Layout AI",
+    label: "Ảnh → Prompt",
+    description: "Đưa ảnh vào, AI đọc ngược ra prompt tái tạo",
+    href: "/image-to-prompt",
+    icon: "image",
+    cta: "Trích prompt",
+  },
+  {
+    label: "Sơ đồ khối AI",
     description: "Bố cục mặt bằng thông minh",
     href: "/auto-layout",
     icon: "layers",

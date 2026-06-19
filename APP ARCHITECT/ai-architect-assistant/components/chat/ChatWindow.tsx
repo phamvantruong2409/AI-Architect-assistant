@@ -6,7 +6,7 @@ import { useChat } from "@/hooks/useChat";
 import { useChatModel } from "@/hooks/useChatModel";
 import { useAiUsage } from "@/hooks/useAiUsage";
 import { getChatSession, type ChatSessionMessage } from "@/lib/chat-sessions";
-import { GEMINI_MODELS } from "@/lib/gemini-models";
+import { AI_MODELS, GEMINI_MODELS } from "@/lib/ai-models";
 import { MessageBubble } from "./MessageBubble";
 import { ChatInput } from "./ChatInput";
 import { SparkleIcon } from "@/components/layout/icons";
@@ -126,9 +126,10 @@ function ChatSessionInner({
     model
   );
 
-  // Model còn lượt để gợi ý chuyển sang khi model hiện tại bị 429
+  // Model Gemini còn lượt để gợi ý chuyển sang khi model hiện tại bị 429
+  // (chỉ áp dụng cho Gemini — DeepSeek dùng quota/số dư riêng của người dùng).
   const fallback = GEMINI_MODELS.find((m) => m.id !== model && !rateLimited[m.id]);
-  const currentLabel = GEMINI_MODELS.find((m) => m.id === model)?.label ?? model;
+  const currentLabel = AI_MODELS.find((m) => m.id === model)?.label ?? model;
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -160,7 +161,7 @@ function ChatSessionInner({
             onChange={(e) => setModel(e.target.value as typeof model)}
             className="appearance-none rounded-card border border-border bg-surface px-3 py-1.5 pr-8 text-xs font-medium text-foreground focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
           >
-            {GEMINI_MODELS.map((m) => (
+            {AI_MODELS.map((m) => (
               <option key={m.id} value={m.id}>
                 {m.label}
               </option>

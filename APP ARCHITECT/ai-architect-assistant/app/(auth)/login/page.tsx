@@ -237,8 +237,8 @@ export default function LoginPage() {
                 </label>
                 <span className="group relative inline-flex">
                   <InfoIcon className="h-3.5 w-3.5 cursor-help text-foreground-soft/70 transition-colors hover:text-accent" />
-                  <span className="pointer-events-none absolute bottom-full left-1/2 z-10 mb-2 hidden w-64 -translate-x-1/2 rounded-card border border-border bg-surface px-3 py-2 text-xs leading-relaxed text-foreground shadow-lg group-hover:block">
-                    API Key dùng cho các tác vụ có sử dụng AI trong AI Architect Assistant — chat, sinh concept, đánh giá render, thuyết minh, kiểm tra pháp lý...
+                  <span className="pointer-events-none absolute bottom-full left-1/2 z-10 mb-2 hidden w-72 -translate-x-1/2 rounded-card border border-border bg-surface px-3 py-2 text-xs leading-relaxed text-foreground shadow-lg group-hover:block">
+                    API Key dùng cho các tác vụ liên quan đến hình ảnh trong AI Architect Assistant
                     <span className="absolute left-1/2 top-full -translate-x-1/2 border-4 border-transparent border-t-border" />
                   </span>
                 </span>

@@ -2,12 +2,43 @@ import { getGeminiModel } from "@/lib/gemini";
 import { systemPrompt } from "@/lib/prompts/system";
 import { legalPrompt } from "@/lib/prompts/legal";
 import { geminiErrorCode, geminiErrorMessage } from "@/lib/gemini-error";
+import { getProvider } from "@/lib/ai-models";
+import {
+  deepseekStreamText,
+  deepseekErrorCode,
+  deepseekErrorMessage,
+} from "@/lib/deepseek";
 
 export async function POST(req: Request) {
   const { messages, mode, model } = await req.json();
 
   if (!Array.isArray(messages) || messages.length === 0) {
     return Response.json({ error: "Thiếu tin nhắn" }, { status: 400 });
+  }
+
+  const system = mode === "legal" ? legalPrompt : systemPrompt;
+
+  // DeepSeek: API tương thích OpenAI, stream về text thuần như Gemini.
+  if (getProvider(model) === "deepseek") {
+    try {
+      const stream = await deepseekStreamText({
+        model,
+        system,
+        messages: messages.map((m: { role: string; content: string }) => ({
+          role: m.role === "assistant" ? ("assistant" as const) : ("user" as const),
+          content: m.content,
+        })),
+      });
+      return new Response(stream, {
+        headers: { "Content-Type": "text/plain; charset=utf-8" },
+      });
+    } catch (error) {
+      console.error("DeepSeek chat error:", error);
+      return Response.json(
+        { error: deepseekErrorMessage(error), code: deepseekErrorCode(error) },
+        { status: 502 }
+      );
+    }
   }
 
   const history = messages.slice(0, -1).map((m: { role: string; content: string }) => ({
@@ -22,7 +53,7 @@ export async function POST(req: Request) {
     const chat = getGeminiModel(model).startChat({
       systemInstruction: {
         role: "system",
-        parts: [{ text: mode === "legal" ? legalPrompt : systemPrompt }],
+        parts: [{ text: system }],
       },
       history,
     });

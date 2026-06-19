@@ -1,4 +1,4 @@
-import { getGeminiModel, generateContentRetry } from "@/lib/gemini";
+import { generateTextLLM } from "@/lib/ai";
 import type {
   DossierFormData,
   DossierResult,
@@ -27,8 +27,6 @@ function line(label: string, value: string): string {
 }
 
 export async function generateDossier(form: DossierFormData): Promise<DossierResult> {
-  const model = getGeminiModel(form.model);
-
   const info =
     line("Tên công trình", form.projectName) +
     line("Loại công trình", form.buildingType) +
@@ -67,8 +65,7 @@ Trả về JSON THUẦN TÚY (không markdown, không \`\`\`), đúng cấu trú
 }
 Chỉ trả về JSON.`;
 
-  const result = await generateContentRetry(model, prompt);
-  const text = result.response.text().trim();
+  const text = (await generateTextLLM({ model: form.model, prompt })).trim();
   const cleaned = text
     .replace(/^```json\n?/, "")
     .replace(/^```\n?/, "")

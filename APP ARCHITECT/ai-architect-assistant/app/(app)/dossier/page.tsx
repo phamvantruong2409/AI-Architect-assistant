@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { MarkdownLite } from "@/components/chat/MarkdownLite";
-import { GEMINI_MODELS } from "@/lib/gemini-models";
+import { DOC_MODELS } from "@/lib/ai-models";
 import { useChatModel } from "@/hooks/useChatModel";
 import { recordAiCall, markRateLimited, estimateTokens } from "@/lib/ai-usage";
 import {
@@ -99,7 +99,7 @@ function slugify(name: string): string {
 }
 
 export default function DossierPage() {
-  const [model, setModel] = useChatModel();
+  const [model, setModel] = useChatModel(DOC_MODELS);
   const [form, setForm] = useState(EMPTY);
   const [projects, setProjects] = useState<ProjectLite[]>([]);
   const [result, setResult] = useState<DossierResult | null>(null);
@@ -328,7 +328,7 @@ export default function DossierPage() {
               value={model}
               onChange={(e) => setModel(e.target.value as typeof model)}
             >
-              {GEMINI_MODELS.map((m) => (
+              {DOC_MODELS.map((m) => (
                 <option key={m.id} value={m.id}>{m.label}</option>
               ))}
             </select>

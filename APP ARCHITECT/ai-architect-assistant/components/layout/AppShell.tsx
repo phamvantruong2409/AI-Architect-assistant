@@ -8,6 +8,7 @@ import { Sidebar } from "./Sidebar";
 import { AmbientSound } from "./AmbientSound";
 import { MenuIcon, CloseIcon, ChatIcon } from "./icons";
 import { navItems } from "./nav-items";
+import { createClient } from "@/lib/supabase/client";
 
 function ArrowLeftIcon({ className }: { className?: string }) {
   return (
@@ -30,8 +31,31 @@ const GREETINGS = [
 export function AppShell({ children }: { children: React.ReactNode }) {
   const [open, setOpen] = useState(false);
   const [greeting, setGreeting] = useState<string | null>(null);
+  // null = đang kiểm tra, true = đã có tên/phiên, false = chưa → đang đẩy về /login
+  const [authed, setAuthed] = useState<boolean | null>(null);
   const pathname = usePathname();
   const router = useRouter();
+
+  useEffect(() => {
+    // Guard vào workspace: đã tạo tên (lần trước) hoặc đã đăng nhập Google thì vào
+    // thẳng; chưa có gì thì mới đẩy về trang login để tạo tên.
+    let active = true;
+    (async () => {
+      if (localStorage.getItem("user-name")) {
+        if (active) setAuthed(true);
+        return;
+      }
+      const { data } = await createClient().auth.getSession();
+      if (!active) return;
+      if (data.session) {
+        setAuthed(true);
+      } else {
+        setAuthed(false);
+        router.replace("/login");
+      }
+    })();
+    return () => { active = false; };
+  }, [router]);
 
   useEffect(() => {
     if (pathname === "/chat") return;
@@ -61,6 +85,10 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   };
   const studioLabel = Object.entries(studioLabels).find(([path]) => pathname.startsWith(path))?.[1];
   const current = navItems.find((item) => item.href === pathname) ?? (studioLabel ? { label: studioLabel } : undefined);
+
+  // Chưa xác minh xong (hoặc chưa có tên → đang chuyển sang /login): không render
+  // workspace để tránh nháy nội dung dashboard rồi mới nhảy trang.
+  if (authed !== true) return null;
 
   return (
     <div className="flex min-h-screen">

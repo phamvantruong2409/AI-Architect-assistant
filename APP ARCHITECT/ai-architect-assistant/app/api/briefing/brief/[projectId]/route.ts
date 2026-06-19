@@ -1,6 +1,6 @@
 import { getBriefById, deleteBrief, setBriefById } from "@/lib/briefing-store";
 import { generateBriefFromSurvey } from "@/lib/briefing-gemini";
-import { geminiErrorCode, geminiErrorMessage } from "@/lib/gemini-error";
+import { aiErrorCode, aiErrorMessage } from "@/lib/ai";
 
 export async function GET(
   _req: Request,
@@ -16,7 +16,7 @@ export async function GET(
 
 // KTS chủ động bấm tạo brief bằng AI từ đáp án khảo sát đã có.
 export async function POST(
-  _req: Request,
+  req: Request,
   { params }: { params: Promise<{ projectId: string }> }
 ) {
   const { projectId } = await params;
@@ -29,14 +29,22 @@ export async function POST(
     return Response.json({ error: "Khách hàng chưa hoàn thành khảo sát" }, { status: 400 });
   }
 
+  const body = await req.json().catch(() => ({}));
+  const model = typeof body?.model === "string" ? body.model : undefined;
+
   try {
-    const brief = await generateBriefFromSurvey(record.project_name, record.client_name, answers);
+    const brief = await generateBriefFromSurvey(
+      record.project_name,
+      record.client_name,
+      answers,
+      model
+    );
     await setBriefById(projectId, brief);
     return Response.json({ ok: true, brief });
   } catch (error) {
     console.error("Briefing generate error:", error);
     return Response.json(
-      { error: geminiErrorMessage(error), code: geminiErrorCode(error) },
+      { error: aiErrorMessage(error, model), code: aiErrorCode(error, model) },
       { status: 502 }
     );
   }

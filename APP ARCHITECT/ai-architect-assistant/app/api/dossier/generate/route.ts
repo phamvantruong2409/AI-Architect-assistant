@@ -1,5 +1,5 @@
 import { generateDossier } from "@/lib/dossier-gemini";
-import { geminiErrorCode, geminiErrorMessage } from "@/lib/gemini-error";
+import { aiErrorCode, aiErrorMessage } from "@/lib/ai";
 import type { DossierFormData } from "@/lib/dossier-types";
 
 export async function POST(req: Request) {
@@ -29,7 +29,7 @@ export async function POST(req: Request) {
       );
     }
     return Response.json(
-      { error: geminiErrorMessage(error), code: geminiErrorCode(error) },
+      { error: aiErrorMessage(error, body.model), code: aiErrorCode(error, body.model) },
       { status: 502 }
     );
   }
