@@ -3,8 +3,10 @@
 import { useRef, useState } from "react";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
+import { ProgressBar } from "@/components/ui/ProgressBar";
 import { GEMINI_MODELS } from "@/lib/gemini-models";
 import { useChatModel } from "@/hooks/useChatModel";
+import { useFakeProgress } from "@/hooks/useFakeProgress";
 import { recordAiCall, markRateLimited, estimateTokens } from "@/lib/ai-usage";
 import { MAX_IMAGE_BYTES, type ReviewResult } from "@/lib/review-types";
 
@@ -28,6 +30,7 @@ export default function ReviewPage() {
   const [result, setResult] = useState<ReviewResult | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const pct = useFakeProgress(loading);
   const fileRef = useRef<HTMLInputElement>(null);
 
   function handleFile(file: File | undefined) {
@@ -167,13 +170,14 @@ export default function ReviewPage() {
 
         <div className="flex justify-end">
           <Button onClick={handleAnalyze} disabled={loading || !imageBase64}>
-            {loading ? "Đang phân tích ảnh..." : "🔍 Đánh giá render"}
+            {loading ? `Đang phân tích ảnh... ${pct}%` : "🔍 Đánh giá render"}
           </Button>
         </div>
       </Card>
 
       {loading && (
         <Card className="space-y-3 p-6">
+          <ProgressBar percent={pct} label="AI đang đánh giá render" />
           <div className="h-16 w-1/3 animate-pulse rounded bg-surface-muted" />
           <div className="h-4 w-full animate-pulse rounded bg-surface-muted" />
           <div className="h-4 w-5/6 animate-pulse rounded bg-surface-muted" />

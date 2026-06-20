@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { Logo } from "@/components/marketing/Logo";
@@ -9,9 +8,10 @@ import { cn } from "@/lib/utils";
 import { useChatSessions } from "@/hooks/useChatSessions";
 import { deleteChatSession, formatRelativeTime, type ChatSession } from "@/lib/chat-sessions";
 import { ConfirmDeleteDialog } from "@/components/chat/ConfirmDeleteDialog";
+import { AmbientSound } from "./AmbientSound";
+import { NotificationBell } from "./NotificationBell";
 import { navItems } from "./nav-items";
-import { SettingsIcon, StarIcon, TrashIcon, CubeIcon, LayersIcon, WandIcon, ImageIcon, PencilIcon, ChevronDownIcon, BellIcon } from "./icons";
-import { ThemeToggle } from "./ThemeToggle";
+import { SettingsIcon, StarIcon, TrashIcon, CubeIcon, ShieldIcon, BrainIcon, RocketIcon, PaletteIcon, PencilIcon, ChevronDownIcon } from "./icons";
 import { useAiUsage } from "@/hooks/useAiUsage";
 import { MODEL_LIMITS, DEFAULT_LIMIT } from "@/lib/ai-usage";
 import { GEMINI_MODELS, DEFAULT_GEMINI_MODEL } from "@/lib/gemini-models";
@@ -26,20 +26,19 @@ const studioItems = [
   {
     name: "Portfolio",
     href: "/portfolio",
-    iconSrc: "/images/studio/logoport.png",
-    icon: ImageIcon,
+    icon: PaletteIcon,
     gradient: "from-violet-600 to-purple-500",
   },
   {
     name: "Pháp lý AI",
     href: "/studio/regulatory",
-    icon: LayersIcon,
+    icon: ShieldIcon,
     gradient: "from-rose-600 to-pink-500",
   },
   {
     name: "Kiến thức AI",
     href: "/studio/knowledge",
-    icon: CubeIcon,
+    icon: BrainIcon,
     gradient: "from-teal-600 to-cyan-500",
   },
   {
@@ -51,7 +50,7 @@ const studioItems = [
   {
     name: "Sắp ra mắt",
     href: null,
-    icon: WandIcon,
+    icon: RocketIcon,
     gradient: "from-zinc-600 to-zinc-500",
   },
 ];
@@ -196,11 +195,7 @@ export function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
                     "flex h-6 w-6 shrink-0 items-center justify-center rounded-[6px]",
                     active ? `bg-gradient-to-br ${item.gradient}` : "bg-sidebar-surface"
                   )}>
-                    {item.iconSrc ? (
-                      <Image src={item.iconSrc} alt={item.name} width={16} height={16} className="h-4 w-4 object-contain" />
-                    ) : (
-                      <Icon className={cn("h-3.5 w-3.5", active ? "text-white" : "text-sidebar-foreground-soft")} />
-                    )}
+                    <Icon className={cn("h-3.5 w-3.5", active ? "text-white" : "text-sidebar-foreground-soft")} />
                   </span>
                   <span className="text-xs font-medium">{item.name}</span>
                 </Link>
@@ -322,13 +317,8 @@ export function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
               <SettingsIcon className="h-[18px] w-[18px]" />
               Cài đặt
             </Link>
-            <button
-              className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-sidebar-foreground-soft transition-colors hover:bg-sidebar-surface hover:text-sidebar-foreground"
-              aria-label="Thông báo"
-            >
-              <BellIcon className="h-[17px] w-[17px]" />
-            </button>
-            <ThemeToggle />
+            <NotificationBell />
+            <AmbientSound />
           </div>
           <div className="px-3 py-1">
             <p className="text-xs font-medium text-sidebar-foreground leading-tight">{userName}</p>

@@ -5,6 +5,8 @@ import { BriefForm } from "./BriefForm";
 import { ConceptGrid } from "./ConceptGrid";
 import { GEMINI_MODELS } from "@/lib/gemini-models";
 import { useChatModel } from "@/hooks/useChatModel";
+import { useFakeProgress } from "@/hooks/useFakeProgress";
+import { ProgressBar } from "@/components/ui/ProgressBar";
 import { recordAiCall, markRateLimited, estimateTokens } from "@/lib/ai-usage";
 import type { Concept, ProjectBrief } from "@/types/concept";
 
@@ -13,6 +15,7 @@ export function ConceptGenerator() {
   const [concepts, setConcepts] = useState<Concept[] | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const pct = useFakeProgress(loading);
 
   const handleSubmit = async (brief: ProjectBrief) => {
     setLoading(true);
@@ -76,13 +79,16 @@ export function ConceptGenerator() {
       )}
 
       {loading && (
-        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {[0, 1, 2].map((i) => (
-            <div
-              key={i}
-              className="h-72 animate-pulse rounded-card border border-border bg-surface-muted"
-            />
-          ))}
+        <div className="space-y-5">
+          <ProgressBar percent={pct} label="AI đang sinh concept" />
+          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            {[0, 1, 2].map((i) => (
+              <div
+                key={i}
+                className="h-72 animate-pulse rounded-card border border-border bg-surface-muted"
+              />
+            ))}
+          </div>
         </div>
       )}
 

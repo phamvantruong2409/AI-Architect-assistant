@@ -6,17 +6,11 @@ import { useChat } from "@/hooks/useChat";
 import { useChatModel } from "@/hooks/useChatModel";
 import { useAiUsage } from "@/hooks/useAiUsage";
 import { getChatSession, type ChatSessionMessage } from "@/lib/chat-sessions";
-import { AI_MODELS, GEMINI_MODELS } from "@/lib/ai-models";
+import { AI_MODELS, GEMINI_MODELS, DEFAULT_CHAT_MODEL } from "@/lib/ai-models";
 import { MessageBubble } from "./MessageBubble";
 import { ChatInput } from "./ChatInput";
-import { SparkleIcon } from "@/components/layout/icons";
-
-const DEFAULT_SUGGESTIONS = [
-  "Gợi ý vật liệu chống nóng cho mặt tiền hướng Tây",
-  "Quy định khoảng lùi xây dựng nhà phố theo QCVN 01:2021",
-  "So sánh phong cách Indochine và Nhiệt đới hiện đại",
-  "Thông thủy cầu thang tối thiểu là bao nhiêu?",
-];
+import { DEFAULT_CHAT_QUESTIONS } from "@/lib/suggestions";
+import { DAILY_CHAT_LIMIT } from "@/lib/ai-usage";
 
 const DEFAULT_TITLE = "Bạn đang nghĩ về điều gì?";
 const DEFAULT_DESCRIPTION =
@@ -48,7 +42,7 @@ export function ChatWindow(props: ChatWindowProps) {
 
 function ChatSession({
   mode = "default",
-  suggestions = DEFAULT_SUGGESTIONS,
+  suggestions,
   emptyTitle = DEFAULT_TITLE,
   emptyDescription = DEFAULT_DESCRIPTION,
   banner,
@@ -117,10 +111,10 @@ function ChatSessionInner({
   searchParams: ReturnType<typeof useSearchParams>;
 }) {
   const [sessionId] = useState(() => sessionIdParam ?? initialSessionId);
-  const [model, setModel] = useChatModel();
+  const [model, setModel] = useChatModel(AI_MODELS, DEFAULT_CHAT_MODEL);
   const { rateLimited } = useAiUsage();
 
-  const { messages, sendMessage, generateImage, stopGeneration, resetQuota, isStreaming, quotaExceeded } = useChat(
+  const { messages, sendMessage, generateImage, stopGeneration, resetQuota, isStreaming, quotaExceeded, chatLimitReached } = useChat(
     mode,
     { id: sessionId, path: pathname, initialMessages },
     model
@@ -129,7 +123,6 @@ function ChatSessionInner({
   // Model Gemini còn lượt để gợi ý chuyển sang khi model hiện tại bị 429
   // (chỉ áp dụng cho Gemini — DeepSeek dùng quota/số dư riêng của người dùng).
   const fallback = GEMINI_MODELS.find((m) => m.id !== model && !rateLimited[m.id]);
-  const currentLabel = AI_MODELS.find((m) => m.id === model)?.label ?? model;
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -150,6 +143,24 @@ function ChatSessionInner({
       behavior: "smooth",
     });
   }, [messages]);
+
+  // Khi không truyền suggestions riêng (vd chat mặc định) → tải câu hỏi gợi ý
+  // theo ngày do AI sinh, bám xu hướng hiện tại; lỗi/offline thì giữ mặc định.
+  const [dailyQuestions, setDailyQuestions] = useState<string[] | null>(null);
+  useEffect(() => {
+    if (suggestions) return;
+    let alive = true;
+    fetch("/api/chat-suggestions")
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => {
+        if (alive && d?.suggestions?.length) setDailyQuestions(d.suggestions);
+      })
+      .catch(() => {});
+    return () => {
+      alive = false;
+    };
+  }, [suggestions]);
+  const effectiveSuggestions = suggestions ?? dailyQuestions ?? DEFAULT_CHAT_QUESTIONS;
 
   return (
     <div className="flex h-full flex-col">
@@ -174,7 +185,7 @@ function ChatSessionInner({
           <EmptyState
             title={emptyTitle ?? DEFAULT_TITLE}
             description={emptyDescription ?? DEFAULT_DESCRIPTION}
-            suggestions={suggestions ?? DEFAULT_SUGGESTIONS}
+            suggestions={effectiveSuggestions}
             onPick={sendMessage}
           />
         ) : (
@@ -188,7 +199,7 @@ function ChatSessionInner({
       {quotaExceeded && (
         fallback ? (
           <div className="flex flex-wrap items-center justify-center gap-2 border-t border-amber-500/30 bg-amber-500/10 px-4 py-2 text-center text-xs font-medium text-amber-600">
-            <span>{currentLabel} đã hết lượt hôm nay.</span>
+            <span>Đã hết lượt đặt câu hỏi cho hôm nay.</span>
             <button
               onClick={() => {
                 setModel(fallback.id);
@@ -196,7 +207,7 @@ function ChatSessionInner({
               }}
               className="rounded-card bg-amber-500/90 px-2.5 py-1 font-semibold text-white transition-colors hover:bg-amber-500"
             >
-              Đổi sang {fallback.label}
+              Thử nguồn AI khác
             </button>
           </div>
         ) : (
@@ -205,12 +216,18 @@ function ChatSessionInner({
           </div>
         )
       )}
+      {chatLimitReached && (
+        <div className="border-t border-amber-500/30 bg-amber-500/10 px-4 py-2 text-center text-xs font-medium text-amber-600">
+          Đã đạt giới hạn {DAILY_CHAT_LIMIT} câu hỏi cho hôm nay. Vui lòng quay lại vào ngày mai.
+        </div>
+      )}
       <ChatInput
         onSend={sendMessage}
         onGenerateImage={generateImage}
         onStop={stopGeneration}
         disabled={isStreaming}
-        blocked={quotaExceeded}
+        blocked={quotaExceeded || chatLimitReached}
+        blockedMessage={chatLimitReached ? `Đã đạt ${DAILY_CHAT_LIMIT} câu hỏi cho hôm nay — quay lại vào ngày mai.` : undefined}
       />
     </div>
   );
@@ -229,9 +246,12 @@ function EmptyState({
 }) {
   return (
     <div className="flex h-full flex-col items-center justify-center px-6 py-12 text-center">
-      <div className="flex h-12 w-12 items-center justify-center rounded-full bg-accent-soft text-accent">
-        <SparkleIcon className="h-6 w-6" />
-      </div>
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src="/images/logoiconhinhtron.png"
+        alt="AI Architect"
+        className="h-16 w-16 rounded-full object-contain"
+      />
       <h2 className="font-display mt-4 text-2xl">{title}</h2>
       <p className="mt-2 max-w-md text-sm text-foreground-soft">
         {description}

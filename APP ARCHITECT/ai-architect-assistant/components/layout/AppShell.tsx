@@ -1,11 +1,11 @@
 "use client";
 
-import { Suspense, useEffect, useState } from "react";
+import { Suspense, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
 import { Sidebar } from "./Sidebar";
-import { AmbientSound } from "./AmbientSound";
+import { TaskIndicator } from "./TaskIndicator";
 import { MenuIcon, CloseIcon, ChatIcon } from "./icons";
 import { navItems } from "./nav-items";
 import { createClient } from "@/lib/supabase/client";
@@ -26,6 +26,30 @@ const GREETINGS = [
   "Cần brief dự án nhanh? Tôi giúp được đó! ✏️",
   "Hôm nay mình thiết kế gì cùng nhau nhỉ?",
   "Cần tư vấn vật liệu hay xu hướng mới? 💡",
+  "Dự án đang tới đâu rồi? Cần tôi phụ một tay không?",
+  "Bí ý tưởng mặt tiền? Hỏi tôi thử xem! 🏠",
+  "Muốn phối cảnh đẹp hơn? Tôi gợi ý prompt cho nhé!",
+  "Đang vướng quy chuẩn nào không? Tôi tra giúp ngay.",
+  "Cần ý tưởng bố trí mặt bằng không nào? 📐",
+  "Thử một phong cách mới cho dự án hôm nay nhé?",
+  "Cần tính khoảng lùi hay mật độ xây dựng? Hỏi tôi nha.",
+  "Mệt rồi thì nghỉ chút, xong mình làm tiếp nhé! ☕",
+  "Có muốn tôi đề xuất bảng màu cho không gian này?",
+  "Cần ý tưởng chống nóng cho hướng Tây không? ☀️",
+  "Muốn so sánh vài phương án thiết kế không nào?",
+  "Đang nghĩ về nội thất phòng nào thế? Tôi gợi ý nhé!",
+  "Cần tham khảo công trình tương tự không? 🔍",
+  "Thử brief nhanh cho khách hàng xem sao nhé?",
+  "Cần ý tưởng cảnh quan, sân vườn không nào? 🌿",
+  "Muốn tối ưu ánh sáng tự nhiên cho nhà không?",
+  "Có dự định làm nhà cấp 4 hiện đại không nhỉ?",
+  "Cần gợi ý vật liệu bền vững, thân thiện không? 🌱",
+  "Đang thiết kế cho khí hậu vùng nào thế?",
+  "Muốn tôi phác ý tưởng concept cho dự án mới chứ?",
+  "Cần ý tưởng cho không gian nhỏ, tối ưu diện tích? 📏",
+  "Thử hỏi tôi về phong thủy hướng nhà nhé?",
+  "Có muốn xem xu hướng kiến trúc 2026 không nào? ✨",
+  "Cần một góc nhìn mới cho thiết kế hôm nay chứ?",
 ];
 
 export function AppShell({ children }: { children: React.ReactNode }) {
@@ -57,16 +81,21 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     return () => { active = false; };
   }, [router]);
 
+  const greetingIndex = useRef(0);
+
   useEffect(() => {
     if (pathname === "/chat") return;
+    let hideTimer: ReturnType<typeof setTimeout>;
+    // Lần lượt qua từng câu (không lặp lại liền kề) — mỗi câu cách nhau 2 phút,
+    // hiện khoảng 10 giây rồi ẩn.
     const show = () => {
-      const msg = GREETINGS[Math.floor(Math.random() * GREETINGS.length)];
-      setGreeting(msg);
-      setTimeout(() => setGreeting(null), 5000);
+      setGreeting(GREETINGS[greetingIndex.current % GREETINGS.length]);
+      greetingIndex.current += 1;
+      hideTimer = setTimeout(() => setGreeting(null), 10000);
     };
-    const initial = setTimeout(show, 12000);
-    const interval = setInterval(show, 50000);
-    return () => { clearTimeout(initial); clearInterval(interval); };
+    const initial = setTimeout(show, 120000);
+    const interval = setInterval(show, 120000);
+    return () => { clearTimeout(initial); clearInterval(interval); clearTimeout(hideTimer); };
   }, [pathname]);
 
   useEffect(() => {
@@ -164,7 +193,6 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               </motion.div>
             )}
           </AnimatePresence>
-          <AmbientSound />
           <Link
             href="/chat"
             aria-label="Mở AI Chat"
@@ -174,6 +202,11 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           </Link>
         </div>
       )}
+
+      {/* Chỉ báo tác vụ nền — hiện ở MỌI trang (kể cả /chat) */}
+      <div className="fixed bottom-6 left-6 z-40">
+        <TaskIndicator />
+      </div>
     </div>
   );
 }

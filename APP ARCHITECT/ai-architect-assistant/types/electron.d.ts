@@ -6,6 +6,7 @@ interface LocalUpscaleArgs {
 }
 
 interface ElectronAPI {
+  getAppVersion: () => Promise<string>;
   selectFolder: () => Promise<string | null>;
   openExternal: (url: string) => Promise<boolean>;
   onAuthCode: (callback: (code: string) => void) => () => void;

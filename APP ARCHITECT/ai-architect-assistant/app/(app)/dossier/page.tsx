@@ -3,9 +3,11 @@
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
+import { ProgressBar } from "@/components/ui/ProgressBar";
 import { MarkdownLite } from "@/components/chat/MarkdownLite";
 import { DOC_MODELS } from "@/lib/ai-models";
 import { useChatModel } from "@/hooks/useChatModel";
+import { useFakeProgress } from "@/hooks/useFakeProgress";
 import { recordAiCall, markRateLimited, estimateTokens } from "@/lib/ai-usage";
 import {
   BUILDING_TYPES,
@@ -106,6 +108,7 @@ export default function DossierPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
+  const pct = useFakeProgress(loading);
 
   useEffect(() => {
     fetch("/api/projects")
@@ -343,13 +346,14 @@ export default function DossierPage() {
 
         <div className="flex justify-end">
           <Button onClick={handleGenerate} disabled={loading}>
-            {loading ? "Đang soạn thuyết minh..." : "✨ Sinh thuyết minh"}
+            {loading ? `Đang soạn thuyết minh... ${pct}%` : "✨ Sinh thuyết minh"}
           </Button>
         </div>
       </Card>
 
       {loading && (
         <Card className="space-y-4 p-6">
+          <ProgressBar percent={pct} label="AI đang soạn thuyết minh" />
           {[0, 1, 2, 3].map((i) => (
             <div key={i} className="space-y-2">
               <div className="h-4 w-1/3 animate-pulse rounded bg-surface-muted" />

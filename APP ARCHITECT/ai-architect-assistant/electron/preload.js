@@ -2,6 +2,8 @@ const { contextBridge, ipcRenderer } = require("electron");
 
 contextBridge.exposeInMainWorld("electronAPI", {
   selectFolder: () => ipcRenderer.invoke("select-folder"),
+  // Phiên bản app hiện tại (app.getVersion) — dùng để phát hiện vừa cập nhật.
+  getAppVersion: () => ipcRenderer.invoke("app-version"),
   // Mở URL bằng trình duyệt mặc định của hệ thống (dùng cho đăng nhập Google).
   openExternal: (url) => ipcRenderer.invoke("open-external", url),
   // Nhận lại "code" khi trình duyệt quay về app qua deep link aiarchitect://

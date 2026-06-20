@@ -11,9 +11,10 @@ const STORAGE_KEY = "ai-architect:chat-model";
  * để không hiển thị/nhận model DeepSeek đã lưu từ tính năng khác.
  */
 export function useChatModel<T extends string = AiModelId>(
-  allowed: readonly { id: T }[] = AI_MODELS as unknown as readonly { id: T }[]
+  allowed: readonly { id: T }[] = AI_MODELS as unknown as readonly { id: T }[],
+  defaultModel: T = DEFAULT_GEMINI_MODEL as T
 ) {
-  const [model, setModel] = useState<T>(DEFAULT_GEMINI_MODEL as T);
+  const [model, setModel] = useState<T>(defaultModel);
 
   useEffect(() => {
     const stored = window.localStorage.getItem(STORAGE_KEY);

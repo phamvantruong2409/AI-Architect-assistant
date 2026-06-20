@@ -1,19 +1,28 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { SendIcon } from "@/components/layout/icons";
-
-const SUGGESTIONS = [
-  "Thiết kế villa 2 tầng 10x20m",
-  "Nhà chống nóng miền Tây",
-  "Resort sinh thái Phú Quốc",
-  "Văn phòng hiện đại 500m²",
-];
+import { DEFAULT_SUGGESTIONS } from "@/lib/suggestions";
 
 export function PromptBar() {
   const [value, setValue] = useState("");
+  const [suggestions, setSuggestions] = useState<string[]>(DEFAULT_SUGGESTIONS);
   const router = useRouter();
+
+  // Tải gợi ý theo ngày (do AI sinh, bám bối cảnh hôm nay); lỗi thì giữ mặc định.
+  useEffect(() => {
+    let alive = true;
+    fetch("/api/suggestions")
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (alive && data?.suggestions?.length) setSuggestions(data.suggestions);
+      })
+      .catch(() => {});
+    return () => {
+      alive = false;
+    };
+  }, []);
 
   const submit = (query?: string) => {
     const q = (query ?? value).trim();
@@ -48,7 +57,7 @@ export function PromptBar() {
 
       <div className="flex flex-wrap items-center gap-2">
         <span className="text-xs text-white/35">Gợi ý cho bạn:</span>
-        {SUGGESTIONS.map((s) => (
+        {suggestions.map((s) => (
           <button
             key={s}
             onClick={() => submit(s)}

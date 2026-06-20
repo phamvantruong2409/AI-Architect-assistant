@@ -7,6 +7,7 @@ import { ArrowLeft, ChevronRight } from 'lucide-react'
 import ParamForm from '@/components/regulatory/ParamForm'
 import FileDropzone from '@/components/regulatory/FileDropzone'
 import type { CheckFormData } from '@/lib/regulatory-types'
+import { useFakeProgress } from '@/hooks/useFakeProgress'
 
 const DEFAULT_FORM: CheckFormData = {
   project_name: '', project_address: '',
@@ -30,6 +31,7 @@ export default function NewRegulatoryCheckPage() {
   const [section, setSection] = useState(0)
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const pct = useFakeProgress(submitting)
 
   function update<K extends keyof CheckFormData>(key: K, value: CheckFormData[K]) {
     setForm((prev) => ({ ...prev, [key]: value }))
@@ -123,7 +125,7 @@ export default function NewRegulatoryCheckPage() {
           <button onClick={handleSubmit} disabled={submitting}
             className="flex-1 py-3 text-sm font-medium bg-stone-200 hover:bg-white disabled:opacity-50 text-stone-900 rounded-xl transition-colors"
           >
-            {submitting ? 'Đang phân tích...' : '⚡ Kiểm tra pháp lý'}
+            {submitting ? `Đang phân tích... ${pct}%` : '⚡ Kiểm tra pháp lý'}
           </button>
         )}
       </div>

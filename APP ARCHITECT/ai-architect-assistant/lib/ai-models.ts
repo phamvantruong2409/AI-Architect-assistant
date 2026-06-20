@@ -17,11 +17,16 @@ export type DeepSeekModelId = (typeof DEEPSEEK_MODELS)[number]["id"];
 // Tất cả model text — dùng cho CHAT (đủ cả pro + flash) và để tra cứu provider/nhãn.
 export const AI_MODELS = [...GEMINI_MODELS, ...DEEPSEEK_MODELS] as const;
 
-// Model cho tác vụ tài liệu (thuyết minh, phân tích brief): chỉ Gemini + DeepSeek
-// Pro — KHÔNG có Flash (Flash chỉ dành cho chat bot).
+// Model cho tác vụ tài liệu (thuyết minh): chỉ Gemini + DeepSeek Pro.
 export const DOC_MODELS = [...GEMINI_MODELS, DEEPSEEK_MODELS[0]] as const;
 
+// Model cho "Nhiệm vụ thiết kế" (sinh brief, chỉ-text): Gemini + cả DeepSeek Pro & Flash.
+export const BRIEF_MODELS = [...GEMINI_MODELS, ...DEEPSEEK_MODELS] as const;
+
 export type AiModelId = GeminiModelId | DeepSeekModelId;
+
+/** Model mặc định cho khung CHAT — DeepSeek V4 Flash (nhanh). */
+export const DEFAULT_CHAT_MODEL: AiModelId = "deepseek-v4-flash";
 
 /** Xác định nhà cung cấp dựa trên model id để route đúng client. */
 export function getProvider(modelId?: string): "gemini" | "deepseek" {

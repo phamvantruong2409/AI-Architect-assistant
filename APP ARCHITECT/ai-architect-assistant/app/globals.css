@@ -2,24 +2,25 @@
 
 @custom-variant dark (&:where(.dark, .dark *));
 
+/* App chỉ dùng dark mode — giá trị dark là mặc định luôn ở :root. */
 :root {
-  --background: #f7f5f1;
-  --surface: #ffffff;
-  --surface-muted: #efebe3;
-  --foreground: #211f1c;
-  --foreground-soft: #5d574e;
-  --border: #e4ded3;
+  --background: #050B14;
+  --surface: #0B1120;
+  --surface-muted: #111827;
+  --foreground: #FFFFFF;
+  --foreground-soft: #94A3B8;
+  --border: rgba(255,255,255,0.08);
   --accent: #14B8A6;
   --accent-soft: rgba(20,184,166,0.12);
-  --accent-foreground: #ffffff;
+  --accent-foreground: #f0fdfa;
   --ring: #14B8A6;
 
-  --sidebar-bg: var(--background);
-  --sidebar-surface: var(--surface-muted);
-  --sidebar-fg: var(--foreground);
-  --sidebar-fg-soft: var(--foreground-soft);
-  --sidebar-border: var(--border);
-  --sidebar-active-bg: var(--accent-soft);
+  --sidebar-bg: #0A1020;
+  --sidebar-surface: #111827;
+  --sidebar-fg: #FFFFFF;
+  --sidebar-fg-soft: #94A3B8;
+  --sidebar-border: rgba(255,255,255,0.06);
+  --sidebar-active-bg: rgba(20,184,166,0.15);
 }
 
 @theme inline {
@@ -45,26 +46,6 @@
   --font-sans: var(--font-inter);
 
   --radius-card: 1rem;
-}
-
-.dark {
-  --background: #050B14;
-  --surface: #0B1120;
-  --surface-muted: #111827;
-  --foreground: #FFFFFF;
-  --foreground-soft: #94A3B8;
-  --border: rgba(255,255,255,0.08);
-  --accent: #14B8A6;
-  --accent-soft: rgba(20,184,166,0.12);
-  --accent-foreground: #f0fdfa;
-  --ring: #14B8A6;
-
-  --sidebar-bg: #0A1020;
-  --sidebar-surface: #111827;
-  --sidebar-fg: #FFFFFF;
-  --sidebar-fg-soft: #94A3B8;
-  --sidebar-border: rgba(255,255,255,0.06);
-  --sidebar-active-bg: rgba(20,184,166,0.15);
 }
 
 html {

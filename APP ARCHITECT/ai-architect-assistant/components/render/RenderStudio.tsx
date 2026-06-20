@@ -4,8 +4,11 @@ import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
+import { ProgressBar } from "@/components/ui/ProgressBar";
 import { GEMINI_MODELS } from "@/lib/gemini-models";
 import { useChatModel } from "@/hooks/useChatModel";
+import { useTask } from "@/hooks/useTasks";
+import { startTask, dismissTask } from "@/lib/tasks";
 import { recordAiCall, markRateLimited, estimateTokens } from "@/lib/ai-usage";
 import {
   RENDER_MODELS,
@@ -172,15 +175,11 @@ export function RenderStudio({ variant = "sketchup" }: { variant?: RenderVariant
   const [imageBase64, setImageBase64] = useState<string | null>(null);
   const [mimeType, setMimeType] = useState("image/jpeg");
 
-  const [analyzing, setAnalyzing] = useState(false);
-  const [analyzeProgress, setAnalyzeProgress] = useState(0);
   const [analysis, setAnalysis] = useState<RenderAnalysis | null>(null);
 
   // Render Optimizer (variant "optimize") — bước 1: đánh giá của KTS, người dùng sửa được.
   const [critique, setCritique] = useState("");
   const [critiqueTitle, setCritiqueTitle] = useState("");
-  // Bước 2: đang gọi AI tạo prompt cải thiện từ bài đánh giá.
-  const [buildingPrompt, setBuildingPrompt] = useState(false);
 
   // Trạng thái có thể sửa, dẫn xuất từ phân tích.
   const [basePrompt, setBasePrompt] = useState("");
@@ -199,13 +198,44 @@ export function RenderStudio({ variant = "sketchup" }: { variant?: RenderVariant
     setResolution(modelResolutions(id)[0]);
   }
 
-  const [rendering, setRendering] = useState(false);
+  // Render chạy như TÁC VỤ NỀN (lib/tasks) → vẫn chạy khi rời trang, quay lại
+  // đọc tiến trình/ kết quả live. Mỗi variant một tác vụ riêng.
+  const renderTaskId = `render:${variant}`;
+  const renderRoute = variant === "optimize" ? "/render-optimizer" : "/render";
+  const renderTask = useTask(renderTaskId);
+  const rendering = renderTask?.status === "running";
+  const renderPct = renderTask?.progress ?? 0;
+
+  // Các bước phụ (phân tích / đánh giá / tạo prompt cải thiện) cũng chạy nền.
+  const analyzeTask = useTask(`render:analyze:${variant}`);
+  const critiqueTask = useTask(`render:critique:${variant}`);
+  const improveTask = useTask(`render:improve:${variant}`);
+  const analyzing = analyzeTask?.status === "running" || critiqueTask?.status === "running";
+  const analyzeProgress =
+    (analyzeTask?.status === "running" ? analyzeTask.progress : critiqueTask?.progress) ?? 0;
+  const buildingPrompt = improveTask?.status === "running";
+  const buildPct = improveTask?.progress ?? 0;
   const [sceneEditing, setSceneEditing] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
   const [results, setResults] = useState<string[]>([]);
   const [error, setError] = useState<string | null>(null);
 
   const [history, setHistory] = useState<RenderHistoryItem[]>([]);
+
+  // Khi tác vụ render nền xong/ lỗi → nạp kết quả vào trang rồi gỡ khỏi store.
+  useEffect(() => {
+    if (renderTask?.status === "done") {
+      setResults((renderTask.result as string[]) ?? []);
+      setError(null);
+      dismissTask(renderTaskId);
+      loadHistory().then(setHistory).catch(() => {});
+    } else if (renderTask?.status === "error") {
+      setError(renderTask.error ?? "Render thất bại");
+      dismissTask(renderTaskId);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [renderTask?.status]);
+
   const fileRef = useRef<HTMLInputElement>(null);
   // Lưu lại nội dung ô "Bầu trời" do AI gợi ý, để khôi phục khi chọn "Tự động".
   const aiSkyRef = useRef("");
@@ -291,97 +321,133 @@ export function RenderStudio({ variant = "sketchup" }: { variant?: RenderVariant
     setAngle(a.recommendedAngleIds[0] ?? "keep");
   }
 
-  async function analyze(b64: string, mime: string) {
-    setAnalyzing(true);
+  function analyze(b64: string, mime: string) {
     setError(null);
-    setAnalyzeProgress(8);
-    const timer = setInterval(() => {
-      setAnalyzeProgress((p) => (p >= 92 ? 92 : Math.min(92, p + Math.max(1, Math.round((94 - p) * 0.1)))));
-    }, 250);
-    try {
-      const res = await fetch("/api/render/analyze", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ imageBase64: b64, mimeType: mime, model: analysisModel }),
-      });
-      const json = await res.json();
-      if (!res.ok) {
-        if (json.code === "QUOTA_EXCEEDED") markRateLimited(analysisModel);
-        throw new Error(json.error || "Phân tích ảnh thất bại");
-      }
-      const a = json as RenderAnalysis;
-      recordAiCall(analysisModel, 300 + estimateTokens(JSON.stringify(a)));
-      applyAnalysis(a);
-      setAnalyzeProgress(100);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Phân tích ảnh thất bại");
-    } finally {
-      clearInterval(timer);
-      setAnalyzing(false);
-      setTimeout(() => setAnalyzeProgress(0), 400);
-    }
+    const curModel = analysisModel;
+    startTask({
+      id: `render:analyze:${variant}`,
+      type: "analyze",
+      label: "Đang phân tích ảnh…",
+      route: renderRoute,
+      fakeProgress: true,
+      run: async () => {
+        const res = await fetch("/api/render/analyze", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ imageBase64: b64, mimeType: mime, model: curModel }),
+        });
+        const json = await res.json();
+        if (!res.ok) {
+          if (json.code === "QUOTA_EXCEEDED") markRateLimited(curModel);
+          throw new Error(json.error || "Phân tích ảnh thất bại");
+        }
+        const a = json as RenderAnalysis;
+        recordAiCall(curModel, 300 + estimateTokens(JSON.stringify(a)));
+        return a;
+      },
+    });
   }
 
   /** Render Optimizer — bước 1: gọi KTS đánh giá ảnh, đổ vào ô đánh giá sửa được. */
-  async function critiqueImage(b64: string, mime: string) {
-    setAnalyzing(true);
+  function critiqueImage(b64: string, mime: string) {
     setError(null);
-    setAnalyzeProgress(8);
-    const timer = setInterval(() => {
-      setAnalyzeProgress((p) => (p >= 92 ? 92 : Math.min(92, p + Math.max(1, Math.round((94 - p) * 0.1)))));
-    }, 250);
-    try {
-      const res = await fetch("/api/render/critique", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ imageBase64: b64, mimeType: mime, model: analysisModel }),
-      });
-      const json = await res.json();
-      if (!res.ok) {
-        if (json.code === "QUOTA_EXCEEDED") markRateLimited(analysisModel);
-        throw new Error(json.error || "Đánh giá ảnh thất bại");
-      }
-      recordAiCall(analysisModel, 300 + estimateTokens(JSON.stringify(json)));
-      setCritique(typeof json.critique === "string" ? json.critique : "");
-      setCritiqueTitle(typeof json.title === "string" ? json.title : "");
-      setAnalyzeProgress(100);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Đánh giá ảnh thất bại");
-    } finally {
-      clearInterval(timer);
-      setAnalyzing(false);
-      setTimeout(() => setAnalyzeProgress(0), 400);
-    }
+    const curModel = analysisModel;
+    startTask({
+      id: `render:critique:${variant}`,
+      type: "critique",
+      label: "Đang đánh giá ảnh…",
+      route: renderRoute,
+      fakeProgress: true,
+      run: async () => {
+        const res = await fetch("/api/render/critique", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ imageBase64: b64, mimeType: mime, model: curModel }),
+        });
+        const json = await res.json();
+        if (!res.ok) {
+          if (json.code === "QUOTA_EXCEEDED") markRateLimited(curModel);
+          throw new Error(json.error || "Đánh giá ảnh thất bại");
+        }
+        recordAiCall(curModel, 300 + estimateTokens(JSON.stringify(json)));
+        return {
+          critique: typeof json.critique === "string" ? json.critique : "",
+          title: typeof json.title === "string" ? json.title : "",
+        };
+      },
+    });
   }
 
   /** Render Optimizer — bước 2: từ bài đánh giá (đã sửa) tạo prompt cải thiện + đề xuất. */
-  async function buildImprovePrompt() {
+  function buildImprovePrompt() {
     if (!imageBase64 || !critique.trim()) {
       setError("Chưa có ảnh hoặc phần đánh giá để tạo prompt");
       return;
     }
-    setBuildingPrompt(true);
     setError(null);
-    try {
-      const res = await fetch("/api/render/improve", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ imageBase64, mimeType, model: analysisModel, critique }),
-      });
-      const json = await res.json();
-      if (!res.ok) {
-        if (json.code === "QUOTA_EXCEEDED") markRateLimited(analysisModel);
-        throw new Error(json.error || "Tạo prompt cải thiện thất bại");
-      }
-      const a = json as RenderAnalysis;
-      recordAiCall(analysisModel, 300 + estimateTokens(JSON.stringify(a)));
-      applyAnalysis(a);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Tạo prompt cải thiện thất bại");
-    } finally {
-      setBuildingPrompt(false);
-    }
+    const curModel = analysisModel;
+    const b64 = imageBase64;
+    const mime = mimeType;
+    const cr = critique;
+    startTask({
+      id: `render:improve:${variant}`,
+      type: "improve",
+      label: "Đang tạo prompt cải thiện…",
+      route: renderRoute,
+      fakeProgress: true,
+      run: async () => {
+        const res = await fetch("/api/render/improve", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ imageBase64: b64, mimeType: mime, model: curModel, critique: cr }),
+        });
+        const json = await res.json();
+        if (!res.ok) {
+          if (json.code === "QUOTA_EXCEEDED") markRateLimited(curModel);
+          throw new Error(json.error || "Tạo prompt cải thiện thất bại");
+        }
+        const a = json as RenderAnalysis;
+        recordAiCall(curModel, 300 + estimateTokens(JSON.stringify(a)));
+        return a;
+      },
+    });
   }
+
+  // Nạp kết quả các bước phụ (chạy nền) vào trang khi xong; lỗi → báo lỗi.
+  useEffect(() => {
+    if (analyzeTask?.status === "done") {
+      applyAnalysis(analyzeTask.result as RenderAnalysis);
+      dismissTask(`render:analyze:${variant}`);
+    } else if (analyzeTask?.status === "error") {
+      setError(analyzeTask.error ?? "Phân tích ảnh thất bại");
+      dismissTask(`render:analyze:${variant}`);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [analyzeTask?.status]);
+
+  useEffect(() => {
+    if (critiqueTask?.status === "done") {
+      const r = critiqueTask.result as { critique: string; title: string };
+      setCritique(r?.critique ?? "");
+      setCritiqueTitle(r?.title ?? "");
+      dismissTask(`render:critique:${variant}`);
+    } else if (critiqueTask?.status === "error") {
+      setError(critiqueTask.error ?? "Đánh giá ảnh thất bại");
+      dismissTask(`render:critique:${variant}`);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [critiqueTask?.status]);
+
+  useEffect(() => {
+    if (improveTask?.status === "done") {
+      applyAnalysis(improveTask.result as RenderAnalysis);
+      dismissTask(`render:improve:${variant}`);
+    } else if (improveTask?.status === "error") {
+      setError(improveTask.error ?? "Tạo prompt cải thiện thất bại");
+      dismissTask(`render:improve:${variant}`);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [improveTask?.status]);
 
   function finalPrompt(): string {
     // Render Optimizer chỉ bám theo prompt cải thiện — KHÔNG ghép khung hình (góc view) hay thời điểm.
@@ -424,52 +490,61 @@ export function RenderStudio({ variant = "sketchup" }: { variant?: RenderVariant
       setError("Chưa có prompt phân tích — hãy phân tích ảnh trước");
       return;
     }
-    setRendering(true);
     setError(null);
     setResults([]);
     const prompt = finalPrompt();
-    try {
-      const res = await fetch("/api/render/generate", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ image: preview, prompt, negativePrompt, model, count, resolution }),
-      });
-      const json = await res.json();
-      if (!res.ok) {
-        if (json.code === "QUOTA_EXCEEDED") markRateLimited(model);
-        throw new Error(json.error || "Render thất bại");
-      }
-      const images = (json.images as string[]) ?? [];
-      if (images.length === 0) throw new Error("AI không trả về ảnh");
-      recordAiCall(model, estimateTokens(prompt) * count);
-      setResults(images);
 
-      // Lưu vào thư viện.
-      const thumb = await makeThumb(preview);
-      const modelLabel = renderModelLabel(model);
-      const angleLabel = variant === "optimize" ? "Tối ưu render" : viewAngleLabel(angle);
-      for (const image of images) {
-        const item: RenderHistoryItem = {
-          id: newId("render"),
-          sourceThumb: thumb,
-          image,
-          prompt,
-          modelLabel,
-          angleLabel,
-          createdAt: Date.now(),
-        };
-        try {
-          await addHistory(item);
-        } catch {
-          /* bỏ qua nếu lưu lỗi */
+    // Chụp lại các giá trị cần thiết để runner chạy độc lập với component (sống
+    // sót khi rời trang). Lưu thư viện cũng nằm trong runner.
+    const payload = { image: preview, prompt, negativePrompt, model, count, resolution };
+    const sourceImage = preview;
+    const curModel = model;
+    const curCount = count;
+    const modelLabel = renderModelLabel(model);
+    const angleLabel = variant === "optimize" ? "Tối ưu render" : viewAngleLabel(angle);
+
+    startTask({
+      id: renderTaskId,
+      type: "render",
+      label: variant === "optimize" ? "Đang tối ưu render…" : "Đang render ảnh…",
+      route: renderRoute,
+      fakeProgress: true,
+      run: async () => {
+        const res = await fetch("/api/render/generate", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+        const json = await res.json();
+        if (!res.ok) {
+          if (json.code === "QUOTA_EXCEEDED") markRateLimited(curModel);
+          throw new Error(json.error || "Render thất bại");
         }
-      }
-      loadHistory().then(setHistory).catch(() => {});
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Render thất bại");
-    } finally {
-      setRendering(false);
-    }
+        const images = (json.images as string[]) ?? [];
+        if (images.length === 0) throw new Error("AI không trả về ảnh");
+        recordAiCall(curModel, estimateTokens(prompt) * curCount);
+
+        // Lưu vào thư viện.
+        const thumb = await makeThumb(sourceImage);
+        for (const image of images) {
+          const item: RenderHistoryItem = {
+            id: newId("render"),
+            sourceThumb: thumb,
+            image,
+            prompt,
+            modelLabel,
+            angleLabel,
+            createdAt: Date.now(),
+          };
+          try {
+            await addHistory(item);
+          } catch {
+            /* bỏ qua nếu lưu lỗi */
+          }
+        }
+        return images;
+      },
+    });
   }
 
   async function sendToUpscale(image: string) {
@@ -679,7 +754,7 @@ export function RenderStudio({ variant = "sketchup" }: { variant?: RenderVariant
                 : "Khi ưng phần đánh giá, bấm “Tạo Prompt cải thiện” để dựng prompt render lại."}
             </p>
             <Button onClick={() => void buildImprovePrompt()} disabled={buildingPrompt || !critique.trim()}>
-              {buildingPrompt ? "Đang tạo prompt…" : "✨ Tạo Prompt cải thiện"}
+              {buildingPrompt ? `Đang tạo prompt… ${buildPct}%` : "✨ Tạo Prompt cải thiện"}
             </Button>
           </div>
         </Card>
@@ -1001,7 +1076,7 @@ export function RenderStudio({ variant = "sketchup" }: { variant?: RenderVariant
                   {rendering ? (
                     <>
                       <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/40 border-t-white" />
-                      Đang render…
+                      Đang render… {renderPct}%
                     </>
                   ) : (
                     <>{copy.renderLabel(count)}</>
@@ -1015,10 +1090,13 @@ export function RenderStudio({ variant = "sketchup" }: { variant?: RenderVariant
 
       {/* Skeleton khi đang render */}
       {rendering && (
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-          {Array.from({ length: count }, (_, i) => (
-            <div key={i} className="aspect-video animate-pulse rounded-card border border-border bg-surface-muted" />
-          ))}
+        <div className="space-y-3">
+          <ProgressBar percent={renderPct} label="AI đang render ảnh" />
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            {Array.from({ length: count }, (_, i) => (
+              <div key={i} className="aspect-video animate-pulse rounded-card border border-border bg-surface-muted" />
+            ))}
+          </div>
         </div>
       )}
 

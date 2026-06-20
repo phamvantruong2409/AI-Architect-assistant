@@ -6,7 +6,11 @@
 
 const LOG_KEY = "ai-architect:usage-log"; // [{ t, model, tokens }]
 const LIMIT_KEY = "ai-architect:rate-limited"; // { date, models: {id:true} }
+const CHAT_COUNT_KEY = "ai-architect:chat-count"; // { date, count }
 export const USAGE_EVENT = "ai-usage-updated";
+
+/** Trần SỐ CÂU HỎI chat mỗi ngày cho 1 máy. Đạt mức này → chặn hỏi thêm. */
+export const DAILY_CHAT_LIMIT = 15;
 
 // Trần cho thanh đo (Google không cho đọc trần thật theo thời gian thực).
 // rpd = null => không giới hạn. Chỉnh tại đây nếu cần.
@@ -100,6 +104,38 @@ export function clearRateLimited(model: string) {
 export function getRateLimited(): Record<string, boolean> {
   if (typeof window === "undefined") return {};
   return readLimitState().models;
+}
+
+// ── Giới hạn số câu hỏi chat/ngày (đếm tại máy, reset nửa đêm local) ──
+function readChatCount(): { date: string; count: number } {
+  try {
+    const s = JSON.parse(localStorage.getItem(CHAT_COUNT_KEY) || "null");
+    if (s && s.date === today()) return s;
+  } catch {
+    /* ignore */
+  }
+  return { date: today(), count: 0 };
+}
+
+/** Số câu hỏi chat đã hỏi hôm nay tại máy này. */
+export function getChatCountToday(): number {
+  if (typeof window === "undefined") return 0;
+  return readChatCount().count;
+}
+
+/** Đã chạm trần câu hỏi/ngày chưa. */
+export function isChatLimitReached(): boolean {
+  return getChatCountToday() >= DAILY_CHAT_LIMIT;
+}
+
+/** Ghi nhận 1 câu hỏi chat. Trả về số đếm mới. */
+export function recordChatQuestion(): number {
+  if (typeof window === "undefined") return 0;
+  const s = readChatCount();
+  s.count += 1;
+  localStorage.setItem(CHAT_COUNT_KEY, JSON.stringify(s));
+  emit();
+  return s.count;
 }
 
 export interface UsageStats {

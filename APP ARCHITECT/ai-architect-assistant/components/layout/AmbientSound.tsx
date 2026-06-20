@@ -256,10 +256,10 @@ export function AmbientSound() {
         <button
           onClick={() => setOpen(!open)}
           aria-label="Nhạc nền"
-          className={`flex h-10 w-10 items-center justify-center rounded-full border transition-all duration-300 hover:scale-110 ${
+          className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full transition-colors ${
             isActive
-              ? "bg-teal-500/15 border-teal-500/40 text-teal-500"
-              : "bg-surface border-border text-foreground-soft hover:text-foreground"
+              ? "bg-teal-500/15 text-teal-500 hover:bg-teal-500/25"
+              : "text-sidebar-foreground-soft hover:bg-sidebar-surface hover:text-sidebar-foreground"
           }`}
         >
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">

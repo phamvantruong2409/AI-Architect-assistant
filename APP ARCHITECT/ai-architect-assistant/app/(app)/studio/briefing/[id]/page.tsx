@@ -6,8 +6,10 @@ import Link from "next/link";
 import { ArrowLeft, Loader2, Sparkles, Check } from "lucide-react";
 import { MarkdownLite } from "@/components/chat/MarkdownLite";
 import type { BriefRecord } from "@/lib/briefing-store";
-import { DOC_MODELS } from "@/lib/ai-models";
+import { BRIEF_MODELS } from "@/lib/ai-models";
 import { useChatModel } from "@/hooks/useChatModel";
+import { useFakeProgress } from "@/hooks/useFakeProgress";
+import { ProgressBar } from "@/components/ui/ProgressBar";
 
 const DETAIL_PLACEHOLDER = `Mô tả tự do về dự án: loại công trình, diện tích, số tầng, hướng nhà; gia đình & lối sống; công năng cần có; phong cách & tông màu mong muốn; vật liệu ưa thích; ngân sách & tiến độ; điều nhất định muốn có / muốn tránh...`;
 
@@ -21,7 +23,8 @@ export default function BriefingDetailPage() {
   const [saved, setSaved] = useState(false);
   const [generating, setGenerating] = useState(false);
   const [genError, setGenError] = useState<string | null>(null);
-  const [model, setModel] = useChatModel(DOC_MODELS);
+  const [model, setModel] = useChatModel(BRIEF_MODELS);
+  const genPct = useFakeProgress(generating);
 
   useEffect(() => {
     fetch(`/api/briefing/brief/${id}`)
@@ -144,7 +147,7 @@ export default function BriefingDetailPage() {
             disabled={generating}
             className="rounded-lg border border-border bg-surface px-3 py-2 text-xs font-medium text-foreground focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring disabled:opacity-50"
           >
-            {DOC_MODELS.map((m) => (
+            {BRIEF_MODELS.map((m) => (
               <option key={m.id} value={m.id}>{m.label}</option>
             ))}
           </select>
@@ -154,14 +157,21 @@ export default function BriefingDetailPage() {
             className="inline-flex items-center gap-2 rounded-lg bg-accent px-4 py-2 text-sm font-medium text-accent-foreground transition-opacity hover:opacity-90 disabled:opacity-50"
           >
             {generating ? <Loader2 size={16} className="animate-spin" /> : <Sparkles size={16} />}
-            {generating ? "Đang đề xuất..." : record.brief ? "Đề xuất lại" : "AI đề xuất nhiệm vụ thiết kế"}
+            {generating ? `Đang đề xuất... ${genPct}%` : record.brief ? "Đề xuất lại" : "AI đề xuất nhiệm vụ thiết kế"}
           </button>
         </div>
         {genError && <p className="mt-3 text-sm text-red-400">{genError}</p>}
       </div>
 
+      {/* Tiến trình khi AI đang suy luận đề xuất */}
+      {generating && (
+        <div className="mt-8 rounded-card border border-border bg-surface p-5 sm:p-6">
+          <ProgressBar percent={genPct} label="AI đang suy luận nhiệm vụ thiết kế" />
+        </div>
+      )}
+
       {/* Nhiệm vụ thiết kế do AI đề xuất */}
-      {record.brief && (
+      {record.brief && !generating && (
         <div className="mt-8">
           <h2 className="mb-3 font-display text-base text-accent">Nhiệm vụ thiết kế (AI đề xuất)</h2>
           <div className="rounded-card border border-border bg-surface p-5 sm:p-6 text-sm leading-relaxed text-foreground">

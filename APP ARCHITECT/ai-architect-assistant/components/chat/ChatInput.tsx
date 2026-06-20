@@ -10,12 +10,14 @@ export function ChatInput({
   onStop,
   disabled,
   blocked,
+  blockedMessage,
 }: {
   onSend: (value: string) => void;
   onGenerateImage?: (value: string) => void;
   onStop?: () => void;
   disabled?: boolean;
   blocked?: boolean;
+  blockedMessage?: string;
 }) {
   const [value, setValue] = useState("");
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -44,7 +46,7 @@ export function ChatInput({
           ref={textareaRef}
           value={value}
           rows={1}
-          placeholder={blocked ? "Đã hết hạn mức Gemini cho hôm nay..." : "Hỏi về thiết kế, vật liệu, quy chuẩn..."}
+          placeholder={blocked ? (blockedMessage ?? "Đã hết lượt đặt câu hỏi cho hôm nay...") : "Hỏi về thiết kế, vật liệu, quy chuẩn..."}
           disabled={blocked}
           className="flex-1 resize-none bg-transparent py-2 text-sm text-foreground placeholder:text-foreground-soft/60 focus:outline-none disabled:cursor-not-allowed disabled:opacity-60"
           onChange={(e) => {

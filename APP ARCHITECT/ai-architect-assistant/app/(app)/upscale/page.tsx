@@ -18,6 +18,8 @@ import {
   loadHistory,
   type UpscaleHistoryItem,
 } from "@/lib/upscale-history";
+import { startTask, dismissTask } from "@/lib/tasks";
+import { useTask } from "@/hooks/useTasks";
 
 const engineLabel = (id: string) => UPSCALE_ENGINES.find((e) => e.id === id)?.label ?? id;
 
@@ -73,9 +75,12 @@ export default function UpscalePage() {
   const [model, setModel] = useState<string>(REALESRGAN_MODELS[0].id);
   const [tile, setTile] = useState<number>(0);
   const [result, setResult] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [progress, setProgress] = useState(0);
   const [error, setError] = useState<string | null>(null);
+
+  // Upscale chạy như TÁC VỤ NỀN → rời trang vẫn xong, quay lại đọc tiến trình live.
+  const task = useTask("upscale");
+  const loading = task?.status === "running";
+  const progress = task?.progress ?? 0;
   const [localAvailable, setLocalAvailable] = useState<boolean | null>(null);
   const [isElectron, setIsElectron] = useState(false);
   const [history, setHistory] = useState<UpscaleHistoryItem[]>([]);
@@ -91,7 +96,6 @@ export default function UpscalePage() {
     } else {
       setLocalAvailable(false);
     }
-    const off = api?.onUpscaleProgress?.((p) => setProgress(p));
     loadHistory().then(setHistory).catch(() => {});
 
     // Handoff từ Render AI: nếu có ảnh được "ném qua Upscale", nạp sẵn vào.
@@ -108,27 +112,21 @@ export default function UpscalePage() {
     } catch {
       /* bỏ qua nếu sessionStorage lỗi */
     }
-    return () => off?.();
   }, []);
 
-  async function saveToHistory(after: string) {
-    if (!preview) return;
-    const item: UpscaleHistoryItem = {
-      id: typeof crypto !== "undefined" && crypto.randomUUID ? crypto.randomUUID() : String(Date.now()),
-      before: preview,
-      after,
-      fileName,
-      scale,
-      engine,
-      createdAt: Date.now(),
-    };
-    try {
-      await addHistory(item);
-      setHistory((h) => [item, ...h].slice(0, 30));
-    } catch {
-      // Bỏ qua nếu lưu thất bại (vd hết dung lượng đĩa).
+  // Khi tác vụ upscale nền xong/ lỗi → nạp kết quả vào trang rồi gỡ khỏi store.
+  useEffect(() => {
+    if (task?.status === "done") {
+      setResult(task.result as string);
+      setError(null);
+      loadHistory().then(setHistory).catch(() => {});
+      dismissTask("upscale");
+    } else if (task?.status === "error") {
+      setError(task.error ?? "Có lỗi xảy ra");
+      dismissTask("upscale");
     }
-  }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [task?.status]);
 
   async function removeHistory(id: string) {
     try {
@@ -172,44 +170,73 @@ export default function UpscalePage() {
       setError("Chưa có ảnh đầu vào");
       return;
     }
+    // Kiểm tra điều kiện engine cục bộ TRƯỚC khi chạy nền (để báo lỗi tức thì).
+    if (engine === "realesrgan") {
+      if (!isElectron || !window.electronAPI?.upscaleLocal) {
+        setError("Real-ESRGAN (Local) chỉ chạy trong ứng dụng desktop. Hãy mở app .exe để dùng.");
+        return;
+      }
+      if (localAvailable === false) {
+        setError("Chưa cài engine Real-ESRGAN. Mở terminal trong thư mục app và chạy: npm run fetch:realesrgan");
+        return;
+      }
+    }
     setError(null);
     setResult(null);
-    setProgress(0);
-    setLoading(true);
-    try {
-      if (engine === "realesrgan") {
-        if (!isElectron || !window.electronAPI?.upscaleLocal) {
-          throw new Error(
-            "Real-ESRGAN (Local) chỉ chạy trong ứng dụng desktop. Hãy mở app .exe để dùng."
-          );
+
+    // Chụp giá trị để runner chạy độc lập với component (sống sót khi rời trang).
+    const curPreview = preview;
+    const curFileName = fileName;
+    const curScale = scale;
+    const curEngine = engine;
+    const curModel = model;
+    const curTile = tile;
+
+    startTask({
+      id: "upscale",
+      type: "upscale",
+      label: "Đang phóng to ảnh…",
+      route: "/upscale",
+      fakeProgress: curEngine !== "realesrgan", // cloud không báo tiến trình thật
+      run: async (h) => {
+        let out: string;
+        if (curEngine === "realesrgan") {
+          const offp = window.electronAPI?.onUpscaleProgress?.((p) => h.setProgress(p));
+          try {
+            out = await window.electronAPI!.upscaleLocal({ dataUrl: curPreview, scale: curScale, tile: curTile, model: curModel });
+          } finally {
+            offp?.();
+          }
+        } else {
+          // Engine cloud (SUPIR / SeedVR2) qua Replicate.
+          const res = await fetch("/api/upscale", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ image: curPreview, scale: curScale, engine: curEngine }),
+          });
+          const data = await res.json();
+          if (!res.ok) throw new Error(data.error || "Upscale cloud thất bại");
+          out = data.image;
         }
-        if (localAvailable === false) {
-          throw new Error(
-            "Chưa cài engine Real-ESRGAN. Mở terminal trong thư mục app và chạy: npm run fetch:realesrgan"
-          );
+
+        // Lưu thư viện.
+        const item: UpscaleHistoryItem = {
+          id: typeof crypto !== "undefined" && crypto.randomUUID ? crypto.randomUUID() : String(Date.now()),
+          before: curPreview,
+          after: out,
+          fileName: curFileName,
+          scale: curScale,
+          engine: curEngine,
+          createdAt: Date.now(),
+        };
+        try {
+          await addHistory(item);
+        } catch {
+          /* bỏ qua nếu lưu thất bại */
         }
-        const out = await window.electronAPI.upscaleLocal({ dataUrl: preview, scale, tile, model });
-        setResult(out);
-        setProgress(100);
-        await saveToHistory(out);
-      } else {
-        // Engine cloud (SUPIR / SeedVR2) qua Replicate.
-        const res = await fetch("/api/upscale", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ image: preview, scale, engine }),
-        });
-        const data = await res.json();
-        if (!res.ok) throw new Error(data.error || "Upscale cloud thất bại");
-        setResult(data.image);
-        setProgress(100);
-        await saveToHistory(data.image);
-      }
-    } catch (e) {
-      setError(e instanceof Error ? e.message : "Có lỗi xảy ra");
-    } finally {
-      setLoading(false);
-    }
+        return out;
+      },
+    });
   }
 
   async function downloadImage(src: string, name: string) {

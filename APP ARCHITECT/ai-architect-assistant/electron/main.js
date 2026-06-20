@@ -321,6 +321,8 @@ function createWindow(splash) {
   mainWindow.loadURL(APP_URL);
 }
 
+ipcMain.handle("app-version", () => app.getVersion());
+
 ipcMain.handle("select-folder", async () => {
   const result = await dialog.showOpenDialog(mainWindow, {
     properties: ["openDirectory", "createDirectory"],

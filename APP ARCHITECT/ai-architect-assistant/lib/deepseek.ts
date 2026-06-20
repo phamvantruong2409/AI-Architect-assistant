@@ -1,15 +1,33 @@
-// API DeepSeek tương thích OpenAI. Key do NHÀ PHÁT TRIỂN cung cấp qua biến môi
-// trường DEEPSEEK_API_KEY (đặt trong .env.local, được bundle theo bản .exe).
-// Người dùng cuối KHÔNG nhập key DeepSeek — chi phí do nhà phát triển trả.
+// API DeepSeek tương thích OpenAI. Chi phí do NHÀ PHÁT TRIỂN trả — người dùng cuối
+// KHÔNG nhập key. Key được NHÚNG SẴN trong app (EMBEDDED_DEEPSEEK_KEY) nên mọi bản
+// build/update đều có sẵn, build ở máy nào cũng kèm key. Vẫn ưu tiên biến môi trường
+// DEEPSEEK_API_KEY (đặt trong .env.local) để đổi key mà không phải sửa code.
 const BASE_URL = "https://api.deepseek.com/v1";
+
+// Key nhúng mặc định — gắn liền với app qua mọi bản phát hành/cập nhật.
+// LƯU Ý: key này nằm trong mã nguồn & trong file .exe phân phối, nên xem như công
+// khai với người có app/repo. Nếu repo phát hành ở chế độ PUBLIC, key sẽ lộ công khai
+// (GitHub/DeepSeek có thể tự thu hồi). Khi cần đổi key: sửa hằng này hoặc đặt
+// DEEPSEEK_API_KEY trong .env.local.
+const EMBEDDED_DEEPSEEK_KEY = "sk-dcf9407a0b53464eb48a60c8214cc6b9";
 
 export interface DeepSeekMessage {
   role: "system" | "user" | "assistant";
   content: string;
 }
 
+/**
+ * Tham số suy luận theo model. Bản "flash" = NHANH → TẮT thinking để trả lời ngay
+ * (nếu bật, model V4 stream cả khối reasoning_content dài trước khi ra câu trả lời,
+ * mà app bỏ qua phần này nên chat trông như bị treo vài giây). Bản "pro" giữ suy luận.
+ */
+function thinkingParams(model: string): Record<string, unknown> {
+  return model.includes("flash") ? { thinking: { type: "disabled" } } : {};
+}
+
 function getApiKey(): string {
-  const key = process.env.DEEPSEEK_API_KEY || "";
+  // Ưu tiên env (dev đổi key nhanh), fallback về key nhúng sẵn trong app.
+  const key = process.env.DEEPSEEK_API_KEY || EMBEDDED_DEEPSEEK_KEY;
   if (!key) {
     const err = new Error("Chưa cấu hình API key DeepSeek.") as Error & { code?: string };
     err.code = "NO_API_KEY";
@@ -69,7 +87,7 @@ export async function deepseekGenerateText(opts: {
   if (opts.system) messages.push({ role: "system", content: opts.system });
   messages.push({ role: "user", content: opts.prompt });
 
-  const res = await postChat({ model: opts.model, messages, stream: false });
+  const res = await postChat({ model: opts.model, messages, stream: false, ...thinkingParams(opts.model) });
   const data = (await res.json()) as {
     choices?: { message?: { content?: string } }[];
   };
@@ -89,7 +107,7 @@ export async function deepseekStreamText(opts: {
   if (opts.system) messages.push({ role: "system", content: opts.system });
   messages.push(...opts.messages);
 
-  const res = await postChat({ model: opts.model, messages, stream: true });
+  const res = await postChat({ model: opts.model, messages, stream: true, ...thinkingParams(opts.model) });
   const body = res.body;
   if (!body) throw new Error("DeepSeek không trả về stream");
 
