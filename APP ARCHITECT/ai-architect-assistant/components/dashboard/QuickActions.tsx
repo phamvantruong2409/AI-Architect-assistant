@@ -9,6 +9,7 @@ import {
   ImageIcon,
   DocumentIcon,
   ArchiveIcon,
+  UpscaleIcon,
 } from "@/components/layout/icons";
 
 const ICONS = {
@@ -18,6 +19,7 @@ const ICONS = {
   image: ImageIcon,
   document: DocumentIcon,
   archive: ArchiveIcon,
+  upscale: UpscaleIcon,
 };
 
 const ICON_GLOWS = {
@@ -27,6 +29,7 @@ const ICON_GLOWS = {
   image: "shadow-[0_0_16px_rgba(20,184,166,0.25)]",
   document: "shadow-[0_0_16px_rgba(20,184,166,0.25)]",
   archive: "shadow-[0_0_16px_rgba(20,184,166,0.25)]",
+  upscale: "shadow-[0_0_16px_rgba(20,184,166,0.25)]",
 };
 
 function handleMouseMove(e: React.MouseEvent<HTMLAnchorElement>) {

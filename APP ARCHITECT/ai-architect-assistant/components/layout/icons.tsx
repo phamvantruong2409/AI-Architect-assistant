@@ -206,6 +206,16 @@ export function ArchiveIcon(props: SVGProps<SVGSVGElement>) {
   );
 }
 
+export function UpscaleIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <Icon {...props}>
+      <rect x="3" y="3" width="18" height="18" rx="2" />
+      <path d="M8 14l2.5-2.5 2 2L16 10" />
+      <path d="M15 8h2.5V10.5" />
+    </Icon>
+  );
+}
+
 export function VideoIcon(props: SVGProps<SVGSVGElement>) {
   return (
     <Icon {...props}>

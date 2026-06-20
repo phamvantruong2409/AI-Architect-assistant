@@ -1,0 +1,817 @@
+"use client";
+
+import { useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/Button";
+import { Card } from "@/components/ui/Card";
+import { GEMINI_MODELS } from "@/lib/gemini-models";
+import { useChatModel } from "@/hooks/useChatModel";
+import { recordAiCall, markRateLimited, estimateTokens } from "@/lib/ai-usage";
+import {
+  RENDER_MODELS,
+  DEFAULT_RENDER_MODEL,
+  VIEW_ANGLES,
+  TIME_OF_DAY,
+  MAX_IMAGE_BYTES,
+  MAX_RENDER_IMAGES,
+  buildRenderPrompt,
+  renderModelLabel,
+  viewAngleLabel,
+  isSkySuggestion,
+  type RenderModelId,
+  type RenderAnalysis,
+} from "@/lib/render-types";
+import {
+  addHistory,
+  clearHistory,
+  deleteHistory,
+  loadHistory,
+  type RenderHistoryItem,
+} from "@/lib/render-history";
+
+const labelClass = "mb-1.5 block text-xs font-medium text-foreground-soft";
+const inputClass =
+  "w-full rounded-card border border-border bg-surface-muted px-3 py-2.5 text-sm text-foreground placeholder:text-foreground-soft/60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring";
+
+/** Một prompt đề xuất ở trạng thái UI (toggle + sửa được). */
+interface EditableSuggestion {
+  id: string;
+  label: string;
+  text: string;
+  enabled: boolean;
+}
+
+function newId(prefix: string): string {
+  return typeof crypto !== "undefined" && "randomUUID" in crypto
+    ? crypto.randomUUID()
+    : `${prefix}-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+}
+
+/** Thu nhỏ ảnh để lưu thumbnail lịch sử. */
+function makeThumb(dataUrl: string, max = 512): Promise<string | null> {
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.onload = () => {
+      const scale = Math.min(1, max / Math.max(img.width, img.height));
+      const w = Math.max(1, Math.round(img.width * scale));
+      const h = Math.max(1, Math.round(img.height * scale));
+      const canvas = document.createElement("canvas");
+      canvas.width = w;
+      canvas.height = h;
+      const ctx = canvas.getContext("2d");
+      if (!ctx) return resolve(null);
+      ctx.drawImage(img, 0, 0, w, h);
+      try {
+        resolve(canvas.toDataURL("image/jpeg", 0.8));
+      } catch {
+        resolve(null);
+      }
+    };
+    img.onerror = () => resolve(null);
+    img.src = dataUrl;
+  });
+}
+
+async function downloadImage(src: string, name: string) {
+  try {
+    const blob = await (await fetch(src)).blob();
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = name;
+    a.click();
+    URL.revokeObjectURL(url);
+  } catch {
+    window.open(src, "_blank");
+  }
+}
+
+function timeAgo(ts: number): string {
+  const s = Math.round((Date.now() - ts) / 1000);
+  if (s < 60) return "vừa xong";
+  const m = Math.round(s / 60);
+  if (m < 60) return `${m} phút trước`;
+  const h = Math.round(m / 60);
+  if (h < 24) return `${h} giờ trước`;
+  return new Date(ts).toLocaleDateString("vi-VN");
+}
+
+function CopyButton({ text, label = "Sao chép prompt" }: { text: string; label?: string }) {
+  const [copied, setCopied] = useState(false);
+  return (
+    <Button
+      size="sm"
+      variant="secondary"
+      className="h-8 px-2.5 text-xs"
+      onClick={async () => {
+        await navigator.clipboard.writeText(text);
+        setCopied(true);
+        setTimeout(() => setCopied(false), 1600);
+      }}
+    >
+      {copied ? "Đã chép" : label}
+    </Button>
+  );
+}
+
+export function RenderStudio() {
+  const router = useRouter();
+  const [analysisModel, setAnalysisModel] = useChatModel(GEMINI_MODELS);
+
+  const [preview, setPreview] = useState<string | null>(null);
+  const [fileName, setFileName] = useState("render");
+  const [imageBase64, setImageBase64] = useState<string | null>(null);
+  const [mimeType, setMimeType] = useState("image/jpeg");
+
+  const [analyzing, setAnalyzing] = useState(false);
+  const [analyzeProgress, setAnalyzeProgress] = useState(0);
+  const [analysis, setAnalysis] = useState<RenderAnalysis | null>(null);
+
+  // Trạng thái có thể sửa, dẫn xuất từ phân tích.
+  const [basePrompt, setBasePrompt] = useState("");
+  const [suggestions, setSuggestions] = useState<EditableSuggestion[]>([]);
+  const [negativePrompt, setNegativePrompt] = useState("");
+  const [angle, setAngle] = useState("keep");
+  const [timeOfDay, setTimeOfDay] = useState("auto");
+
+  const [model, setModel] = useState<RenderModelId>(DEFAULT_RENDER_MODEL);
+  const [count, setCount] = useState(2);
+
+  const [rendering, setRendering] = useState(false);
+  const [showPreview, setShowPreview] = useState(false);
+  const [results, setResults] = useState<string[]>([]);
+  const [error, setError] = useState<string | null>(null);
+
+  const [history, setHistory] = useState<RenderHistoryItem[]>([]);
+  const fileRef = useRef<HTMLInputElement>(null);
+  // Lưu lại nội dung ô "Bầu trời" do AI gợi ý, để khôi phục khi chọn "Tự động".
+  const aiSkyRef = useRef("");
+
+  useEffect(() => {
+    loadHistory().then(setHistory).catch(() => {});
+  }, []);
+
+  // Dán ảnh trực tiếp bằng Ctrl+V.
+  useEffect(() => {
+    function onPaste(e: ClipboardEvent) {
+      const item = Array.from(e.clipboardData?.items ?? []).find((i) =>
+        i.type.startsWith("image/")
+      );
+      if (item) {
+        e.preventDefault();
+        handleFile(item.getAsFile());
+      }
+    }
+    window.addEventListener("paste", onPaste);
+    return () => window.removeEventListener("paste", onPaste);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [analysisModel]);
+
+  function handleFile(file: File | undefined | null) {
+    if (!file) return;
+    if (!file.type.startsWith("image/")) {
+      setError("Vui lòng chọn một tệp ảnh");
+      return;
+    }
+    if (file.size > MAX_IMAGE_BYTES) {
+      setError("Ảnh quá lớn (tối đa 8MB). Vui lòng nén lại.");
+      return;
+    }
+    setError(null);
+    setResults([]);
+    setAnalysis(null);
+    setMimeType(file.type);
+    setFileName(file.name.replace(/\.[^.]+$/, "") || "render");
+    const reader = new FileReader();
+    reader.onload = () => {
+      const dataUrl = reader.result as string;
+      setPreview(dataUrl);
+      const b64 = dataUrl.split(",")[1] ?? null;
+      setImageBase64(b64);
+      if (b64) void analyze(b64, file.type);
+    };
+    reader.readAsDataURL(file);
+  }
+
+  function clearImage() {
+    setPreview(null);
+    setImageBase64(null);
+    setAnalysis(null);
+    setResults([]);
+    if (fileRef.current) fileRef.current.value = "";
+  }
+
+  async function analyze(b64: string, mime: string) {
+    setAnalyzing(true);
+    setError(null);
+    setAnalyzeProgress(8);
+    const timer = setInterval(() => {
+      setAnalyzeProgress((p) => (p >= 92 ? 92 : Math.min(92, p + Math.max(1, Math.round((94 - p) * 0.1)))));
+    }, 250);
+    try {
+      const res = await fetch("/api/render/analyze", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ imageBase64: b64, mimeType: mime, model: analysisModel }),
+      });
+      const json = await res.json();
+      if (!res.ok) {
+        if (json.code === "QUOTA_EXCEEDED") markRateLimited(analysisModel);
+        throw new Error(json.error || "Phân tích ảnh thất bại");
+      }
+      const a = json as RenderAnalysis;
+      recordAiCall(analysisModel, 300 + estimateTokens(JSON.stringify(a)));
+      setAnalysis(a);
+      setBasePrompt(a.analysisPrompt);
+      const baseSugg = a.suggestions.map((s) => ({ ...s, enabled: true }));
+      // Ghi nhớ ô "Bầu trời" gốc do AI gợi ý (dùng khi quay lại "Tự động").
+      aiSkyRef.current = baseSugg.find((s) => isSkySuggestion(s.label))?.text ?? "";
+      // Nếu đang chọn một giờ cụ thể, đồng bộ luôn ô bầu trời theo giờ đó.
+      setSuggestions(applySky(baseSugg, timeOfDay));
+      setNegativePrompt(a.negativePrompt);
+      setAngle(a.recommendedAngleIds[0] ?? "keep");
+      setAnalyzeProgress(100);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Phân tích ảnh thất bại");
+    } finally {
+      clearInterval(timer);
+      setAnalyzing(false);
+      setTimeout(() => setAnalyzeProgress(0), 400);
+    }
+  }
+
+  function finalPrompt(): string {
+    const angleHint = VIEW_ANGLES.find((a) => a.id === angle)?.promptHint;
+    const timeHint = TIME_OF_DAY.find((t) => t.id === timeOfDay)?.promptHint;
+    return buildRenderPrompt({
+      analysisPrompt: basePrompt,
+      enabledSuggestions: suggestions.filter((s) => s.enabled),
+      angleHint,
+      timeHint,
+    });
+  }
+
+  /** Đồng bộ ô "Bầu trời" theo giờ đã chọn (giờ cụ thể → trời khớp; "Tự động" → trả về bản AI). */
+  function applySky(list: EditableSuggestion[], timeId: string): EditableSuggestion[] {
+    const time = TIME_OF_DAY.find((t) => t.id === timeId);
+    if (!time) return list;
+    return list.map((s) => {
+      if (!isSkySuggestion(s.label)) return s;
+      const text = timeId === "auto" ? aiSkyRef.current || s.text : time.sky || s.text;
+      return { ...s, text };
+    });
+  }
+
+  /** Chọn thời điểm trong ngày + tự động cập nhật ô bầu trời cho khớp. */
+  function selectTime(timeId: string) {
+    setTimeOfDay(timeId);
+    setSuggestions((list) => applySky(list, timeId));
+  }
+
+  async function render() {
+    if (!preview) {
+      setError("Chưa có ảnh đầu vào");
+      return;
+    }
+    if (!basePrompt.trim()) {
+      setError("Chưa có prompt phân tích — hãy phân tích ảnh trước");
+      return;
+    }
+    setRendering(true);
+    setError(null);
+    setResults([]);
+    const prompt = finalPrompt();
+    try {
+      const res = await fetch("/api/render/generate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ image: preview, prompt, negativePrompt, model, count }),
+      });
+      const json = await res.json();
+      if (!res.ok) {
+        if (json.code === "QUOTA_EXCEEDED") markRateLimited(model);
+        throw new Error(json.error || "Render thất bại");
+      }
+      const images = (json.images as string[]) ?? [];
+      if (images.length === 0) throw new Error("AI không trả về ảnh");
+      recordAiCall(model, estimateTokens(prompt) * count);
+      setResults(images);
+
+      // Lưu vào thư viện.
+      const thumb = await makeThumb(preview);
+      const modelLabel = renderModelLabel(model);
+      const angleLabel = viewAngleLabel(angle);
+      for (const image of images) {
+        const item: RenderHistoryItem = {
+          id: newId("render"),
+          sourceThumb: thumb,
+          image,
+          prompt,
+          modelLabel,
+          angleLabel,
+          createdAt: Date.now(),
+        };
+        try {
+          await addHistory(item);
+        } catch {
+          /* bỏ qua nếu lưu lỗi */
+        }
+      }
+      loadHistory().then(setHistory).catch(() => {});
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Render thất bại");
+    } finally {
+      setRendering(false);
+    }
+  }
+
+  async function sendToUpscale(image: string) {
+    // Upscale cần data:image/ URL. Ảnh Flux là URL từ xa → chuyển sang dataURL trước.
+    let dataUrl = image;
+    if (!image.startsWith("data:")) {
+      try {
+        const blob = await (await fetch(image)).blob();
+        dataUrl = await new Promise<string>((resolve, reject) => {
+          const r = new FileReader();
+          r.onload = () => resolve(r.result as string);
+          r.onerror = () => reject(r.error);
+          r.readAsDataURL(blob);
+        });
+      } catch {
+        setError("Không tải được ảnh để chuyển qua Upscale. Hãy tải ảnh về rồi tự tải lên.");
+        return;
+      }
+    }
+    try {
+      sessionStorage.setItem(
+        "upscale-incoming",
+        JSON.stringify({ image: dataUrl, fileName: `${fileName}-render` })
+      );
+    } catch {
+      /* ignore */
+    }
+    router.push("/upscale");
+  }
+
+  async function removeFromHistory(id: string) {
+    try {
+      await deleteHistory(id);
+    } catch {
+      /* vẫn gỡ khỏi UI */
+    }
+    setHistory((h) => h.filter((it) => it.id !== id));
+  }
+
+  async function clearAll() {
+    if (!confirm("Xoá tất cả ảnh đã render?")) return;
+    try {
+      await clearHistory();
+    } catch {
+      /* vẫn xoá khỏi UI */
+    }
+    setHistory([]);
+  }
+
+  function toggleSuggestion(id: string) {
+    setSuggestions((list) => list.map((s) => (s.id === id ? { ...s, enabled: !s.enabled } : s)));
+  }
+  function editSuggestion(id: string, text: string) {
+    setSuggestions((list) => list.map((s) => (s.id === id ? { ...s, text } : s)));
+  }
+  function removeSuggestion(id: string) {
+    setSuggestions((list) => list.filter((s) => s.id !== id));
+  }
+  function addSuggestion() {
+    setSuggestions((list) => [
+      ...list,
+      { id: newId("sug"), label: "Prompt tùy chỉnh", text: "", enabled: true },
+    ]);
+  }
+
+  const recommendedAngles = new Set(analysis?.recommendedAngleIds ?? []);
+  const selectedModelInfo = RENDER_MODELS.find((m) => m.id === model);
+
+  return (
+    <div className="mx-auto max-w-5xl space-y-6 px-4 py-6 sm:px-6">
+      <header>
+        <h1 className="font-display text-2xl">Render AI</h1>
+        <p className="mt-1 text-sm text-foreground-soft">
+          Ném ảnh thô SketchUp vào — AI tự phân tích, đề xuất prompt giữ đúng khối, rồi render ra ảnh thực tế.
+          Bạn chỉ việc chỉnh nhẹ và bấm Render.
+        </p>
+      </header>
+
+      {/* Vùng tải ảnh */}
+      <Card className="space-y-3 p-4 sm:p-5">
+        <div className="flex items-center justify-between gap-3">
+          <label className={labelClass + " mb-0"}>Ảnh SketchUp thô *</label>
+          <div className="flex items-center gap-2">
+            <span className="text-xs text-foreground-soft">Model phân tích</span>
+            <select
+              className="rounded-card border border-border bg-surface px-2 py-1 text-xs text-foreground focus:border-accent/50 focus:outline-none"
+              value={analysisModel}
+              onChange={(e) => setAnalysisModel(e.target.value as typeof analysisModel)}
+            >
+              {GEMINI_MODELS.map((m) => (
+                <option key={m.id} value={m.id}>{m.label}</option>
+              ))}
+            </select>
+          </div>
+        </div>
+        <div
+          onClick={() => fileRef.current?.click()}
+          onDragOver={(e) => e.preventDefault()}
+          onDrop={(e) => {
+            e.preventDefault();
+            handleFile(e.dataTransfer.files?.[0]);
+          }}
+          className="flex min-h-[200px] cursor-pointer flex-col items-center justify-center gap-2 overflow-hidden rounded-card border border-dashed border-border bg-surface-muted p-3 text-center transition-colors hover:border-accent/50"
+        >
+          {preview ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={preview} alt="Ảnh SketchUp" className="max-h-[360px] w-auto rounded-card object-contain" />
+          ) : (
+            <>
+              <span className="text-sm text-foreground">Kéo thả ảnh, bấm để chọn, hoặc dán Ctrl+V</span>
+              <span className="text-xs text-foreground-soft">JPG, PNG, WEBP — tối đa 8MB</span>
+            </>
+          )}
+        </div>
+        <input
+          ref={fileRef}
+          type="file"
+          accept="image/*"
+          className="hidden"
+          onChange={(e) => handleFile(e.target.files?.[0])}
+        />
+        {preview && (
+          <div className="flex gap-3">
+            <button
+              className="text-xs text-foreground-soft underline-offset-2 hover:text-foreground hover:underline"
+              onClick={clearImage}
+            >
+              Chọn ảnh khác
+            </button>
+            {!analyzing && imageBase64 && (
+              <button
+                className="text-xs text-accent underline-offset-2 hover:underline"
+                onClick={() => void analyze(imageBase64, mimeType)}
+              >
+                Phân tích lại
+              </button>
+            )}
+          </div>
+        )}
+        {analyzing && (
+          <div className="space-y-1.5">
+            <div className="flex items-center justify-between text-xs text-foreground-soft">
+              <span>Đang phân tích ảnh & đề xuất prompt…</span>
+              <span>{analyzeProgress}%</span>
+            </div>
+            <div className="h-2 overflow-hidden rounded-full bg-surface-muted">
+              <div
+                className="h-full rounded-full bg-accent transition-all duration-300 ease-out"
+                style={{ width: `${analyzeProgress}%` }}
+              />
+            </div>
+          </div>
+        )}
+      </Card>
+
+      {error && (
+        <div className="rounded-card border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-400">
+          {error}
+        </div>
+      )}
+
+      {/* Kết quả phân tích + điều khiển render */}
+      {analysis && !analyzing && (
+        <div className="space-y-6">
+          {analysis.title.trim() && (
+            <h2 className="font-display text-lg text-foreground">{analysis.title}</h2>
+          )}
+
+          {/* Prompt phân tích (sửa được) */}
+          <Card className="space-y-2 p-4 sm:p-5">
+            <label className={labelClass}>Prompt phân tích (giữ đúng khối — có thể sửa)</label>
+            <textarea
+              className={inputClass + " min-h-[110px] resize-y leading-relaxed"}
+              value={basePrompt}
+              onChange={(e) => setBasePrompt(e.target.value)}
+            />
+          </Card>
+
+          {/* Prompt đề xuất — toggle/sửa/bỏ */}
+          <Card className="space-y-3 p-4 sm:p-5">
+            <div className="flex items-center justify-between gap-3">
+              <label className={labelClass + " mb-0"}>Prompt đề xuất (bật/tắt, sửa, hoặc bỏ)</label>
+              <button
+                className="text-xs text-accent underline-offset-2 hover:underline"
+                onClick={addSuggestion}
+              >
+                + Thêm prompt
+              </button>
+            </div>
+            {suggestions.length === 0 && (
+              <p className="text-xs text-foreground-soft">Chưa có đề xuất nào. Bấm “+ Thêm prompt”.</p>
+            )}
+            <div className="space-y-2.5">
+              {suggestions.map((s) => (
+                <div
+                  key={s.id}
+                  className={`rounded-card border p-2.5 transition-colors ${
+                    s.enabled ? "border-accent/40 bg-accent/5" : "border-border bg-surface-muted opacity-70"
+                  }`}
+                >
+                  <div className="flex items-center justify-between gap-2">
+                    <label className="flex items-center gap-2 text-sm font-medium text-foreground">
+                      <input
+                        type="checkbox"
+                        checked={s.enabled}
+                        onChange={() => toggleSuggestion(s.id)}
+                        className="accent-accent"
+                      />
+                      {s.label}
+                    </label>
+                    <button
+                      className="text-xs text-foreground-soft hover:text-red-400"
+                      onClick={() => removeSuggestion(s.id)}
+                    >
+                      Bỏ
+                    </button>
+                  </div>
+                  <textarea
+                    className={inputClass + " mt-2 min-h-[52px] resize-y text-xs"}
+                    value={s.text}
+                    onChange={(e) => editSuggestion(s.id, e.target.value)}
+                  />
+                </div>
+              ))}
+            </div>
+          </Card>
+
+          {/* Thời điểm trong ngày */}
+          <Card className="space-y-2 p-4 sm:p-5">
+            <label className={labelClass}>Thời điểm trong ngày (quyết định ánh sáng & bầu trời)</label>
+            <div className="flex flex-wrap gap-2">
+              {TIME_OF_DAY.map((t) => {
+                const active = timeOfDay === t.id;
+                return (
+                  <button
+                    key={t.id}
+                    onClick={() => selectTime(t.id)}
+                    className={`rounded-full border px-3 py-1.5 text-xs transition-colors ${
+                      active
+                        ? "border-accent bg-accent/15 text-foreground"
+                        : "border-border bg-surface text-foreground-soft hover:border-accent/40"
+                    }`}
+                  >
+                    {t.label}
+                  </button>
+                );
+              })}
+            </div>
+          </Card>
+
+          {/* Góc view */}
+          <Card className="space-y-2 p-4 sm:p-5">
+            <label className={labelClass}>Góc view</label>
+            <div className="flex flex-wrap gap-2">
+              {VIEW_ANGLES.map((a) => {
+                const active = angle === a.id;
+                const rec = recommendedAngles.has(a.id);
+                return (
+                  <button
+                    key={a.id}
+                    onClick={() => setAngle(a.id)}
+                    className={`rounded-full border px-3 py-1.5 text-xs transition-colors ${
+                      active
+                        ? "border-accent bg-accent/15 text-foreground"
+                        : "border-border bg-surface text-foreground-soft hover:border-accent/40"
+                    }`}
+                  >
+                    {a.label}
+                    {rec && (
+                      <span className="ml-1.5 rounded bg-teal-500/20 px-1 py-0.5 text-[9px] font-medium text-teal-400">
+                        AI gợi ý
+                      </span>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+          </Card>
+
+          {/* Negative prompt — luôn hiển thị, sửa được */}
+          <Card className="space-y-2 p-4 sm:p-5">
+            <label className={labelClass}>
+              Negative prompt — những thứ cần TRÁNH khi render
+            </label>
+            <textarea
+              className={inputClass + " min-h-[64px] resize-y text-xs"}
+              value={negativePrompt}
+              onChange={(e) => setNegativePrompt(e.target.value)}
+              placeholder="vd: méo hình khối, sai số tầng, đổi bố cục, mờ nhòe, vỡ nét, watermark, chữ..."
+            />
+          </Card>
+
+          {/* Chọn model render */}
+          <Card className="space-y-3 p-4 sm:p-5">
+            <label className={labelClass}>Model render</label>
+            <div className="grid gap-2 sm:grid-cols-3">
+              {RENDER_MODELS.map((m) => {
+                const active = model === m.id;
+                return (
+                  <button
+                    key={m.id}
+                    onClick={() => setModel(m.id)}
+                    className={`rounded-card border p-3 text-left transition-colors ${
+                      active ? "border-accent bg-accent/10" : "border-border bg-surface hover:border-accent/40"
+                    }`}
+                  >
+                    <div className="flex flex-wrap items-center gap-1.5">
+                      <span className="text-sm font-semibold text-foreground">{m.label}</span>
+                      <span
+                        className={`rounded px-1.5 py-0.5 text-[10px] font-medium ${
+                          m.cloud ? "bg-indigo-500/15 text-indigo-400" : "bg-teal-500/15 text-teal-400"
+                        }`}
+                      >
+                        {m.badge}
+                      </span>
+                      {m.recommended && (
+                        <span className="rounded bg-amber-500/15 px-1.5 py-0.5 text-[10px] font-medium text-amber-500">
+                          Khuyên dùng
+                        </span>
+                      )}
+                    </div>
+                    <p className="mt-1 text-[11px] leading-relaxed text-foreground-soft">{m.description}</p>
+                  </button>
+                );
+              })}
+            </div>
+            {selectedModelInfo?.cloud && (
+              <p className="rounded-card border border-amber-500/30 bg-amber-500/10 p-2.5 text-xs text-amber-500">
+                Engine cloud cần <code className="font-mono">REPLICATE_API_TOKEN</code> trong <code className="font-mono">.env.local</code>. Chưa có token sẽ báo lỗi khi render.
+              </p>
+            )}
+
+            {/* Số ảnh */}
+            <div>
+              <label className={labelClass}>Số ảnh render</label>
+              <div className="flex gap-2">
+                {Array.from({ length: MAX_RENDER_IMAGES }, (_, i) => i + 1).map((n) => (
+                  <button
+                    key={n}
+                    onClick={() => setCount(n)}
+                    className={`h-9 w-9 rounded-card border text-sm font-medium transition-colors ${
+                      count === n
+                        ? "border-accent bg-accent/15 text-foreground"
+                        : "border-border bg-surface text-foreground-soft hover:border-accent/40"
+                    }`}
+                  >
+                    {n}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="flex gap-2">
+              <Button
+                variant="secondary"
+                onClick={() => setShowPreview(true)}
+                disabled={!basePrompt.trim()}
+                className="shrink-0"
+              >
+                👁 Xem trước prompt
+              </Button>
+              <Button onClick={render} disabled={rendering} className="flex-1">
+                {rendering ? "Đang render…" : `🎨 Render ${count} ảnh`}
+              </Button>
+            </div>
+          </Card>
+        </div>
+      )}
+
+      {/* Skeleton khi đang render */}
+      {rendering && (
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          {Array.from({ length: count }, (_, i) => (
+            <div key={i} className="aspect-video animate-pulse rounded-card border border-border bg-surface-muted" />
+          ))}
+        </div>
+      )}
+
+      {/* Kết quả render lần này */}
+      {results.length > 0 && !rendering && (
+        <Card className="space-y-3 p-4 sm:p-5">
+          <h2 className="font-display text-base text-accent">Kết quả render ({results.length})</h2>
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            {results.map((src, i) => (
+              <div key={i} className="space-y-2">
+                <div className="overflow-hidden rounded-card border border-border bg-black/40">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={src} alt={`Render ${i + 1}`} className="block w-full" />
+                </div>
+                <div className="flex flex-wrap gap-1.5">
+                  <Button size="sm" variant="secondary" className="h-8 px-2.5 text-xs" onClick={() => downloadImage(src, `${fileName}-render-${i + 1}.png`)}>
+                    Tải về
+                  </Button>
+                  <CopyButton text={finalPrompt()} />
+                  <Button size="sm" variant="secondary" className="h-8 px-2.5 text-xs" onClick={() => void sendToUpscale(src)}>
+                    Ném qua Upscale
+                  </Button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </Card>
+      )}
+
+      {/* Thư viện đã render */}
+      {history.length > 0 && (
+        <section>
+          <div className="mb-3 flex items-center justify-between">
+            <h2 className="text-sm font-semibold text-foreground">Thư viện đã render ({history.length})</h2>
+            <button
+              className="text-xs text-foreground-soft transition-colors hover:text-red-400"
+              onClick={clearAll}
+            >
+              Xoá tất cả
+            </button>
+          </div>
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {history.map((it) => (
+              <Card key={it.id} className="space-y-2 p-2.5">
+                <div className="overflow-hidden rounded-card border border-border bg-black/40">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={it.image} alt="" className="block w-full" />
+                </div>
+                <p className="text-[11px] text-foreground-soft">
+                  {it.modelLabel} · {it.angleLabel} · {timeAgo(it.createdAt)}
+                </p>
+                <div className="flex flex-wrap gap-1.5">
+                  <Button size="sm" variant="secondary" className="h-8 px-2.5 text-xs" onClick={() => downloadImage(it.image, "render.png")}>
+                    Tải
+                  </Button>
+                  <CopyButton text={it.prompt} />
+                  <Button size="sm" variant="secondary" className="h-8 px-2.5 text-xs" onClick={() => void sendToUpscale(it.image)}>
+                    Upscale
+                  </Button>
+                  <Button size="sm" variant="ghost" className="h-8 px-2.5 text-xs hover:text-red-400" onClick={() => removeFromHistory(it.id)}>
+                    Xoá
+                  </Button>
+                </div>
+              </Card>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* Popup xem trước prompt cuối sẽ gửi cho AI */}
+      {showPreview && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm"
+          onClick={() => setShowPreview(false)}
+        >
+          <Card
+            className="flex max-h-[80vh] w-full max-w-2xl flex-col overflow-hidden p-0"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between border-b border-border px-5 py-3">
+              <h2 className="font-display text-base text-foreground">Prompt cuối gửi cho AI</h2>
+              <button
+                className="text-foreground-soft hover:text-foreground"
+                onClick={() => setShowPreview(false)}
+                aria-label="Đóng"
+              >
+                ✕
+              </button>
+            </div>
+            <div className="space-y-4 overflow-y-auto px-5 py-4">
+              <div>
+                <label className={labelClass}>Prompt</label>
+                <p className="whitespace-pre-wrap rounded-card border border-border bg-surface-muted px-3 py-2.5 text-sm leading-relaxed text-foreground">
+                  {finalPrompt()}
+                </p>
+              </div>
+              {negativePrompt.trim() && (
+                <div>
+                  <label className={labelClass}>Negative prompt (những thứ cần tránh)</label>
+                  <p className="whitespace-pre-wrap rounded-card border border-border bg-surface-muted px-3 py-2.5 text-sm leading-relaxed text-foreground">
+                    {negativePrompt}
+                  </p>
+                </div>
+              )}
+            </div>
+            <div className="flex items-center justify-between gap-2 border-t border-border px-5 py-3">
+              <CopyButton text={finalPrompt()} label="Sao chép prompt" />
+              <Button size="sm" onClick={() => setShowPreview(false)}>
+                Đóng
+              </Button>
+            </div>
+          </Card>
+        </div>
+      )}
+    </div>
+  );
+}

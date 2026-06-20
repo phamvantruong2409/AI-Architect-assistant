@@ -10,6 +10,18 @@ contextBridge.exposeInMainWorld("electronAPI", {
     ipcRenderer.on("auth-code", handler);
     return () => ipcRenderer.removeListener("auth-code", handler);
   },
+
+  // ── Upscale ảnh cục bộ bằng Real-ESRGAN (ncnn-vulkan) ──
+  // Kiểm tra binary đã có trong app chưa.
+  upscaleLocalAvailable: () => ipcRenderer.invoke("upscale-local-available"),
+  // Chạy upscale: opts = { dataUrl, scale, tile, model } → trả về data URL PNG đã phóng to.
+  upscaleLocal: (opts) => ipcRenderer.invoke("upscale-local", opts),
+  // Theo dõi tiến trình (0..100). Trả về hàm hủy lắng nghe.
+  onUpscaleProgress: (callback) => {
+    const handler = (_e, percent) => callback(percent);
+    ipcRenderer.on("upscale-progress", handler);
+    return () => ipcRenderer.removeListener("upscale-progress", handler);
+  },
 });
 
 // ---- Thanh tiến trình cập nhật (overlay tự chứa, hiển thị trên mọi trang) ----

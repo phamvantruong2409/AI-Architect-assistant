@@ -31,8 +31,8 @@ export function getGeminiModel(modelId?: string) {
   return genAI.getGenerativeModel({ model: id, generationConfig });
 }
 
-export function getGeminiImageModel() {
-  return getGenAI().getGenerativeModel({ model: "gemini-2.5-flash-image" });
+export function getGeminiImageModel(modelId = "gemini-2.5-flash-image") {
+  return getGenAI().getGenerativeModel({ model: modelId });
 }
 
 export function getGeminiEmbeddingModel() {

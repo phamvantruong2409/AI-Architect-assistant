@@ -2,7 +2,7 @@ export interface QuickAction {
   label: string;
   description: string;
   href: string;
-  icon: "chat" | "wand" | "layers" | "image" | "document" | "archive";
+  icon: "chat" | "wand" | "layers" | "image" | "document" | "archive" | "upscale";
   cta: string;
 }
 
@@ -38,7 +38,7 @@ export const quickActions: QuickAction[] = [
   {
     label: "Render AI",
     description: "Render ảnh 3D chất lượng cao",
-    href: "/review",
+    href: "/render",
     icon: "image",
     cta: "Render ngay",
   },
@@ -48,6 +48,13 @@ export const quickActions: QuickAction[] = [
     href: "/dossier",
     icon: "document",
     cta: "Viết thuyết minh",
+  },
+  {
+    label: "Upscale ảnh",
+    description: "Phóng to ảnh nét hơn với SUPIR & Real-ESRGAN",
+    href: "/upscale",
+    icon: "upscale",
+    cta: "Nâng cấp ảnh",
   },
 ];
 

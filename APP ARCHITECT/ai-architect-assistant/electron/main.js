@@ -330,6 +330,93 @@ ipcMain.handle("open-external", async (_e, url) => {
   return false;
 });
 
+// ── Upscale ảnh cục bộ bằng Real-ESRGAN (ncnn-vulkan) ─────────────────────
+// Binary + thư mục models nằm trong vendor/realesrgan (dev) hoặc
+// resources/realesrgan (đã đóng gói, qua extraResources). Tải binary bằng
+// "npm run fetch:realesrgan".
+function resolveRealesrganDir() {
+  const packaged = path.join(process.resourcesPath, "realesrgan");
+  const dev = path.join(__dirname, "..", "vendor", "realesrgan");
+  return app.isPackaged ? packaged : dev;
+}
+
+function realesrganExe() {
+  const exe =
+    process.platform === "win32" ? "realesrgan-ncnn-vulkan.exe" : "realesrgan-ncnn-vulkan";
+  return path.join(resolveRealesrganDir(), exe);
+}
+
+ipcMain.handle("upscale-local-available", () => {
+  try {
+    return fs.existsSync(realesrganExe());
+  } catch {
+    return false;
+  }
+});
+
+ipcMain.handle("upscale-local", async (_e, opts) => {
+  const exe = realesrganExe();
+  if (!fs.existsSync(exe)) {
+    throw new Error(
+      "Chưa cài engine Real-ESRGAN. Mở terminal trong thư mục app và chạy: npm run fetch:realesrgan"
+    );
+  }
+
+  const { dataUrl, scale = 4, tile = 0, model = "realesrgan-x4plus" } = opts || {};
+  if (typeof dataUrl !== "string" || !dataUrl.startsWith("data:image/")) {
+    throw new Error("Ảnh đầu vào không hợp lệ");
+  }
+
+  const base64 = dataUrl.split(",")[1] || "";
+  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "upscale-"));
+  const inPath = path.join(tmpDir, "in.png");
+  const outPath = path.join(tmpDir, "out.png");
+  fs.writeFileSync(inPath, Buffer.from(base64, "base64"));
+
+  const dir = resolveRealesrganDir();
+  const modelsDir = path.join(dir, "models");
+  const args = [
+    "-i", inPath,
+    "-o", outPath,
+    "-n", String(model),
+    "-s", String(scale),
+    "-t", String(tile),
+    "-f", "png",
+  ];
+  if (fs.existsSync(modelsDir)) args.push("-m", modelsDir);
+
+  try {
+    await new Promise((resolve, reject) => {
+      const child = spawn(exe, args, { cwd: dir });
+      let stderr = "";
+      child.stderr.on("data", (d) => {
+        const s = String(d);
+        stderr += s;
+        // ncnn-vulkan in tiến trình ra stderr dạng "12.34%".
+        const matches = s.match(/(\d+(?:\.\d+)?)%/g);
+        if (matches && matches.length && mainWindow && !mainWindow.isDestroyed()) {
+          const pct = parseFloat(matches[matches.length - 1]);
+          if (!Number.isNaN(pct)) mainWindow.webContents.send("upscale-progress", Math.round(pct));
+        }
+      });
+      child.on("error", reject);
+      child.on("exit", (code) => {
+        if (code === 0 && fs.existsSync(outPath)) resolve();
+        else reject(new Error(`Real-ESRGAN lỗi (code ${code}).\n${stderr.slice(-600)}`));
+      });
+    });
+
+    const outBuf = fs.readFileSync(outPath);
+    return `data:image/png;base64,${outBuf.toString("base64")}`;
+  } finally {
+    try {
+      fs.rmSync(tmpDir, { recursive: true, force: true });
+    } catch {
+      // dọn rác tạm thất bại — không sao
+    }
+  }
+});
+
 let autoUpdateInitialized = false;
 function setupAutoUpdate() {
   if (!app.isPackaged) return;

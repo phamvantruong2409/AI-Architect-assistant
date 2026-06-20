@@ -21,6 +21,9 @@
 /build
 /dist
 
+# Real-ESRGAN binary (tải bằng: npm run fetch:realesrgan)
+/vendor/
+
 # misc
 .DS_Store
 *.pem

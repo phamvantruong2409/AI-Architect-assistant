@@ -8,6 +8,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
+    "fetch:realesrgan": "node scripts/fetch-realesrgan.js",
     "build:electron": "next build && node scripts/prepare-electron.js",
     "predist": "npm run build:electron",
     "dist": "electron-builder",
@@ -52,6 +53,10 @@
       {
         "from": ".next/standalone",
         "to": "standalone"
+      },
+      {
+        "from": "vendor/realesrgan",
+        "to": "realesrgan"
       }
     ],
     "protocols": [
