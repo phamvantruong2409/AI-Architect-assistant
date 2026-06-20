@@ -554,7 +554,17 @@ export function RenderStudio() {
 
           {/* Thời điểm trong ngày */}
           <Card className="space-y-2 p-4 sm:p-5">
-            <label className={labelClass}>Thời điểm trong ngày (quyết định ánh sáng & bầu trời)</label>
+            <div className="flex items-center gap-1.5">
+              <label className={labelClass + " mb-0"}>Thời điểm trong ngày (quyết định ánh sáng & bầu trời)</label>
+              <span className="group relative inline-flex">
+                <span className="flex h-4 w-4 cursor-help items-center justify-center rounded-full border border-border text-[10px] font-semibold text-foreground-soft">
+                  i
+                </span>
+                <span className="pointer-events-none absolute left-1/2 top-full z-20 mt-1.5 w-60 -translate-x-1/2 rounded-card border border-border bg-surface px-3 py-2 text-[11px] leading-relaxed text-foreground opacity-0 shadow-lg transition-opacity duration-150 group-hover:opacity-100">
+                  Prompt bầu trời sẽ tự động thay đổi theo giờ bạn chọn.
+                </span>
+              </span>
+            </div>
             <div className="flex flex-wrap gap-2">
               {TIME_OF_DAY.map((t) => {
                 const active = timeOfDay === t.id;
