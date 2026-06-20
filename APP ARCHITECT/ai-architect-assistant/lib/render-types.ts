@@ -191,6 +191,12 @@ export function isSkySuggestion(label: string): boolean {
   return l.includes("trời") || l.includes("thời tiết");
 }
 
+/** Nhận diện ô "người-xe-nội thất phụ" (entourage) — mặc định BỎ tích. */
+export function isEntourageSuggestion(label: string): boolean {
+  const l = label.toLowerCase();
+  return l.includes("người") || l.includes("entourage");
+}
+
 /** Một prompt đề xuất (toggle/sửa được) do AI sinh ra. */
 export interface RenderSuggestion {
   id: string;

@@ -18,6 +18,7 @@ import {
   renderModelLabel,
   viewAngleLabel,
   isSkySuggestion,
+  isEntourageSuggestion,
   type RenderModelId,
   type RenderAnalysis,
 } from "@/lib/render-types";
@@ -223,7 +224,8 @@ export function RenderStudio() {
       recordAiCall(analysisModel, 300 + estimateTokens(JSON.stringify(a)));
       setAnalysis(a);
       setBasePrompt(a.analysisPrompt);
-      const baseSugg = a.suggestions.map((s) => ({ ...s, enabled: true }));
+      // Mặc định bật tất cả, RIÊNG "người-xe phụ" để TẮT (người dùng tự bật nếu muốn).
+      const baseSugg = a.suggestions.map((s) => ({ ...s, enabled: !isEntourageSuggestion(s.label) }));
       // Ghi nhớ ô "Bầu trời" gốc do AI gợi ý (dùng khi quay lại "Tự động").
       aiSkyRef.current = baseSugg.find((s) => isSkySuggestion(s.label))?.text ?? "";
       // Nếu đang chọn một giờ cụ thể, đồng bộ luôn ô bầu trời theo giờ đó.
