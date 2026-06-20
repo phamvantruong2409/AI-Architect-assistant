@@ -20,6 +20,8 @@ import {
   viewAngleLabel,
   isSkySuggestion,
   isEntourageSuggestion,
+  isSceneSuggestion,
+  SCENE_CONTEXTS,
   type RenderModelId,
   type RenderAnalysis,
 } from "@/lib/render-types";
@@ -34,6 +36,50 @@ import {
 const labelClass = "mb-1.5 block text-xs font-medium text-foreground-soft";
 const inputClass =
   "w-full rounded-card border border-border bg-surface-muted px-3 py-2.5 text-sm text-foreground placeholder:text-foreground-soft/60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring";
+
+/**
+ * Hai biến thể dùng chung pipeline phân tích → đề xuất → tạo prompt → render:
+ *  - "sketchup": Render AI — ảnh SketchUp thô → render thực tế.
+ *  - "optimize": Render Optimizer — ảnh render/ảnh thật đã có → render lại đẹp & thật hơn.
+ */
+export type RenderVariant = "sketchup" | "optimize";
+
+const VARIANT_COPY: Record<
+  RenderVariant,
+  {
+    title: string;
+    subtitle: string;
+    uploadLabel: string;
+    uploadAlt: string;
+    analyzingLabel: string;
+    reanalyzeLabel: string;
+    basePromptLabel: string;
+    renderLabel: (n: number) => string;
+  }
+> = {
+  sketchup: {
+    title: "Render AI",
+    subtitle:
+      "Ném ảnh thô SketchUp vào — AI tự phân tích, đề xuất prompt giữ đúng khối, rồi render ra ảnh thực tế. Bạn chỉ việc chỉnh nhẹ và bấm Render.",
+    uploadLabel: "Ảnh SketchUp thô *",
+    uploadAlt: "Ảnh SketchUp",
+    analyzingLabel: "Đang phân tích ảnh & đề xuất prompt…",
+    reanalyzeLabel: "Phân tích lại",
+    basePromptLabel: "Prompt phân tích (giữ đúng khối — có thể sửa)",
+    renderLabel: (n) => `Render ${n} ảnh`,
+  },
+  optimize: {
+    title: "Render Optimizer",
+    subtitle:
+      "Đưa một ảnh render (hoặc ảnh thật) đã có vào — AI đóng vai KTS 20 năm kinh nghiệm ĐÁNH GIÁ ảnh (thừa/thiếu, ánh sáng, vật liệu, nên thêm gì). Bạn sửa lại phần đánh giá, rồi bấm “Tạo Prompt cải thiện” để render lại đẹp & thật hơn. Giữ nguyên thiết kế.",
+    uploadLabel: "Ảnh render cần tối ưu *",
+    uploadAlt: "Ảnh render gốc",
+    analyzingLabel: "Đang đánh giá ảnh như một KTS 20 năm…",
+    reanalyzeLabel: "Đánh giá lại",
+    basePromptLabel: "Prompt cải thiện (liền mạch — giữ đúng thiết kế, có thể sửa)",
+    renderLabel: (n) => `Render lại ${n} ảnh`,
+  },
+};
 
 /** Một prompt đề xuất ở trạng thái UI (toggle + sửa được). */
 interface EditableSuggestion {
@@ -116,8 +162,9 @@ function CopyButton({ text, label = "Sao chép prompt" }: { text: string; label?
   );
 }
 
-export function RenderStudio() {
+export function RenderStudio({ variant = "sketchup" }: { variant?: RenderVariant } = {}) {
   const router = useRouter();
+  const copy = VARIANT_COPY[variant];
   const [analysisModel, setAnalysisModel] = useChatModel(GEMINI_MODELS);
 
   const [preview, setPreview] = useState<string | null>(null);
@@ -128,6 +175,12 @@ export function RenderStudio() {
   const [analyzing, setAnalyzing] = useState(false);
   const [analyzeProgress, setAnalyzeProgress] = useState(0);
   const [analysis, setAnalysis] = useState<RenderAnalysis | null>(null);
+
+  // Render Optimizer (variant "optimize") — bước 1: đánh giá của KTS, người dùng sửa được.
+  const [critique, setCritique] = useState("");
+  const [critiqueTitle, setCritiqueTitle] = useState("");
+  // Bước 2: đang gọi AI tạo prompt cải thiện từ bài đánh giá.
+  const [buildingPrompt, setBuildingPrompt] = useState(false);
 
   // Trạng thái có thể sửa, dẫn xuất từ phân tích.
   const [basePrompt, setBasePrompt] = useState("");
@@ -147,6 +200,7 @@ export function RenderStudio() {
   }
 
   const [rendering, setRendering] = useState(false);
+  const [sceneEditing, setSceneEditing] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
   const [results, setResults] = useState<string[]>([]);
   const [error, setError] = useState<string | null>(null);
@@ -155,6 +209,8 @@ export function RenderStudio() {
   const fileRef = useRef<HTMLInputElement>(null);
   // Lưu lại nội dung ô "Bầu trời" do AI gợi ý, để khôi phục khi chọn "Tự động".
   const aiSkyRef = useRef("");
+  // Lưu lại nội dung ô "Bao cảnh" do AI gợi ý, để dùng cho lựa chọn "Theo AI gợi ý".
+  const aiSceneRef = useRef("");
 
   useEffect(() => {
     loadHistory().then(setHistory).catch(() => {});
@@ -189,6 +245,8 @@ export function RenderStudio() {
     setError(null);
     setResults([]);
     setAnalysis(null);
+    setCritique("");
+    setCritiqueTitle("");
     setMimeType(file.type);
     setFileName(file.name.replace(/\.[^.]+$/, "") || "render");
     const reader = new FileReader();
@@ -197,7 +255,7 @@ export function RenderStudio() {
       setPreview(dataUrl);
       const b64 = dataUrl.split(",")[1] ?? null;
       setImageBase64(b64);
-      if (b64) void analyze(b64, file.type);
+      if (b64) void runFirstPass(b64, file.type);
     };
     reader.readAsDataURL(file);
   }
@@ -206,8 +264,31 @@ export function RenderStudio() {
     setPreview(null);
     setImageBase64(null);
     setAnalysis(null);
+    setCritique("");
+    setCritiqueTitle("");
     setResults([]);
     if (fileRef.current) fileRef.current.value = "";
+  }
+
+  /** Bước đầu sau khi có ảnh: sketchup → phân tích thẳng; optimize → KTS đánh giá trước. */
+  function runFirstPass(b64: string, mime: string) {
+    return variant === "optimize" ? critiqueImage(b64, mime) : analyze(b64, mime);
+  }
+
+  /** Đưa RenderAnalysis vào các ô sửa được (prompt nền, đề xuất, negative, góc). */
+  function applyAnalysis(a: RenderAnalysis) {
+    setAnalysis(a);
+    setBasePrompt(a.analysisPrompt);
+    // Mặc định bật tất cả, RIÊNG "người-xe phụ" để TẮT (người dùng tự bật nếu muốn).
+    const baseSugg = a.suggestions.map((s) => ({ ...s, enabled: !isEntourageSuggestion(s.label) }));
+    // Ghi nhớ ô "Bầu trời" gốc do AI gợi ý (dùng khi quay lại "Tự động").
+    aiSkyRef.current = baseSugg.find((s) => isSkySuggestion(s.label))?.text ?? "";
+    // Ghi nhớ ô "Bao cảnh" gốc do AI gợi ý (dùng cho lựa chọn "Theo AI gợi ý").
+    aiSceneRef.current = baseSugg.find((s) => isSceneSuggestion(s.label))?.text ?? "";
+    // Nếu đang chọn một giờ cụ thể, đồng bộ luôn ô bầu trời theo giờ đó.
+    setSuggestions(applySky(baseSugg, timeOfDay));
+    setNegativePrompt(a.negativePrompt);
+    setAngle(a.recommendedAngleIds[0] ?? "keep");
   }
 
   async function analyze(b64: string, mime: string) {
@@ -230,16 +311,7 @@ export function RenderStudio() {
       }
       const a = json as RenderAnalysis;
       recordAiCall(analysisModel, 300 + estimateTokens(JSON.stringify(a)));
-      setAnalysis(a);
-      setBasePrompt(a.analysisPrompt);
-      // Mặc định bật tất cả, RIÊNG "người-xe phụ" để TẮT (người dùng tự bật nếu muốn).
-      const baseSugg = a.suggestions.map((s) => ({ ...s, enabled: !isEntourageSuggestion(s.label) }));
-      // Ghi nhớ ô "Bầu trời" gốc do AI gợi ý (dùng khi quay lại "Tự động").
-      aiSkyRef.current = baseSugg.find((s) => isSkySuggestion(s.label))?.text ?? "";
-      // Nếu đang chọn một giờ cụ thể, đồng bộ luôn ô bầu trời theo giờ đó.
-      setSuggestions(applySky(baseSugg, timeOfDay));
-      setNegativePrompt(a.negativePrompt);
-      setAngle(a.recommendedAngleIds[0] ?? "keep");
+      applyAnalysis(a);
       setAnalyzeProgress(100);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Phân tích ảnh thất bại");
@@ -247,6 +319,67 @@ export function RenderStudio() {
       clearInterval(timer);
       setAnalyzing(false);
       setTimeout(() => setAnalyzeProgress(0), 400);
+    }
+  }
+
+  /** Render Optimizer — bước 1: gọi KTS đánh giá ảnh, đổ vào ô đánh giá sửa được. */
+  async function critiqueImage(b64: string, mime: string) {
+    setAnalyzing(true);
+    setError(null);
+    setAnalyzeProgress(8);
+    const timer = setInterval(() => {
+      setAnalyzeProgress((p) => (p >= 92 ? 92 : Math.min(92, p + Math.max(1, Math.round((94 - p) * 0.1)))));
+    }, 250);
+    try {
+      const res = await fetch("/api/render/critique", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ imageBase64: b64, mimeType: mime, model: analysisModel }),
+      });
+      const json = await res.json();
+      if (!res.ok) {
+        if (json.code === "QUOTA_EXCEEDED") markRateLimited(analysisModel);
+        throw new Error(json.error || "Đánh giá ảnh thất bại");
+      }
+      recordAiCall(analysisModel, 300 + estimateTokens(JSON.stringify(json)));
+      setCritique(typeof json.critique === "string" ? json.critique : "");
+      setCritiqueTitle(typeof json.title === "string" ? json.title : "");
+      setAnalyzeProgress(100);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Đánh giá ảnh thất bại");
+    } finally {
+      clearInterval(timer);
+      setAnalyzing(false);
+      setTimeout(() => setAnalyzeProgress(0), 400);
+    }
+  }
+
+  /** Render Optimizer — bước 2: từ bài đánh giá (đã sửa) tạo prompt cải thiện + đề xuất. */
+  async function buildImprovePrompt() {
+    if (!imageBase64 || !critique.trim()) {
+      setError("Chưa có ảnh hoặc phần đánh giá để tạo prompt");
+      return;
+    }
+    setBuildingPrompt(true);
+    setError(null);
+    try {
+      const res = await fetch("/api/render/improve", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ imageBase64, mimeType, model: analysisModel, critique }),
+      });
+      const json = await res.json();
+      if (!res.ok) {
+        if (json.code === "QUOTA_EXCEEDED") markRateLimited(analysisModel);
+        throw new Error(json.error || "Tạo prompt cải thiện thất bại");
+      }
+      const a = json as RenderAnalysis;
+      recordAiCall(analysisModel, 300 + estimateTokens(JSON.stringify(a)));
+      applyAnalysis(a);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Tạo prompt cải thiện thất bại");
+    } finally {
+      setBuildingPrompt(false);
     }
   }
 
@@ -385,6 +518,18 @@ export function RenderStudio() {
   function toggleSuggestion(id: string) {
     setSuggestions((list) => list.map((s) => (s.id === id ? { ...s, enabled: !s.enabled } : s)));
   }
+  /** Chọn bao cảnh từ dropdown: "off" tắt, "ai" dùng bản AI gợi ý, còn lại lấy preset. */
+  function selectScene(id: string, optionId: string) {
+    setSuggestions((list) =>
+      list.map((s) => {
+        if (s.id !== id) return s;
+        if (optionId === "off") return { ...s, enabled: false };
+        if (optionId === "ai") return { ...s, enabled: true, text: aiSceneRef.current };
+        const opt = SCENE_CONTEXTS.find((o) => o.id === optionId);
+        return opt ? { ...s, enabled: true, text: opt.text } : s;
+      })
+    );
+  }
   function editSuggestion(id: string, text: string) {
     setSuggestions((list) => list.map((s) => (s.id === id ? { ...s, text } : s)));
   }
@@ -404,17 +549,14 @@ export function RenderStudio() {
   return (
     <div className="mx-auto max-w-5xl space-y-6 px-4 py-6 sm:px-6">
       <header>
-        <h1 className="font-display text-2xl">Render AI</h1>
-        <p className="mt-1 text-sm text-foreground-soft">
-          Ném ảnh thô SketchUp vào — AI tự phân tích, đề xuất prompt giữ đúng khối, rồi render ra ảnh thực tế.
-          Bạn chỉ việc chỉnh nhẹ và bấm Render.
-        </p>
+        <h1 className="font-display text-2xl">{copy.title}</h1>
+        <p className="mt-1 text-sm text-foreground-soft">{copy.subtitle}</p>
       </header>
 
       {/* Vùng tải ảnh */}
       <Card className="space-y-3 p-4 sm:p-5">
         <div className="flex items-center justify-between gap-3">
-          <label className={labelClass + " mb-0"}>Ảnh SketchUp thô *</label>
+          <label className={labelClass + " mb-0"}>{copy.uploadLabel}</label>
           <div className="flex items-center gap-2">
             <span className="text-xs text-foreground-soft">Model phân tích</span>
             <select
@@ -439,7 +581,7 @@ export function RenderStudio() {
         >
           {preview ? (
             // eslint-disable-next-line @next/next/no-img-element
-            <img src={preview} alt="Ảnh SketchUp" className="max-h-[360px] w-auto rounded-card object-contain" />
+            <img src={preview} alt={copy.uploadAlt} className="max-h-[360px] w-auto rounded-card object-contain" />
           ) : (
             <>
               <span className="text-sm text-foreground">Kéo thả ảnh, bấm để chọn, hoặc dán Ctrl+V</span>
@@ -465,24 +607,39 @@ export function RenderStudio() {
             {!analyzing && imageBase64 && (
               <button
                 className="text-xs text-accent underline-offset-2 hover:underline"
-                onClick={() => void analyze(imageBase64, mimeType)}
+                onClick={() => void runFirstPass(imageBase64, mimeType)}
               >
-                Phân tích lại
+                {copy.reanalyzeLabel}
               </button>
             )}
           </div>
         )}
         {analyzing && (
-          <div className="space-y-1.5">
-            <div className="flex items-center justify-between text-xs text-foreground-soft">
-              <span>Đang phân tích ảnh & đề xuất prompt…</span>
-              <span>{analyzeProgress}%</span>
+          <div className="space-y-2">
+            <div className="flex items-center justify-between text-xs">
+              <span className="inline-flex items-center gap-2 font-medium">
+                <span className="relative flex h-3.5 w-3.5 items-center justify-center">
+                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-accent/40" />
+                  <span className="relative inline-flex h-2 w-2 rounded-full bg-accent" />
+                </span>
+                <span className="animate-progress-flow bg-gradient-to-r from-accent via-cyan-300 to-accent bg-clip-text font-semibold text-transparent">
+                  {copy.analyzingLabel}
+                </span>
+              </span>
+              <span className="font-display text-sm font-bold tabular-nums text-accent">
+                {analyzeProgress}%
+              </span>
             </div>
-            <div className="h-2 overflow-hidden rounded-full bg-surface-muted">
+            <div className="relative h-2.5 overflow-hidden rounded-full border border-accent/15 bg-surface-muted shadow-inner">
               <div
-                className="h-full rounded-full bg-accent transition-all duration-300 ease-out"
-                style={{ width: `${analyzeProgress}%` }}
-              />
+                className="animate-progress-flow relative h-full rounded-full bg-gradient-to-r from-teal-500 via-cyan-400 to-emerald-400 transition-all duration-300 ease-out"
+                style={{ width: `${analyzeProgress}%`, boxShadow: "0 0 12px rgba(20,184,166,0.55)" }}
+              >
+                {/* Vệt sáng quét qua thanh */}
+                <div className="absolute inset-0 -skew-x-12">
+                  <div className="animate-progress-shimmer h-full w-1/3 bg-gradient-to-r from-transparent via-white/70 to-transparent" />
+                </div>
+              </div>
             </div>
           </div>
         )}
@@ -494,16 +651,46 @@ export function RenderStudio() {
         </div>
       )}
 
+      {/* Render Optimizer — bước 1: đánh giá của KTS (sửa được) → bước 2: tạo prompt cải thiện */}
+      {variant === "optimize" && critique && !analyzing && (
+        <Card className="space-y-3 p-4 sm:p-5">
+          {critiqueTitle.trim() && (
+            <h2 className="font-display text-lg text-foreground">{critiqueTitle}</h2>
+          )}
+          <div>
+            <label className={labelClass}>
+              Đánh giá của KTS 20 năm kinh nghiệm — đọc & chỉnh lại theo ý bạn trước khi tạo prompt
+            </label>
+            <textarea
+              className={inputClass + " min-h-[260px] resize-y leading-relaxed"}
+              value={critique}
+              onChange={(e) => setCritique(e.target.value)}
+              placeholder="AI sẽ điền bài đánh giá vào đây…"
+            />
+          </div>
+          <div className="flex items-center justify-between gap-3">
+            <p className="text-[11px] leading-relaxed text-foreground-soft">
+              {analysis
+                ? "Đã tạo prompt cải thiện bên dưới. Sửa đánh giá rồi bấm lại để tạo prompt mới."
+                : "Khi ưng phần đánh giá, bấm “Tạo Prompt cải thiện” để dựng prompt render lại."}
+            </p>
+            <Button onClick={() => void buildImprovePrompt()} disabled={buildingPrompt || !critique.trim()}>
+              {buildingPrompt ? "Đang tạo prompt…" : "✨ Tạo Prompt cải thiện"}
+            </Button>
+          </div>
+        </Card>
+      )}
+
       {/* Kết quả phân tích + điều khiển render */}
       {analysis && !analyzing && (
         <div className="space-y-6">
-          {analysis.title.trim() && (
+          {variant === "sketchup" && analysis.title.trim() && (
             <h2 className="font-display text-lg text-foreground">{analysis.title}</h2>
           )}
 
           {/* Prompt phân tích (sửa được) */}
           <Card className="space-y-2 p-4 sm:p-5">
-            <label className={labelClass}>Prompt phân tích (giữ đúng khối — có thể sửa)</label>
+            <label className={labelClass}>{copy.basePromptLabel}</label>
             <textarea
               className={inputClass + " min-h-[110px] resize-y leading-relaxed"}
               value={basePrompt}
@@ -511,7 +698,8 @@ export function RenderStudio() {
             />
           </Card>
 
-          {/* Prompt đề xuất — toggle/sửa/bỏ */}
+          {/* Prompt đề xuất — toggle/sửa/bỏ (chỉ Render AI; Render Optimizer dùng prompt liền mạch) */}
+          {variant === "sketchup" && (
           <Card className="space-y-3 p-4 sm:p-5">
             <div className="flex items-center justify-between gap-3">
               <label className={labelClass + " mb-0"}>Prompt đề xuất (bật/tắt, sửa, hoặc bỏ)</label>
@@ -526,39 +714,94 @@ export function RenderStudio() {
               <p className="text-xs text-foreground-soft">Chưa có đề xuất nào. Bấm “+ Thêm prompt”.</p>
             )}
             <div className="space-y-2.5">
-              {suggestions.map((s) => (
-                <div
-                  key={s.id}
-                  className={`rounded-card border p-2.5 transition-colors ${
-                    s.enabled ? "border-accent/40 bg-accent/5" : "border-border bg-surface-muted opacity-70"
-                  }`}
-                >
-                  <div className="flex items-center justify-between gap-2">
-                    <label className="flex items-center gap-2 text-sm font-medium text-foreground">
-                      <input
-                        type="checkbox"
-                        checked={s.enabled}
-                        onChange={() => toggleSuggestion(s.id)}
-                        className="accent-accent"
-                      />
-                      {s.label}
-                    </label>
-                    <button
-                      className="text-xs text-foreground-soft hover:text-red-400"
-                      onClick={() => removeSuggestion(s.id)}
+              {suggestions.map((s) => {
+                // Ô "Bao cảnh" → dropdown chọn sẵn thay vì checkbox + gõ tay.
+                if (isSceneSuggestion(s.label)) {
+                  // Xác định mục đang chọn: tắt / theo AI / một preset / đã sửa tay.
+                  const current = !s.enabled
+                    ? "off"
+                    : SCENE_CONTEXTS.find((o) => o.text === s.text)?.id ??
+                      (aiSceneRef.current && s.text === aiSceneRef.current ? "ai" : "custom");
+                  const isCustom = current === "custom";
+                  const showEditor = s.enabled && (sceneEditing || isCustom);
+                  return (
+                    <div
+                      key={s.id}
+                      className={`rounded-card border p-2.5 transition-colors ${
+                        s.enabled ? "border-accent/40 bg-accent/5" : "border-border bg-surface-muted opacity-70"
+                      }`}
                     >
-                      Bỏ
-                    </button>
+                      <div className="flex items-center gap-2">
+                        <span className="shrink-0 text-sm font-medium text-foreground">{s.label}</span>
+                        <select
+                          className={inputClass + " h-9 min-w-0 flex-1 py-0 text-xs"}
+                          value={current}
+                          onChange={(e) => selectScene(s.id, e.target.value)}
+                        >
+                          <option value="off">— Không thêm bao cảnh —</option>
+                          {aiSceneRef.current && <option value="ai">Theo AI gợi ý</option>}
+                          {SCENE_CONTEXTS.map((o) => (
+                            <option key={o.id} value={o.id}>
+                              {o.label}
+                            </option>
+                          ))}
+                          {isCustom && <option value="custom">Tùy chỉnh (đã sửa tay)</option>}
+                        </select>
+                        {s.enabled && !isCustom && (
+                          <button
+                            className="shrink-0 text-xs text-accent underline-offset-2 hover:underline"
+                            onClick={() => setSceneEditing((v) => !v)}
+                          >
+                            {sceneEditing ? "Thu gọn" : "Sửa tay"}
+                          </button>
+                        )}
+                      </div>
+                      {showEditor && (
+                        <textarea
+                          className={inputClass + " mt-2 min-h-[52px] resize-y text-xs"}
+                          value={s.text}
+                          onChange={(e) => editSuggestion(s.id, e.target.value)}
+                          placeholder="Gõ mô tả bao cảnh tùy ý…"
+                        />
+                      )}
+                    </div>
+                  );
+                }
+                return (
+                  <div
+                    key={s.id}
+                    className={`rounded-card border p-2.5 transition-colors ${
+                      s.enabled ? "border-accent/40 bg-accent/5" : "border-border bg-surface-muted opacity-70"
+                    }`}
+                  >
+                    <div className="flex items-center justify-between gap-2">
+                      <label className="flex items-center gap-2 text-sm font-medium text-foreground">
+                        <input
+                          type="checkbox"
+                          checked={s.enabled}
+                          onChange={() => toggleSuggestion(s.id)}
+                          className="accent-accent"
+                        />
+                        {s.label}
+                      </label>
+                      <button
+                        className="text-xs text-foreground-soft hover:text-red-400"
+                        onClick={() => removeSuggestion(s.id)}
+                      >
+                        Bỏ
+                      </button>
+                    </div>
+                    <textarea
+                      className={inputClass + " mt-2 min-h-[52px] resize-y text-xs"}
+                      value={s.text}
+                      onChange={(e) => editSuggestion(s.id, e.target.value)}
+                    />
                   </div>
-                  <textarea
-                    className={inputClass + " mt-2 min-h-[52px] resize-y text-xs"}
-                    value={s.text}
-                    onChange={(e) => editSuggestion(s.id, e.target.value)}
-                  />
-                </div>
-              ))}
+                );
+              })}
             </div>
           </Card>
+          )}
 
           {/* Thời điểm trong ngày */}
           <Card className="space-y-2 p-4 sm:p-5">
@@ -735,8 +978,27 @@ export function RenderStudio() {
               >
                 👁 Xem trước prompt
               </Button>
-              <Button onClick={render} disabled={rendering} className="flex-1">
-                {rendering ? "Đang render…" : `🎨 Render ${count} ảnh`}
+              <Button
+                onClick={render}
+                disabled={rendering}
+                className={`group relative flex-1 overflow-hidden border-0 bg-gradient-to-r from-teal-500 via-cyan-500 to-emerald-500 bg-[length:200%_100%] text-white shadow-[0_0_18px_rgba(20,184,166,0.45)] transition-all duration-300 hover:shadow-[0_0_28px_rgba(20,184,166,0.75)] disabled:opacity-100 ${
+                  rendering ? "animate-progress-flow cursor-wait" : "hover:bg-[position:100%_0]"
+                }`}
+              >
+                {/* Vệt sáng quét qua nút khi hover */}
+                {!rendering && (
+                  <span className="pointer-events-none absolute inset-0 -translate-x-full -skew-x-12 bg-gradient-to-r from-transparent via-white/40 to-transparent transition-transform duration-700 ease-out group-hover:translate-x-full" />
+                )}
+                <span className="relative inline-flex items-center gap-2 uppercase tracking-wide">
+                  {rendering ? (
+                    <>
+                      <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/40 border-t-white" />
+                      Đang render…
+                    </>
+                  ) : (
+                    <>{copy.renderLabel(count)}</>
+                  )}
+                </span>
               </Button>
             </div>
           </Card>
@@ -840,9 +1102,27 @@ export function RenderStudio() {
             </div>
             <div className="space-y-4 overflow-y-auto px-5 py-4">
               <div>
-                <label className={labelClass}>Prompt</label>
+                <div className="mb-1.5 flex items-center justify-between gap-2">
+                  <label className={labelClass + " mb-0"}>Prompt</label>
+                  {(() => {
+                    const words = finalPrompt().trim().split(/\s+/).filter(Boolean).length;
+                    const ok = words <= 300;
+                    return (
+                      <span
+                        className={`rounded-full px-2 py-0.5 text-[11px] font-medium ${
+                          ok ? "bg-accent/10 text-accent" : "bg-amber-500/15 text-amber-500"
+                        }`}
+                      >
+                        {words} từ · không quá 300
+                      </span>
+                    );
+                  })()}
+                </div>
                 <p className="whitespace-pre-wrap rounded-card border border-border bg-surface-muted px-3 py-2.5 text-sm leading-relaxed text-foreground">
                   {finalPrompt()}
+                </p>
+                <p className="mt-1.5 text-[11px] leading-relaxed text-foreground-soft">
+                  Mẹo: prompt <span className="font-medium text-foreground">không nên quá 300 từ</span> — dài hơn dễ loãng và mâu thuẫn, khiến AI bỏ bớt chi tiết. Nếu lố, hãy tắt bớt vài prompt đề xuất.
                 </p>
               </div>
               {negativePrompt.trim() && (

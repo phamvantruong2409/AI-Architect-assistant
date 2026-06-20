@@ -1,9 +1,9 @@
-import { analyzeForRender } from "@/lib/render-gemini";
+import { critiqueForOptimize } from "@/lib/render-gemini";
 import { geminiErrorCode, geminiErrorMessage } from "@/lib/gemini-error";
-import type { RenderAnalyzeRequest } from "@/lib/render-types";
+import type { RenderCritiqueRequest } from "@/lib/render-types";
 
 export async function POST(req: Request) {
-  let body: Partial<RenderAnalyzeRequest>;
+  let body: Partial<RenderCritiqueRequest>;
   try {
     body = await req.json();
   } catch {
@@ -11,18 +11,18 @@ export async function POST(req: Request) {
   }
 
   if (typeof body.imageBase64 !== "string" || !body.imageBase64.trim()) {
-    return Response.json({ error: "Vui lòng đưa ảnh vào để phân tích" }, { status: 400 });
+    return Response.json({ error: "Vui lòng đưa ảnh vào để đánh giá" }, { status: 400 });
   }
 
   try {
-    const analysis = await analyzeForRender({
+    const critique = await critiqueForOptimize({
       imageBase64: body.imageBase64,
       mimeType: body.mimeType || "image/jpeg",
-      model: (body.model as RenderAnalyzeRequest["model"]) || "gemini-3-flash-preview",
+      model: (body.model as RenderCritiqueRequest["model"]) || "gemini-3-flash-preview",
     });
-    return Response.json(analysis);
+    return Response.json(critique);
   } catch (error) {
-    console.error("Render analyze error:", error);
+    console.error("Render critique error:", error);
     if (error instanceof SyntaxError) {
       return Response.json(
         { error: "AI trả về dữ liệu không đọc được. Vui lòng thử lại hoặc đổi model." },

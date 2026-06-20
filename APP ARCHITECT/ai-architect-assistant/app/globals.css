@@ -108,6 +108,25 @@ body::-webkit-scrollbar {
   animation: pulse-glow 2.5s ease-in-out infinite;
 }
 
+/* Render progress — vệt sáng quét ngang trên thanh */
+@keyframes progress-shimmer {
+  0% { transform: translateX(-150%); }
+  100% { transform: translateX(350%); }
+}
+.animate-progress-shimmer {
+  animation: progress-shimmer 1.4s ease-in-out infinite;
+}
+
+/* Gradient chảy — dùng cho cả nền thanh lẫn chữ (cần bg-size 200%) */
+@keyframes progress-flow {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 200% 50%; }
+}
+.animate-progress-flow {
+  background-size: 200% 100%;
+  animation: progress-flow 2.4s linear infinite;
+}
+
 ::selection {
   background: var(--accent-soft);
   color: var(--accent);

@@ -22,11 +22,11 @@ export const quickActions: QuickAction[] = [
     cta: "Mở kho",
   },
   {
-    label: "Ảnh → Prompt",
-    description: "Đưa ảnh vào, AI đọc ngược ra prompt tái tạo",
-    href: "/image-to-prompt",
+    label: "Render Optimizer",
+    description: "Tối ưu ảnh render đã có: AI phân tích → đề xuất → render lại",
+    href: "/render-optimizer",
     icon: "image",
-    cta: "Trích prompt",
+    cta: "Tối ưu render",
   },
   {
     label: "Sơ đồ khối AI",

@@ -3,7 +3,7 @@
 
 import type { GeminiModelId } from "@/lib/gemini-models";
 
-/** Tối đa 8MB cho ảnh đầu vào — đồng bộ với Ảnh → Prompt. */
+/** Tối đa 8MB cho ảnh đầu vào. */
 export const MAX_IMAGE_BYTES = 8 * 1024 * 1024;
 
 /** Số ảnh tối đa cho một lần render. */
@@ -207,6 +207,79 @@ export function isEntourageSuggestion(label: string): boolean {
   return l.includes("người") || l.includes("entourage");
 }
 
+/** Nhận diện ô "Bao cảnh" — hiển thị dạng dropdown chọn sẵn thay vì gõ tay. */
+export function isSceneSuggestion(label: string): boolean {
+  return label.toLowerCase().includes("bao cảnh");
+}
+
+/** Một lựa chọn bao cảnh sẵn cho dropdown. */
+export interface SceneContextOption {
+  id: string;
+  /** Nhãn hiển thị trong dropdown. */
+  label: string;
+  /** Nội dung prompt (TIẾNG VIỆT) ghép vào khi chọn. */
+  text: string;
+}
+
+/** ~10 bao cảnh dựng sẵn để người dùng bấm chọn nhanh. */
+export const SCENE_CONTEXTS: SceneContextOption[] = [
+  {
+    id: "urban-townhouse",
+    label: "Phố nhà liền kề Việt Nam",
+    text: "bối cảnh phố Việt Nam với dãy nhà phố liền kề sát hai bên, vỉa hè lát gạch sạch sẽ, vài cây xanh ven đường",
+  },
+  {
+    id: "modern-urban",
+    label: "Khu đô thị hiện đại",
+    text: "bối cảnh khu đô thị hiện đại, đường rộng thoáng, các tòa nhà lân cận tiết chế, cây xanh và vỉa hè gọn gàng",
+  },
+  {
+    id: "quiet-residential",
+    label: "Khu dân cư yên tĩnh nhiều cây",
+    text: "khu dân cư yên tĩnh, đường nội bộ rợp bóng cây xanh, không gian thoáng đãng, ít xe cộ",
+  },
+  {
+    id: "villa-garden",
+    label: "Biệt thự sân vườn riêng",
+    text: "công trình độc lập trong khuôn viên sân vườn riêng, hàng rào hợp phong cách, thảm cỏ và cây cảnh được chăm chút",
+  },
+  {
+    id: "commercial-street",
+    label: "Phố thương mại sầm uất",
+    text: "bối cảnh tuyến phố thương mại sầm uất, biển hiệu cửa hàng tiết chế, vỉa hè đông vui có sức sống",
+  },
+  {
+    id: "seaside",
+    label: "Ven biển",
+    text: "bối cảnh ven biển, hàng dừa và cây nhiệt đới, nắng gió biển, đường ven biển thoáng đãng phía xa",
+  },
+  {
+    id: "lakeside",
+    label: "Ven hồ / sông nước",
+    text: "bối cảnh ven hồ hoặc sông, mặt nước phẳng phản chiếu, cây xanh và lối đi dạo ven nước",
+  },
+  {
+    id: "countryside",
+    label: "Đồng quê / nông thôn",
+    text: "bối cảnh đồng quê Việt Nam, cánh đồng và cây cối tự nhiên, hàng rào thấp, không gian rộng yên bình",
+  },
+  {
+    id: "mountain",
+    label: "Đồi núi / cao nguyên",
+    text: "bối cảnh đồi núi cao nguyên, rừng cây và sườn đồi xanh phía sau, sương nhẹ lãng đãng, thiên nhiên khoáng đạt",
+  },
+  {
+    id: "greenery-park",
+    label: "Khuôn viên cây xanh rộng",
+    text: "công trình giữa khuôn viên nhiều cây xanh kiểu công viên hoặc resort, thảm cỏ rộng, lối đi và cây bóng mát",
+  },
+  {
+    id: "minimal-studio",
+    label: "Phông tối giản (studio)",
+    text: "nền phông tối giản kiểu studio, không bối cảnh đô thị, làm nổi bật riêng khối kiến trúc",
+  },
+];
+
 /** Một prompt đề xuất (toggle/sửa được) do AI sinh ra. */
 export interface RenderSuggestion {
   id: string;
@@ -236,9 +309,34 @@ export interface RenderAnalyzeRequest {
   model: GeminiModelId;
 }
 
-/** Preamble bắt buộc: bảo toàn hình học của bản vẽ SketchUp thô. */
-export const STRUCTURE_PREAMBLE =
-  "Render model SketchUp thô này thành ảnh kiến trúc chân thực, GIỮ NGUYÊN hình khối, tỉ lệ, số tầng, vị trí cửa, mái, góc camera và bố cục của ảnh gốc (không thêm/bớt/đổi khối hay ô cửa). Chỉ bổ sung vật liệu, ánh sáng và bối cảnh thực tế.";
+/**
+ * Render Optimizer — bước 1: KTS 20 năm kinh nghiệm ĐÁNH GIÁ ảnh render đã có
+ * (thừa/thiếu, ánh sáng, vật liệu, bao cảnh, nên thêm gì). Người dùng sửa được đánh giá này.
+ */
+export interface RenderCritiqueRequest {
+  imageBase64: string;
+  mimeType: string;
+  model: GeminiModelId;
+}
+
+export interface RenderCritique {
+  /** Tiêu đề ngắn tiếng Việt (3–6 từ). */
+  title: string;
+  /** Bài đánh giá kiến trúc bằng tiếng Việt, nhiều mục, dạng text sửa được. */
+  critique: string;
+}
+
+/**
+ * Render Optimizer — bước 2: từ bài ĐÁNH GIÁ (đã được người dùng sửa) + ảnh gốc,
+ * dựng prompt cải thiện + đề xuất + negative để render lại. Trả về RenderAnalysis.
+ */
+export interface RenderImproveRequest {
+  imageBase64: string;
+  mimeType: string;
+  model: GeminiModelId;
+  /** Bài đánh giá đã được người dùng chỉnh sửa. */
+  critique: string;
+}
 
 /** Ghép prompt render cuối cùng từ phân tích + đề xuất đã bật + góc view. */
 export function buildRenderPrompt(opts: {
@@ -247,7 +345,7 @@ export function buildRenderPrompt(opts: {
   angleHint?: string;
   timeHint?: string;
 }): string {
-  const parts = [STRUCTURE_PREAMBLE, opts.analysisPrompt.trim()];
+  const parts = [opts.analysisPrompt.trim()];
   for (const s of opts.enabledSuggestions) {
     if (s.text.trim()) parts.push(s.text.trim());
   }
