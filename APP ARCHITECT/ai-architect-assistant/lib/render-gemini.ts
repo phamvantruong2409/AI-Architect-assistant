@@ -106,10 +106,9 @@ export async function improveForOptimize(
   req: RenderImproveRequest
 ): Promise<RenderAnalysis> {
   const model = getGeminiModel(req.model);
-  const angleList = VIEW_ANGLES.map((a) => `"${a.id}" = ${a.label}`).join("; ");
 
   const result = await generateContentRetry(model, [
-    buildImprovePrompt(angleList, req.critique),
+    buildImprovePrompt(req.critique),
     { inlineData: { mimeType: req.mimeType, data: req.imageBase64 } },
   ]);
 
@@ -175,7 +174,7 @@ Chỉ trả về JSON.`;
  * BƯỚC 2 — Từ bài ĐÁNH GIÁ (đã được người dùng sửa) + ảnh gốc, dựng prompt cải thiện
  * để RENDER LẠI cho chân thực hơn (Render Optimizer). Giữ nguyên thiết kế & bố cục.
  */
-function buildImprovePrompt(angleList: string, critique: string): string {
+function buildImprovePrompt(critique: string): string {
   return `Bạn là chuyên gia diễn họa & hậu kỳ kiến trúc, chuyên NÂNG CẤP một ảnh render đã có cho chân thực, sống động và ấn tượng hơn.
 
 Dưới đây là BÀI ĐÁNH GIÁ của một KTS giàu kinh nghiệm về ảnh đính kèm (người dùng có thể đã chỉnh sửa). Hãy BÁM SÁT bài đánh giá này, biến các điểm cần cải thiện trong đó thành prompt render cụ thể:
@@ -183,20 +182,20 @@ Dưới đây là BÀI ĐÁNH GIÁ của một KTS giàu kinh nghiệm về ản
 ${critique.trim()}
 """
 
-NHIỆM VỤ: dựa trên ẢNH đính kèm + bài đánh giá trên, chuẩn bị dữ liệu để RENDER LẠI cho thực và đẹp hơn, NHƯNG phải GIỮ NGUYÊN hình khối, THIẾT KẾ công trình, số tầng, vị trí cửa, mái, góc camera và bố cục như ảnh gốc. KHÔNG đổi thiết kế, KHÔNG thêm/bớt khối, KHÔNG đổi góc nhìn trừ khi người dùng tự chọn.
+NHIỆM VỤ: dựa trên ẢNH đính kèm + bài đánh giá trên, dựng prompt để RENDER LẠI cho thực và đẹp hơn CHỈ bằng cách áp dụng các "ĐỀ XUẤT CẢI THIỆN" trong bài đánh giá. GIỮ NGUYÊN hình khối, THIẾT KẾ công trình, số tầng, vị trí cửa, mái, góc camera, khung hình và toàn bộ bối cảnh như ảnh gốc. KHÔNG đổi thiết kế, KHÔNG thêm/bớt khối, KHÔNG đổi khung hình/góc nhìn.
 
 QUAN TRỌNG: TẤT CẢ nội dung trả về phải viết bằng TIẾNG VIỆT (kể cả prompt và negative prompt) — không lẫn tiếng Anh. Người dùng là kiến trúc sư Việt và sẽ đọc/sửa trực tiếp prompt này.
 
 NGÂN SÁCH ĐỘ DÀI: viết "analysisPrompt" thành MỘT đoạn prompt LIỀN MẠCH, khoảng 150–220 TỪ. Súc tích, đi thẳng vào ý, KHÔNG lặp ý, KHÔNG tính từ hoa mỹ thừa, KHÔNG kể lể từng ô cửa/chi tiết nhỏ.
 
 NGUYÊN TẮC:
-- "analysisPrompt" là TOÀN BỘ prompt render cuối, viết LIỀN MẠCH thành một đoạn văn tự nhiên (KHÔNG gạch đầu dòng, KHÔNG tách mục, KHÔNG đánh số): vừa mô tả công trình ĐÚNG thiết kế ảnh gốc, vừa DỆT SẴN các cải thiện theo bài ĐÁNH GIÁ ở trên — ưu tiên bám đúng những gì nêu trong mục "ĐỀ XUẤT CẢI THIỆN". KHÔNG bịa thêm cải thiện mà bài đánh giá không nhắc tới.
-- Phần mô tả công trình: bám sát loại công trình, phong cách, số tầng, tỉ lệ, cách bố trí cửa/ban công/mái theo lối KHÁI QUÁT — GIỮ ĐÚNG thiết kế, không thêm/bớt khối.
-- Dệt vào các cải thiện mà bài đánh giá nêu, ví dụ: vật liệu chân thực hơn (nếu có kính/gương thì tả phản xạ đúng vật lý, thoáng thấy nội thất, tránh kính phẳng lì), chất ánh sáng & không khí đẹp và thật hơn (KHÔNG cố định một giờ cụ thể vì người dùng sẽ TỰ CHỌN giờ), bầu trời có chiều sâu, bao cảnh & cây xanh hợp loại công trình và khí hậu VN, hậu kỳ như ảnh chụp thật (độ nét, màu tự nhiên, khử cảm giác CGI giả). Chỉ đưa khía cạnh nào bài đánh giá có đề cập.
-- TUYỆT ĐỐI KHÔNG mô tả góc camera/góc nhìn (người dùng chọn "Góc view" riêng). Viết theo lối KHẲNG ĐỊNH (chỉ mô tả cái MUỐN CÓ), TUYỆT ĐỐI không dùng câu phủ định kiểu "không/tránh/đừng" — mọi thứ cần tránh để dành cho "negativePrompt".
+- "analysisPrompt" là TOÀN BỘ prompt render cuối, viết LIỀN MẠCH thành một đoạn văn tự nhiên (KHÔNG gạch đầu dòng, KHÔNG tách mục, KHÔNG đánh số). Prompt CHỈ XOAY QUANH các cải thiện trong mục "ĐỀ XUẤT CẢI THIỆN" của bài đánh giá — bám đúng từng điểm đó, KHÔNG bịa thêm cải thiện mà bài đánh giá không nhắc tới.
+- Mở đầu chỉ cần một mệnh đề NGẮN neo chủ thể (vd "căn biệt thự hiện đại trong ảnh") để giữ đúng công trình; KHÔNG mô tả lại chi tiết thiết kế, KHÔNG kể lể từng tầng/ô cửa.
+- GIỮ NGUYÊN khung hình, góc nhìn, bố cục và TOÀN BỘ bối cảnh của ảnh gốc (bao cảnh, cây xanh, bầu trời, người, xe, hậu cảnh, đường phố). TUYỆT ĐỐI KHÔNG đổi khung hình/góc máy và KHÔNG thêm/đổi bao cảnh, cây xanh, bầu trời, người, xe... TRỪ KHI chính mục "ĐỀ XUẤT CẢI THIỆN" yêu cầu.
+- Mỗi cải thiện diễn đạt cụ thể, đúng nghề (vd "đá ốp mặt tiền vân thật, độ nhám và phản xạ đúng vật lý"; "ánh sáng mềm, bóng đổ thật, tăng chiều sâu"; "ảnh nét, màu tự nhiên, khử cảm giác CGI giả nhựa"). Viết theo lối KHẲNG ĐỊNH (chỉ mô tả cái MUỐN CÓ), TUYỆT ĐỐI không dùng câu phủ định kiểu "không/tránh/đừng" — mọi thứ cần tránh để dành cho "negativePrompt".
 - "suggestions": để MẢNG RỖNG []. KHÔNG tách thành các đề xuất riêng.
-- "recommendedAngleIds": ưu tiên "keep" (render lại ĐÚNG góc ảnh gốc), kèm 1–2 góc khác từ danh sách sau nếu thật sự tôn công trình hơn (chỉ trả về id): ${angleList}.
-- "negativePrompt": TIẾNG VIỆT, liệt kê lỗi cần tránh (đổi thiết kế công trình, méo hình khối, sai số tầng, đổi bố cục, cảm giác CGI giả nhựa, chậu cây vụn vặt, vật trang trí thừa, bố cục lộn xộn rườm rà, mờ nhòe, vỡ nét, watermark, chữ...).
+- "recommendedAngleIds": luôn trả về ["keep"] (render lại GIỮ NGUYÊN khung hình ảnh gốc).
+- "negativePrompt": TIẾNG VIỆT, liệt kê lỗi cần tránh (đổi thiết kế công trình, méo hình khối, sai số tầng, đổi khung hình/góc máy, đổi bố cục & bối cảnh gốc, cảm giác CGI giả nhựa, mờ nhòe, vỡ nét, watermark, chữ...).
 - "title": tiêu đề NGẮN tiếng Việt 3–6 từ.
 
 Trả về JSON THUẦN TÚY (không markdown, không \`\`\`), đúng cấu trúc:

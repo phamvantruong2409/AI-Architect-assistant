@@ -384,6 +384,10 @@ export function RenderStudio({ variant = "sketchup" }: { variant?: RenderVariant
   }
 
   function finalPrompt(): string {
+    // Render Optimizer chỉ bám theo prompt cải thiện — KHÔNG ghép khung hình (góc view) hay thời điểm.
+    if (variant === "optimize") {
+      return buildRenderPrompt({ analysisPrompt: basePrompt, enabledSuggestions: [] });
+    }
     const angleHint = VIEW_ANGLES.find((a) => a.id === angle)?.promptHint;
     const timeHint = TIME_OF_DAY.find((t) => t.id === timeOfDay)?.promptHint;
     return buildRenderPrompt({
@@ -443,7 +447,7 @@ export function RenderStudio({ variant = "sketchup" }: { variant?: RenderVariant
       // Lưu vào thư viện.
       const thumb = await makeThumb(preview);
       const modelLabel = renderModelLabel(model);
-      const angleLabel = viewAngleLabel(angle);
+      const angleLabel = variant === "optimize" ? "Tối ưu render" : viewAngleLabel(angle);
       for (const image of images) {
         const item: RenderHistoryItem = {
           id: newId("render"),
@@ -803,7 +807,9 @@ export function RenderStudio({ variant = "sketchup" }: { variant?: RenderVariant
           </Card>
           )}
 
-          {/* Thời điểm trong ngày */}
+          {/* Thời điểm & Góc view — chỉ Render AI; Render Optimizer giữ nguyên khung hình & bối cảnh ảnh gốc */}
+          {variant === "sketchup" && (
+          <>
           <Card className="space-y-2 p-4 sm:p-5">
             <div className="flex items-center gap-1.5">
               <label className={labelClass + " mb-0"}>Thời điểm trong ngày (quyết định ánh sáng & bầu trời)</label>
@@ -864,6 +870,8 @@ export function RenderStudio({ variant = "sketchup" }: { variant?: RenderVariant
               })}
             </div>
           </Card>
+          </>
+          )}
 
           {/* Negative prompt — luôn hiển thị, sửa được */}
           <Card className="space-y-2 p-4 sm:p-5">
