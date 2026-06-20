@@ -31,8 +31,16 @@ export function getGeminiModel(modelId?: string) {
   return genAI.getGenerativeModel({ model: id, generationConfig });
 }
 
-export function getGeminiImageModel(modelId = "gemini-2.5-flash-image") {
-  return getGenAI().getGenerativeModel({ model: modelId });
+export function getGeminiImageModel(
+  modelId = "gemini-2.5-flash-image",
+  generationConfig?: Record<string, unknown>
+) {
+  // imageConfig (chọn khổ/độ phân giải) chưa có trong type SDK 0.24.1 nhưng vẫn
+  // được gửi xuống REST API — cast để truyền qua.
+  return getGenAI().getGenerativeModel({
+    model: modelId,
+    generationConfig: generationConfig as Record<string, never> | undefined,
+  });
 }
 
 export function getGeminiEmbeddingModel() {

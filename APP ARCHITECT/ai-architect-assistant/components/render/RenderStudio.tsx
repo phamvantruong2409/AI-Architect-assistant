@@ -12,6 +12,7 @@ import {
   DEFAULT_RENDER_MODEL,
   VIEW_ANGLES,
   TIME_OF_DAY,
+  modelResolutions,
   MAX_IMAGE_BYTES,
   MAX_RENDER_IMAGES,
   buildRenderPrompt,
@@ -136,7 +137,14 @@ export function RenderStudio() {
   const [timeOfDay, setTimeOfDay] = useState("auto");
 
   const [model, setModel] = useState<RenderModelId>(DEFAULT_RENDER_MODEL);
+  const [resolution, setResolution] = useState(modelResolutions(DEFAULT_RENDER_MODEL)[0]);
   const [count, setCount] = useState(2);
+
+  // Đổi model → đặt lại khổ ảnh về mặc định của model đó.
+  function selectModel(id: RenderModelId) {
+    setModel(id);
+    setResolution(modelResolutions(id)[0]);
+  }
 
   const [rendering, setRendering] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
@@ -287,7 +295,7 @@ export function RenderStudio() {
       const res = await fetch("/api/render/generate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ image: preview, prompt, negativePrompt, model, count }),
+        body: JSON.stringify({ image: preview, prompt, negativePrompt, model, count, resolution }),
       });
       const json = await res.json();
       if (!res.ok) {
@@ -636,7 +644,7 @@ export function RenderStudio() {
                 return (
                   <button
                     key={m.id}
-                    onClick={() => setModel(m.id)}
+                    onClick={() => selectModel(m.id)}
                     className={`rounded-card border p-3 text-left transition-colors ${
                       active ? "border-accent bg-accent/10" : "border-border bg-surface hover:border-accent/40"
                     }`}
@@ -684,6 +692,37 @@ export function RenderStudio() {
                     {n}
                   </button>
                 ))}
+              </div>
+            </div>
+
+            {/* Khổ ảnh / độ phân giải (theo model) */}
+            <div>
+              <label className={labelClass}>
+                Khổ ảnh{" "}
+                <span className="text-foreground-soft/70">
+                  (tỉ lệ theo ảnh gốc · độ phân giải theo model)
+                </span>
+              </label>
+              <div className="flex gap-2">
+                {modelResolutions(model).map((r) => (
+                  <button
+                    key={r}
+                    onClick={() => setResolution(r)}
+                    disabled={modelResolutions(model).length === 1}
+                    className={`h-9 min-w-[3rem] rounded-card border px-3 text-sm font-medium transition-colors disabled:opacity-100 ${
+                      resolution === r
+                        ? "border-accent bg-accent/15 text-foreground"
+                        : "border-border bg-surface text-foreground-soft hover:border-accent/40"
+                    }`}
+                  >
+                    {r}
+                  </button>
+                ))}
+                {model === "gemini-image" && (
+                  <span className="self-center text-[11px] text-foreground-soft">
+                    Bản Flash chỉ 1K — cần lớn hơn hãy chọn Pro hoặc dùng Upscale.
+                  </span>
+                )}
               </div>
             </div>
 

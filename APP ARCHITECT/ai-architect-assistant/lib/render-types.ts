@@ -22,6 +22,8 @@ export interface RenderModelInfo {
   geminiModel?: string;
   /** true = engine cloud cần REPLICATE_API_TOKEN. */
   cloud?: boolean;
+  /** Các khổ/độ phân giải hỗ trợ; phần tử đầu là mặc định. */
+  resolutions: string[];
 }
 
 export const RENDER_MODELS: RenderModelInfo[] = [
@@ -33,6 +35,7 @@ export const RENDER_MODELS: RenderModelInfo[] = [
       "Chất lượng render cao nhất của Gemini — giữ khối/bố cục sát, vật liệu & ánh sáng thực, độ phân giải cao. Là model trả phí (preview), chậm & tốn hơn bản Flash.",
     geminiModel: "gemini-3-pro-image-preview",
     recommended: true,
+    resolutions: ["2K", "4K"],
   },
   {
     id: "gemini-image",
@@ -41,6 +44,7 @@ export const RENDER_MODELS: RenderModelInfo[] = [
     description:
       "Bản nháp nhanh, rẻ — hợp để thử nhiều phương án trước khi render bản đẹp bằng Pro.",
     geminiModel: "gemini-2.5-flash-image",
+    resolutions: ["1K"],
   },
   {
     id: "flux-controlnet",
@@ -49,6 +53,7 @@ export const RENDER_MODELS: RenderModelInfo[] = [
     description:
       "ControlNet khóa hình học từ nét/độ sâu của bản vẽ → giữ đúng khối nhất. Chạy cloud (Replicate), cần token & tốn credit/ảnh.",
     cloud: true,
+    resolutions: ["2K", "4K", "8K"],
   },
 ];
 
@@ -56,6 +61,11 @@ export const DEFAULT_RENDER_MODEL: RenderModelId = "gemini-image-pro";
 
 export function renderModelLabel(id: string): string {
   return RENDER_MODELS.find((m) => m.id === id)?.label ?? id;
+}
+
+/** Các khổ ảnh hỗ trợ của một model render (phần tử đầu = mặc định). */
+export function modelResolutions(id: string): string[] {
+  return RENDER_MODELS.find((m) => m.id === id)?.resolutions ?? ["1K"];
 }
 
 /** Map backend Gemini → model id thật; trả null nếu không phải backend Gemini. */

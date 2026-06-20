@@ -19,6 +19,7 @@ interface GenBody {
   negativePrompt?: string;
   model?: string;
   count?: number;
+  resolution?: string; // "1K" | "2K" | "4K" | "8K"
 }
 
 /** Tách dataURL "data:<mime>;base64,<data>" → { mimeType, data }. */
@@ -34,9 +35,17 @@ async function generateWithGemini(
   image: { mimeType: string; data: string },
   prompt: string,
   negativePrompt: string,
-  count: number
+  count: number,
+  resolution: string
 ): Promise<string[]> {
-  const model = getGeminiImageModel(geminiModel);
+  // Chọn khổ ảnh: Nano Banana Pro (gemini-3 pro image) hỗ trợ 2K/4K qua
+  // imageConfig.imageSize. Flash chỉ 1K → không gửi (để mặc định).
+  // Tên field imageConfig/imageSize cần xác minh khi chạy thật với key Pro.
+  const supportsSize = geminiModel.includes("pro") && /^(2K|4K)$/i.test(resolution);
+  const generationConfig = supportsSize
+    ? { imageConfig: { imageSize: resolution.toUpperCase() } }
+    : undefined;
+  const model = getGeminiImageModel(geminiModel, generationConfig);
   // Gemini image không có tham số negative riêng → gộp vào text prompt.
   const fullPrompt = negativePrompt.trim()
     ? `${prompt}\n\nCần TRÁNH (không được có): ${negativePrompt.trim()}`
@@ -72,11 +81,15 @@ function collectUrls(output: ReplicatePrediction["output"]): string[] {
   return [];
 }
 
+// Khổ ảnh Flux → số megapixel gần đúng (tên field tuỳ schema model, xác minh khi có token).
+const FLUX_MEGAPIXELS: Record<string, number> = { "2K": 4, "4K": 8, "8K": 16 };
+
 async function generateWithFlux(
   image: string,
   prompt: string,
   negativePrompt: string,
-  count: number
+  count: number,
+  resolution: string
 ): Promise<{ images?: string[]; error?: string; code?: string; status?: number }> {
   const token = process.env.REPLICATE_API_TOKEN;
   if (!token) {
@@ -104,6 +117,9 @@ async function generateWithFlux(
           control_image: image,
           prompt,
           ...(negativePrompt.trim() ? { negative_prompt: negativePrompt.trim() } : {}),
+          ...(FLUX_MEGAPIXELS[resolution.toUpperCase()]
+            ? { megapixels: String(FLUX_MEGAPIXELS[resolution.toUpperCase()]) }
+            : {}),
           num_outputs: count,
         },
       }),
@@ -157,11 +173,12 @@ export async function POST(req: Request) {
   }
   const negativePrompt = typeof body.negativePrompt === "string" ? body.negativePrompt : "";
   const count = Math.min(MAX_RENDER_IMAGES, Math.max(1, Math.round(body.count ?? 1)));
+  const resolution = typeof body.resolution === "string" ? body.resolution : "";
   const modelId = body.model || "gemini-image-pro";
 
   // --- Flux + ControlNet (cloud) ---
   if (modelId === "flux-controlnet") {
-    const out = await generateWithFlux(image, prompt.trim(), negativePrompt, count);
+    const out = await generateWithFlux(image, prompt.trim(), negativePrompt, count, resolution);
     if (out.error) {
       return Response.json({ error: out.error, code: out.code }, { status: out.status ?? 502 });
     }
@@ -178,7 +195,7 @@ export async function POST(req: Request) {
     return Response.json({ error: "Ảnh đầu vào không hợp lệ" }, { status: 400 });
   }
   try {
-    const images = await generateWithGemini(geminiModel, parsed, prompt.trim(), negativePrompt, count);
+    const images = await generateWithGemini(geminiModel, parsed, prompt.trim(), negativePrompt, count, resolution);
     if (images.length === 0) {
       return Response.json(
         { error: "AI không trả về ảnh. Thử lại, đổi model, hoặc chỉnh prompt." },
