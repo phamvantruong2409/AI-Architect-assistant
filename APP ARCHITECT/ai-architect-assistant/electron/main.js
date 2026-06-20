@@ -8,6 +8,7 @@ const { spawn, spawnSync } = require("child_process");
 
 let mainWindow;
 let serverProcess;
+let serverPid = null; // giữ riêng PID server con để còn taskkill được kể cả khi mất tham chiếu
 let APP_URL = "";
 let pendingAuthCode = null; // code nhận qua deep link trước khi renderer sẵn sàng
 
@@ -140,12 +141,14 @@ async function startLocalServer() {
     },
     stdio: ["ignore", "pipe", "pipe"],
   });
+  serverPid = serverProcess.pid;
 
   serverProcess.stdout.on("data", (d) => logToFile(`[server] ${String(d).trim()}`));
   serverProcess.stderr.on("data", (d) => logToFile(`[server-err] ${String(d).trim()}`));
   serverProcess.on("exit", (code, signal) => {
     logToFile(`server thoát code=${code} signal=${signal}`);
     serverProcess = null;
+    serverPid = null;
   });
 
   APP_URL = `http://127.0.0.1:${port}`;
@@ -155,22 +158,26 @@ async function startLocalServer() {
 }
 
 function stopLocalServer() {
-  if (serverProcess && !serverProcess.killed) {
-    const pid = serverProcess.pid;
+  // Lấy PID kể cả khi tham chiếu serverProcess đã mất (tránh để lại tiến trình
+  // mồ côi giữ tên exe → installer NSIS báo "cannot be closed").
+  const pid = (serverProcess && serverProcess.pid) || serverPid;
+  if (pid) {
     try {
-      if (process.platform === "win32" && pid) {
-        // Server chạy bằng chính file .exe của Electron (ELECTRON_RUN_AS_NODE).
-        // Phải kill cả cây tiến trình con và ÉP BUỘC, nếu không installer NSIS
-        // vẫn thấy tiến trình dùng file .exe → báo "cannot be closed".
+      if (process.platform === "win32") {
+        // Server chạy bằng chính file .exe của Electron (ELECTRON_RUN_AS_NODE),
+        // nên CÙNG TÊN ẢNH với app. Phải kill cả cây tiến trình con và ÉP BUỘC,
+        // nếu không installer NSIS vẫn thấy "AI Architect Assistant.exe" đang
+        // chạy → báo "cannot be closed" rồi đòi đóng tay.
         spawnSync("taskkill", ["/pid", String(pid), "/T", "/F"]);
-      } else {
+      } else if (serverProcess) {
         serverProcess.kill();
       }
     } catch {
       // process có thể đã thoát
     }
-    serverProcess = null;
   }
+  serverProcess = null;
+  serverPid = null;
 }
 
 function createSplashWindow() {
@@ -469,7 +476,10 @@ function setupAutoUpdate() {
       // Dừng hẳn server con (cùng file .exe) trước, nếu không installer
       // sẽ báo "cannot be closed" rồi đòi đóng tay.
       stopLocalServer();
-      setTimeout(() => autoUpdater.quitAndInstall(), 500);
+      // (isSilent=true, isForceRunAfter=true): cài IM LẶNG (không hiện cửa sổ
+      // installer, không hỏi gì) rồi TỰ MỞ LẠI app — đúng trải nghiệm
+      // "cập nhật xong khởi động lại luôn". Hoãn 800ms cho server con chết hẳn.
+      setTimeout(() => autoUpdater.quitAndInstall(true, true), 800);
     }
   });
 
