@@ -1,0 +1,8 @@
+# Ảnh nguồn thư viện — chỉ giữ local, không đẩy lên git
+# (ảnh đã xử lý nằm trong ai-architect-assistant/public/library)
+/thuviennhatro-canho/
+/thuvienpngu/
+/thuvienwc/
+
+# Bản cũ + file cài đặt rất nặng
+/v-old/
