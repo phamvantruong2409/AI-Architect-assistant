@@ -1,40 +1,42 @@
-; build/installer.nsh — tuỳ biến trình cài NSIS (electron-builder tự nạp file này).
+; build/installer.nsh — tuỳ biến trình cài NSIS (electron-builder tự nạp qua nsis.include).
 ;
-; VÁ PHỔ QUÁT cho lỗi "Failed to uninstall old application files / cannot be closed":
-; Trước khi gỡ-cài bản cũ, ép tắt MỌI tiến trình còn giữ file .exe — kể cả server
-; Next.js chạy nền dưới dạng ELECTRON_RUN_AS_NODE (cùng tên ảnh
-; "AI Architect Assistant.exe"). Nếu không giết, NSIS thấy file đang bị khoá →
-; gỡ-cài thất bại → retry vô vọng → bản cài hỏng dở.
+; ============================================================================
+;  NGUYÊN NHÂN GỐC (xác nhận bằng thực nghiệm 2026-06-21) của lỗi
+;  "Failed to uninstall old application files. Please try running the installer again.: 2"
+; ----------------------------------------------------------------------------
+;  App chạy server Next.js đóng gói trong $INSTDIR\resources\standalone. Lúc chạy,
+;  Next.js GHI CACHE ẢNH TỐI ƯU vào ...\.next\cache\images\<hash 43 ký tự>\<tên file rất dài>.
+;  Đường dẫn cài + tên file này VƯỢT 260 ký tự (MAX_PATH của Windows).
 ;
-; Vì đoạn này nằm trong TRÌNH CÀI MỚI (chạy trên máy khách lúc update), nó áp dụng
-; NGAY cho mọi bản nguồn — KHÔNG bị "độ trễ một phiên bản" như vá ở phía app runtime.
-; Nhờ vậy bất kỳ khách nào có auto-update (>= v0.3.0) đều cài đè được lên bản mới nhất.
-
-; CƠ CHẾ LỖI (xác nhận từ template electron-builder): trình gỡ-cài bản cũ xoá thư
-; mục cài bằng kiểu "atomic move" — ĐỔI TÊN (MOVE) từng file sang temp. Chỉ cần 1
-; file đang bị KHOÁ là cả bước thất bại → uninstaller trả exit code 2 →
-; "Failed to uninstall old application files. Please try running the installer again.: 2".
-; Vì vậy phải ép tắt MỌI tiến trình giữ file VÀ chờ OS nhả handle TRƯỚC khi gỡ-cài.
+;  Khi cập nhật, trình cài chạy trình GỠ-CÀI bản cũ; nó xoá thư mục cài bằng "atomic
+;  move" (Rename từng file qua temp) dùng Win32 API CŨ → KHÔNG xử lý được path > 260
+;  → atomicRMDir abort → uninstaller trả exit code 2 → đúng hộp thoại trên.
+;  => TẤT ĐỊNH cho mọi khách đã dùng app đủ để Next cache ảnh. KHÔNG liên quan khoá
+;     file / tiến trình đang chạy.
+;
+;  VÁ: TRƯỚC khi gỡ-cài bản cũ, XOÁ sạch thư mục .next\cache bằng robocopy /MIR — công
+;  cụ này xử lý được path > 260 (RMDir của NSIS thì KHÔNG). Cache chỉ là dữ liệu tạm,
+;  xoá đi Next tự tạo lại. Vì đoạn này nằm trong trình cài MỚI (chạy trên máy khách lúc
+;  update) nên áp dụng NGAY cho mọi bản nguồn có auto-update (>= v0.3.0), không bị
+;  "độ trễ một phiên bản".
+; ============================================================================
 
 !macro customInit
-  ; /F = ép buộc, /T = giết cả cây tiến trình con. Bỏ qua lỗi nếu không có tiến trình.
-  ; Dùng đường dẫn tuyệt đối tới taskkill để chắc chắn chạy được trong trình cài im lặng.
+  ; $INSTDIR đã được initMultiUser đặt (chạy trước customInit) = thư mục cài hiện có.
 
-  ; 1) App + server Next.js: server chạy bằng chính exe Electron qua
-  ;    ELECTRON_RUN_AS_NODE → CÙNG tên ảnh "AI Architect Assistant.exe".
+  ; 1) Ép tắt app + server (cùng tên ảnh exe) để chắc chắn không khoá file lúc gỡ-cài.
   nsExec::Exec '"$SYSDIR\taskkill.exe" /F /T /IM "AI Architect Assistant.exe"'
   Pop $0
 
-  ; 2) Các exe phụ ĐÓNG GÓI KÈM có TÊN KHÁC — check mặc định của NSIS không giết,
-  ;    nhưng nếu còn sống sẽ khoá file của chúng trong thư mục cài → gỡ-cài thất bại:
-  ;    Real-ESRGAN (upscale) và windows-trash (module 'trash' xoá vào thùng rác).
-  nsExec::Exec '"$SYSDIR\taskkill.exe" /F /T /IM "realesrgan-ncnn-vulkan.exe"'
+  ; 2) XOÁ .next\cache (thủ phạm long-path) bằng robocopy /MIR từ một thư mục rỗng.
+  ;    robocopy chịu được đường dẫn > 260 ký tự; RMDir /r của NSIS thì không.
+  InitPluginsDir
+  CreateDirectory "$PLUGINSDIR\emptymirror"
+  nsExec::Exec '"$SYSDIR\robocopy.exe" "$PLUGINSDIR\emptymirror" "$INSTDIR\resources\standalone\.next\cache" /MIR /R:0 /W:0 /NJH /NJS /NFL /NDL'
   Pop $0
-  nsExec::Exec '"$SYSDIR\taskkill.exe" /F /T /IM "windows-trash.exe"'
-  Pop $0
+  ; Sau khi robocopy đã dọn rỗng, thư mục cache không còn path dài → RMDir gỡ nốt vỏ.
+  RMDir /r "$INSTDIR\resources\standalone\.next\cache"
 
-  ; 3) Chờ Windows nhả handle: ảnh .exe + native module (sharp .node/.dll) đã nạp vào
-  ;    RAM cần thời gian unmap sau khi process chết (có cả antivirus quét). 1.5s thường
-  ;    KHÔNG đủ trên máy thật → nâng lên 4s. Trình cài còn retry gỡ-cài 5 lần nữa.
-  Sleep 4000
+  ; 3) Chờ một nhịp cho Windows nhả handle trước khi NSIS gỡ-cài bản cũ.
+  Sleep 1500
 !macroend
