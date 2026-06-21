@@ -57,11 +57,34 @@ export interface QuickAction {
 
 export const quickActions: QuickAction[] = [
   {
-    label: "AI Chat",
-    description: "Trao đổi, hỏi đáp về kiến trúc – nội thất",
-    href: "/chat",
-    icon: "chat",
-    cta: "Bắt đầu chat",
+    label: "Tra cứu thư viện",
+    description: "Tra cứu kho mặt bằng, cấu tạo & phong cách kiến trúc",
+    href: "",
+    icon: "search",
+    cta: "Mở thư viện",
+    items: [
+      {
+        label: "MB Công năng",
+        description: "Tra cứu mặt bằng công năng theo loại không gian",
+        href: "/library/cong-nang",
+        icon: "floorplan",
+        cta: "Tra công năng",
+      },
+      {
+        label: "Chi tiết cấu tạo",
+        description: "Tra cứu chi tiết cấu tạo, bản vẽ kỹ thuật",
+        href: "/library/cau-tao",
+        icon: "blueprint",
+        cta: "Tra cấu tạo",
+      },
+      {
+        label: "Phong cách kiến trúc",
+        description: "Tra cứu phong cách kiến trúc & nội thất tham khảo",
+        href: "/library/phong-cach",
+        icon: "palette",
+        cta: "Tra phong cách",
+      },
+    ],
   },
   {
     label: "Nghiên cứu thiết kế",
