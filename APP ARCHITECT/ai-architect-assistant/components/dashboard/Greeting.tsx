@@ -28,18 +28,47 @@ const TIPS = [
   "Lắng nghe địa hình — công trình đẹp hài hòa với đất.",
   "Mỗi lần phê duyệt là cơ hội để hoàn thiện thêm một chút.",
   "Concept mạnh sẽ dẫn lối cho mọi quyết định thiết kế.",
+  "Hãy đặt câu hỏi 'tại sao' trước khi quyết định 'như thế nào'.",
+  "Một mặt đứng đẹp bắt đầu từ một mặt bằng mạch lạc.",
+  "Đừng thiết kế cho giải thưởng — hãy thiết kế cho con người.",
+  "Khoảng trống biết thở quan trọng hơn việc lấp đầy mọi mét vuông.",
+  "Hướng nắng và hướng gió quyết định trước khi đặt bút vẽ.",
+  "Ranh giới giữa trong và ngoài là nơi kiến trúc thật sự bắt đầu.",
+  "Một thang đẹp có thể là trái tim của cả ngôi nhà.",
+  "Tối ưu chi phí không có nghĩa là hy sinh ý tưởng.",
+  "Học từ công trình cũ — chúng đã chịu thử thách của thời gian.",
+  "Bóng đổ cũng là một phần của thiết kế, đừng bỏ quên.",
+  "Trải nghiệm di chuyển qua không gian quan trọng hơn từng góc nhìn tĩnh.",
+  "Vật liệu thật luôn kể câu chuyện mà render khó tả hết.",
+  "Đặt mình vào vị trí người dùng và đi thử qua từng căn phòng.",
+  "Một ý tưởng rõ ràng đáng giá hơn mười chi tiết cầu kỳ.",
+  "Hãy giữ lại bản phác đầu tiên — đôi khi nó đúng nhất.",
+  "Thiết kế thụ động trước, thiết bị cơ điện sau.",
+  "Tỷ lệ con người là thước đo cuối cùng của mọi không gian.",
+  "Ánh sáng buổi chiều sẽ tiết lộ vẻ đẹp thật của vật liệu.",
+  "Cửa sổ không chỉ để nhìn ra — còn để đưa thiên nhiên vào.",
+  "Bớt một đường nét thừa, công trình lại mạnh thêm một chút.",
+  "Lắng nghe khách hàng, nhưng đừng quên vai trò dẫn dắt của bạn.",
+  "Sự tĩnh lặng trong thiết kế cũng là một dạng sang trọng.",
+  "Hãy để công năng và cảm xúc cùng song hành.",
 ];
 
 const REST_TIPS_1H = [
   "Đã hơn 1 giờ rồi — nghỉ 10 phút để mắt được thư giãn.",
   "Đứng dậy vươn vai một chút, ý tưởng sẽ rõ hơn sau khi nghỉ ngơi.",
   "Một tách cà phê và vài phút nghỉ sẽ giúp bạn sáng tạo hơn.",
+  "Nhìn ra xa 20 giây để đôi mắt được nghỉ — rồi quay lại nhé.",
+  "Một quãng nghỉ ngắn thường mở ra giải pháp bạn đang tìm.",
+  "Uống chút nước đi đã — não bộ cần được cấp đủ nước để sáng tạo.",
 ];
 
 const REST_TIPS_5H = [
   "Nghỉ ngơi thôi, đã 5 tiếng rồi — não bộ cần nạp lại năng lượng!",
   "5 tiếng thiết kế là quá đủ — hãy nghỉ ngơi để ngày mai làm tốt hơn.",
   "Công trình tốt nhất được vẽ bởi kiến trúc sư được nghỉ ngơi đầy đủ.",
+  "Đã làm việc rất chăm rồi — đứng dậy đi dạo một vòng nhé.",
+  "Ý tưởng hay thường đến lúc bạn rời khỏi bàn làm việc.",
+  "Sức khỏe của bạn cũng là một dự án quan trọng — hãy chăm sóc nó.",
 ];
 
 function pickRandom<T>(arr: T[]): T {

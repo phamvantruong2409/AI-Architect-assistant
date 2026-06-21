@@ -1,0 +1,3702 @@
+﻿{
+    "type":  "laminate",
+    "size":  256,
+    "count":  739,
+    "items":  [
+                  {
+                      "file":  "LK 002 S.jpg",
+                      "name":  "LK 002 S",
+                      "color":  "#CBCBCB"
+                  },
+                  {
+                      "file":  "LK 005 A.jpg",
+                      "name":  "LK 005 A",
+                      "color":  "#434141"
+                  },
+                  {
+                      "file":  "LK 006 A.jpg",
+                      "name":  "LK 006 A",
+                      "color":  "#000000"
+                  },
+                  {
+                      "file":  "LK 007 D.jpg",
+                      "name":  "LK 007 D",
+                      "color":  "#000000"
+                  },
+                  {
+                      "file":  "LK 008 A.jpg",
+                      "name":  "LK 008 A",
+                      "color":  "#0C0C0C"
+                  },
+                  {
+                      "file":  "LK 009 A.jpg",
+                      "name":  "LK 009 A",
+                      "color":  "#010101"
+                  },
+                  {
+                      "file":  "LK 010 S.jpg",
+                      "name":  "LK 010 S",
+                      "color":  "#E9E7E4"
+                  },
+                  {
+                      "file":  "LK 012 S.jpg",
+                      "name":  "LK 012 S",
+                      "color":  "#F7F6F0"
+                  },
+                  {
+                      "file":  "LK 013 A.jpg",
+                      "name":  "LK 013 A",
+                      "color":  "#F9F9F9"
+                  },
+                  {
+                      "file":  "LK 014 A.jpg",
+                      "name":  "LK 014 A",
+                      "color":  "#F4F4F4"
+                  },
+                  {
+                      "file":  "LK 015 A.jpg",
+                      "name":  "LK 015 A",
+                      "color":  "#EEE7DB"
+                  },
+                  {
+                      "file":  "LK 016 A.jpg",
+                      "name":  "LK 016 A",
+                      "color":  "#7BAC27"
+                  },
+                  {
+                      "file":  "LK 017 A.jpg",
+                      "name":  "LK 017 A",
+                      "color":  "#EED960"
+                  },
+                  {
+                      "file":  "LK 018 A.jpg",
+                      "name":  "LK 018 A",
+                      "color":  "#D58231"
+                  },
+                  {
+                      "file":  "LK 019 A.jpg",
+                      "name":  "LK 019 A",
+                      "color":  "#A51E18"
+                  },
+                  {
+                      "file":  "LK 020 A.jpg",
+                      "name":  "LK 020 A",
+                      "color":  "#C0000C"
+                  },
+                  {
+                      "file":  "LK 021 A.jpg",
+                      "name":  "LK 021 A",
+                      "color":  "#002E75"
+                  },
+                  {
+                      "file":  "LK 023 A.jpg",
+                      "name":  "LK 023 A",
+                      "color":  "#B09C7C"
+                  },
+                  {
+                      "file":  "LK 027 A.jpg",
+                      "name":  "LK 027 A",
+                      "color":  "#BBA785"
+                  },
+                  {
+                      "file":  "LK 032 A.jpg",
+                      "name":  "LK 032 A",
+                      "color":  "#723C1A"
+                  },
+                  {
+                      "file":  "LK 034 A.jpg",
+                      "name":  "LK 034 A",
+                      "color":  "#391508"
+                  },
+                  {
+                      "file":  "LK 035 A.jpg",
+                      "name":  "LK 035 A",
+                      "color":  "#3E180A"
+                  },
+                  {
+                      "file":  "LK 038 A.jpg",
+                      "name":  "LK 038 A",
+                      "color":  "#795E49"
+                  },
+                  {
+                      "file":  "LK 039 A.jpg",
+                      "name":  "LK 039 A",
+                      "color":  "#80674C"
+                  },
+                  {
+                      "file":  "LK 040 A.jpg",
+                      "name":  "LK 040 A",
+                      "color":  "#21110A"
+                  },
+                  {
+                      "file":  "LK 041 D.jpg",
+                      "name":  "LK 041 D",
+                      "color":  "#A7ABA9"
+                  },
+                  {
+                      "file":  "LK 042 A.jpg",
+                      "name":  "LK 042 A",
+                      "color":  "#E4E2E0"
+                  },
+                  {
+                      "file":  "LK 045 V.jpg",
+                      "name":  "LK 045 V",
+                      "color":  "#550001"
+                  },
+                  {
+                      "file":  "LK 046 V.jpg",
+                      "name":  "LK 046 V",
+                      "color":  "#F7F7F4"
+                  },
+                  {
+                      "file":  "LK 047 A.jpg",
+                      "name":  "LK 047 A",
+                      "color":  "#3E251A"
+                  },
+                  {
+                      "file":  "LK 048 A.jpg",
+                      "name":  "LK 048 A",
+                      "color":  "#5E4330"
+                  },
+                  {
+                      "file":  "LK 049 A.jpg",
+                      "name":  "LK 049 A",
+                      "color":  "#292727"
+                  },
+                  {
+                      "file":  "LK 050 A.jpg",
+                      "name":  "LK 050 A",
+                      "color":  "#A48C63"
+                  },
+                  {
+                      "file":  "LK 051 A.jpg",
+                      "name":  "LK 051 A",
+                      "color":  "#B4B0A4"
+                  },
+                  {
+                      "file":  "LK 052 A.jpg",
+                      "name":  "LK 052 A",
+                      "color":  "#7E705C"
+                  },
+                  {
+                      "file":  "LK 053 A.jpg",
+                      "name":  "LK 053 A",
+                      "color":  "#2E1E17"
+                  },
+                  {
+                      "file":  "LK 055 A.jpg",
+                      "name":  "LK 055 A",
+                      "color":  "#130E0E"
+                  },
+                  {
+                      "file":  "LK 056 A.jpg",
+                      "name":  "LK 056 A",
+                      "color":  "#C0BEB2"
+                  },
+                  {
+                      "file":  "LK 057 A.jpg",
+                      "name":  "LK 057 A",
+                      "color":  "#827767"
+                  },
+                  {
+                      "file":  "LK 058 D.jpg",
+                      "name":  "LK 058 D",
+                      "color":  "#2A1C11"
+                  },
+                  {
+                      "file":  "LK 059 A.jpg",
+                      "name":  "LK 059 A",
+                      "color":  "#835739"
+                  },
+                  {
+                      "file":  "LK 060 D.jpg",
+                      "name":  "LK 060 D",
+                      "color":  "#1E100A"
+                  },
+                  {
+                      "file":  "LK 062 A.jpg",
+                      "name":  "LK 062 A",
+                      "color":  "#A99C82"
+                  },
+                  {
+                      "file":  "LK 063 A.jpg",
+                      "name":  "LK 063 A",
+                      "color":  "#A0927C"
+                  },
+                  {
+                      "file":  "LK 064 A.jpg",
+                      "name":  "LK 064 A",
+                      "color":  "#534031"
+                  },
+                  {
+                      "file":  "LK 071 D.jpg",
+                      "name":  "LK 071 D",
+                      "color":  "#2E1A11"
+                  },
+                  {
+                      "file":  "LK 072 A.jpg",
+                      "name":  "LK 072 A",
+                      "color":  "#8E5A31"
+                  },
+                  {
+                      "file":  "LK 073 D.jpg",
+                      "name":  "LK 073 D",
+                      "color":  "#402518"
+                  },
+                  {
+                      "file":  "LK 074 D.jpg",
+                      "name":  "LK 074 D",
+                      "color":  "#251710"
+                  },
+                  {
+                      "file":  "LK 075 A.jpg",
+                      "name":  "LK 075 A",
+                      "color":  "#2C1305"
+                  },
+                  {
+                      "file":  "LK 082 D.jpg",
+                      "name":  "LK 082 D",
+                      "color":  "#7B5231"
+                  },
+                  {
+                      "file":  "LK 098 A.jpg",
+                      "name":  "LK 098 A",
+                      "color":  "#5A402C"
+                  },
+                  {
+                      "file":  "LK 101 A.jpg",
+                      "name":  "LK 101 A",
+                      "color":  "#E7E6E4"
+                  },
+                  {
+                      "file":  "LK 102 A.jpg",
+                      "name":  "LK 102 A",
+                      "color":  "#C7C7C7"
+                  },
+                  {
+                      "file":  "LK 103 T.jpg",
+                      "name":  "LK 103 T",
+                      "color":  "#390703"
+                  },
+                  {
+                      "file":  "LK 104 T.jpg",
+                      "name":  "LK 104 T",
+                      "color":  "#0C0C0C"
+                  },
+                  {
+                      "file":  "LK 107 V.jpg",
+                      "name":  "LK 107 V",
+                      "color":  "#F4F4F4"
+                  },
+                  {
+                      "file":  "LK 108 V.jpg",
+                      "name":  "LK 108 V",
+                      "color":  "#FBF7F7"
+                  },
+                  {
+                      "file":  "LK 10901 I.jpg",
+                      "name":  "LK 10901 I",
+                      "color":  "#7E634A"
+                  },
+                  {
+                      "file":  "LK 10902 I.jpg",
+                      "name":  "LK 10902 I",
+                      "color":  "#837B6C"
+                  },
+                  {
+                      "file":  "LK 10903 I.jpg",
+                      "name":  "LK 10903 I",
+                      "color":  "#AC9980"
+                  },
+                  {
+                      "file":  "LK 10904 I.jpg",
+                      "name":  "LK 10904 I",
+                      "color":  "#A99579"
+                  },
+                  {
+                      "file":  "LK 11003 M.jpg",
+                      "name":  "LK 11003 M",
+                      "color":  "#D5D5D5"
+                  },
+                  {
+                      "file":  "LK 11004 M.jpg",
+                      "name":  "LK 11004 M",
+                      "color":  "#B4A562"
+                  },
+                  {
+                      "file":  "LK 11005 M.jpg",
+                      "name":  "LK 11005 M",
+                      "color":  "#DB9B69"
+                  },
+                  {
+                      "file":  "LK 11090 M.jpg",
+                      "name":  "LK 11090 M",
+                      "color":  "#676767"
+                  },
+                  {
+                      "file":  "LK 11100 A.jpg",
+                      "name":  "LK 11100 A",
+                      "color":  "#4A4140"
+                  },
+                  {
+                      "file":  "LK 11102 A.jpg",
+                      "name":  "LK 11102 A",
+                      "color":  "#797267"
+                  },
+                  {
+                      "file":  "LK 1111 L.jpg",
+                      "name":  "LK 1111 L",
+                      "color":  "#D2D2D2"
+                  },
+                  {
+                      "file":  "LK 1112 L.jpg",
+                      "name":  "LK 1112 L",
+                      "color":  "#CEC5B7"
+                  },
+                  {
+                      "file":  "LK 1113 L.jpg",
+                      "name":  "LK 1113 L",
+                      "color":  "#BDBDBD"
+                  },
+                  {
+                      "file":  "LK 1114 L.jpg",
+                      "name":  "LK 1114 L",
+                      "color":  "#7E7E7E"
+                  },
+                  {
+                      "file":  "LK 1115 L.jpg",
+                      "name":  "LK 1115 L",
+                      "color":  "#C9AE87"
+                  },
+                  {
+                      "file":  "LK 1116 L.jpg",
+                      "name":  "LK 1116 L",
+                      "color":  "#735E4C"
+                  },
+                  {
+                      "file":  "LK 1117 L.jpg",
+                      "name":  "LK 1117 L",
+                      "color":  "#771E1C"
+                  },
+                  {
+                      "file":  "LK 1118 L.jpg",
+                      "name":  "LK 1118 L",
+                      "color":  "#310803"
+                  },
+                  {
+                      "file":  "LK 1119 L.jpg",
+                      "name":  "LK 1119 L",
+                      "color":  "#73402A"
+                  },
+                  {
+                      "file":  "LK 1120 L.jpg",
+                      "name":  "LK 1120 L",
+                      "color":  "#3E2E27"
+                  },
+                  {
+                      "file":  "LK 1121 L.jpg",
+                      "name":  "LK 1121 L",
+                      "color":  "#131313"
+                  },
+                  {
+                      "file":  "LK 1150 A.jpg",
+                      "name":  "LK 1150 A",
+                      "color":  "#C4C4B7"
+                  },
+                  {
+                      "file":  "LK 1151 A.jpg",
+                      "name":  "LK 1151 A",
+                      "color":  "#0E0E0E"
+                  },
+                  {
+                      "file":  "LK 1152 A.jpg",
+                      "name":  "LK 1152 A",
+                      "color":  "#A0A099"
+                  },
+                  {
+                      "file":  "LK 1153 A.jpg",
+                      "name":  "LK 1153 A",
+                      "color":  "#414141"
+                  },
+                  {
+                      "file":  "LK 1154 A.jpg",
+                      "name":  "LK 1154 A",
+                      "color":  "#E9E9E9"
+                  },
+                  {
+                      "file":  "LK 1155 D.jpg",
+                      "name":  "LK 1155 D",
+                      "color":  "#D5D5D4"
+                  },
+                  {
+                      "file":  "LK 1156 D.jpg",
+                      "name":  "LK 1156 D",
+                      "color":  "#EDE7DD"
+                  },
+                  {
+                      "file":  "LK 1158 D.jpg",
+                      "name":  "LK 1158 D",
+                      "color":  "#ACB2B5"
+                  },
+                  {
+                      "file":  "LK 1159 T.jpg",
+                      "name":  "LK 1159 T",
+                      "color":  "#F2F2F2"
+                  },
+                  {
+                      "file":  "LK 1160 T.jpg",
+                      "name":  "LK 1160 T",
+                      "color":  "#B4AC9C"
+                  },
+                  {
+                      "file":  "LK 1161 T.jpg",
+                      "name":  "LK 1161 T",
+                      "color":  "#83837E"
+                  },
+                  {
+                      "file":  "LK 1162 T.jpg",
+                      "name":  "LK 1162 T",
+                      "color":  "#A9AEB2"
+                  },
+                  {
+                      "file":  "LK 1163 T.jpg",
+                      "name":  "LK 1163 T",
+                      "color":  "#606060"
+                  },
+                  {
+                      "file":  "LK 1164 A.jpg",
+                      "name":  "LK 1164 A",
+                      "color":  "#E66362"
+                  },
+                  {
+                      "file":  "LK 1165 A.jpg",
+                      "name":  "LK 1165 A",
+                      "color":  "#C0BBE2"
+                  },
+                  {
+                      "file":  "LK 1166 A.jpg",
+                      "name":  "LK 1166 A",
+                      "color":  "#BD501E"
+                  },
+                  {
+                      "file":  "LK 1167 A.jpg",
+                      "name":  "LK 1167 A",
+                      "color":  "#CDCBC9"
+                  },
+                  {
+                      "file":  "LK 1168 A.jpg",
+                      "name":  "LK 1168 A",
+                      "color":  "#1A2943"
+                  },
+                  {
+                      "file":  "LK 1169 A.jpg",
+                      "name":  "LK 1169 A",
+                      "color":  "#C9BBB0"
+                  },
+                  {
+                      "file":  "LK 1170 A.jpg",
+                      "name":  "LK 1170 A",
+                      "color":  "#C2C2C2"
+                  },
+                  {
+                      "file":  "LK 1171 A.jpg",
+                      "name":  "LK 1171 A",
+                      "color":  "#E2D0C2"
+                  },
+                  {
+                      "file":  "LK 1172 A.jpg",
+                      "name":  "LK 1172 A",
+                      "color":  "#59432E"
+                  },
+                  {
+                      "file":  "LK 1173 A.jpg",
+                      "name":  "LK 1173 A",
+                      "color":  "#6A6A6A"
+                  },
+                  {
+                      "file":  "LK 1174 A.jpg",
+                      "name":  "LK 1174 A",
+                      "color":  "#E0D9E0"
+                  },
+                  {
+                      "file":  "LK 1175 A.jpg",
+                      "name":  "LK 1175 A",
+                      "color":  "#4C1A18"
+                  },
+                  {
+                      "file":  "LK 1177 A.jpg",
+                      "name":  "LK 1177 A",
+                      "color":  "#A02C35"
+                  },
+                  {
+                      "file":  "LK 1178 A.jpg",
+                      "name":  "LK 1178 A",
+                      "color":  "#C9B489"
+                  },
+                  {
+                      "file":  "LK 1179 A.jpg",
+                      "name":  "LK 1179 A",
+                      "color":  "#E2E2E6"
+                  },
+                  {
+                      "file":  "LK 1180 A.jpg",
+                      "name":  "LK 1180 A",
+                      "color":  "#C7E7EE"
+                  },
+                  {
+                      "file":  "LK 1181 A.jpg",
+                      "name":  "LK 1181 A",
+                      "color":  "#E7E2CE"
+                  },
+                  {
+                      "file":  "LK 1183 A.jpg",
+                      "name":  "LK 1183 A",
+                      "color":  "#AB9979"
+                  },
+                  {
+                      "file":  "LK 1184 A.jpg",
+                      "name":  "LK 1184 A",
+                      "color":  "#856A52"
+                  },
+                  {
+                      "file":  "LK 1186 A.jpg",
+                      "name":  "LK 1186 A",
+                      "color":  "#534587"
+                  },
+                  {
+                      "file":  "LK 1187 A.jpg",
+                      "name":  "LK 1187 A",
+                      "color":  "#F0EDE0"
+                  },
+                  {
+                      "file":  "LK 1188 A.jpg",
+                      "name":  "LK 1188 A",
+                      "color":  "#D9C799"
+                  },
+                  {
+                      "file":  "LK 1189 T.jpg",
+                      "name":  "LK 1189 T",
+                      "color":  "#5E5752"
+                  },
+                  {
+                      "file":  "LK 1190 A.jpg",
+                      "name":  "LK 1190 A",
+                      "color":  "#7C7C7C"
+                  },
+                  {
+                      "file":  "LK 1191 A.jpg",
+                      "name":  "LK 1191 A",
+                      "color":  "#C9B0A0"
+                  },
+                  {
+                      "file":  "LK 1192 A.jpg",
+                      "name":  "LK 1192 A",
+                      "color":  "#B26A67"
+                  },
+                  {
+                      "file":  "LK 1193 A.jpg",
+                      "name":  "LK 1193 A",
+                      "color":  "#310C15"
+                  },
+                  {
+                      "file":  "LK 1194 A.jpg",
+                      "name":  "LK 1194 A",
+                      "color":  "#2C2C31"
+                  },
+                  {
+                      "file":  "LK 1195 A.jpg",
+                      "name":  "LK 1195 A",
+                      "color":  "#C75C03"
+                  },
+                  {
+                      "file":  "LK 1196 A.jpg",
+                      "name":  "LK 1196 A",
+                      "color":  "#F4EDE7"
+                  },
+                  {
+                      "file":  "LK 1197 A.jpg",
+                      "name":  "LK 1197 A",
+                      "color":  "#050505"
+                  },
+                  {
+                      "file":  "LK 1198 A.jpg",
+                      "name":  "LK 1198 A",
+                      "color":  "#E7E0D5"
+                  },
+                  {
+                      "file":  "LK 1199 A.jpg",
+                      "name":  "LK 1199 A",
+                      "color":  "#B4C597"
+                  },
+                  {
+                      "file":  "LK 1200 T.jpg",
+                      "name":  "LK 1200 T",
+                      "color":  "#B7B9B5"
+                  },
+                  {
+                      "file":  "LK 1201 T.jpg",
+                      "name":  "LK 1201 T",
+                      "color":  "#0E0E11"
+                  },
+                  {
+                      "file":  "LK 1203 T.jpg",
+                      "name":  "LK 1203 T",
+                      "color":  "#393939"
+                  },
+                  {
+                      "file":  "LK 1204 T.jpg",
+                      "name":  "LK 1204 T",
+                      "color":  "#000000"
+                  },
+                  {
+                      "file":  "LK 1205 T.jpg",
+                      "name":  "LK 1205 T",
+                      "color":  "#000000"
+                  },
+                  {
+                      "file":  "LK 1206 T.jpg",
+                      "name":  "LK 1206 T",
+                      "color":  "#000000"
+                  },
+                  {
+                      "file":  "LK 1207 T.jpg",
+                      "name":  "LK 1207 T",
+                      "color":  "#000000"
+                  },
+                  {
+                      "file":  "LK 131 A.jpg",
+                      "name":  "LK 131 A",
+                      "color":  "#7B5735"
+                  },
+                  {
+                      "file":  "LK 2001 E.jpg",
+                      "name":  "LK 2001 E",
+                      "color":  "#000000"
+                  },
+                  {
+                      "file":  "LK 2002 E.jpg",
+                      "name":  "LK 2002 E",
+                      "color":  "#000000"
+                  },
+                  {
+                      "file":  "LK 2003 E.jpg",
+                      "name":  "LK 2003 E",
+                      "color":  "#000000"
+                  },
+                  {
+                      "file":  "LK 2004 E.jpg",
+                      "name":  "LK 2004 E",
+                      "color":  "#000000"
+                  },
+                  {
+                      "file":  "LK 2005 E.jpg",
+                      "name":  "LK 2005 E",
+                      "color":  "#000000"
+                  },
+                  {
+                      "file":  "LK 2006 E.jpg",
+                      "name":  "LK 2006 E",
+                      "color":  "#000000"
+                  },
+                  {
+                      "file":  "LK 2007 E.jpg",
+                      "name":  "LK 2007 E",
+                      "color":  "#000000"
+                  },
+                  {
+                      "file":  "LK 2008 E.jpg",
+                      "name":  "LK 2008 E",
+                      "color":  "#000000"
+                  },
+                  {
+                      "file":  "LK 2009 E.jpg",
+                      "name":  "LK 2009 E",
+                      "color":  "#000000"
+                  },
+                  {
+                      "file":  "LK 2010 E.jpg",
+                      "name":  "LK 2010 E",
+                      "color":  "#000000"
+                  },
+                  {
+                      "file":  "LK 2011 E.jpg",
+                      "name":  "LK 2011 E",
+                      "color":  "#000000"
+                  },
+                  {
+                      "file":  "LK 2012 E.jpg",
+                      "name":  "LK 2012 E",
+                      "color":  "#000000"
+                  },
+                  {
+                      "file":  "LK 2013 E.jpg",
+                      "name":  "LK 2013 E",
+                      "color":  "#000000"
+                  },
+                  {
+                      "file":  "LK 2014 T.jpg",
+                      "name":  "LK 2014 T",
+                      "color":  "#000000"
+                  },
+                  {
+                      "file":  "LK 2015 I.jpg",
+                      "name":  "LK 2015 I",
+                      "color":  "#000000"
+                  },
+                  {
+                      "file":  "LK 2016 T.jpg",
+                      "name":  "LK 2016 T",
+                      "color":  "#000000"
+                  },
+                  {
+                      "file":  "LK 2017 I.jpg",
+                      "name":  "LK 2017 I",
+                      "color":  "#000000"
+                  },
+                  {
+                      "file":  "LK 2117 I.jpg",
+                      "name":  "LK 2117 I",
+                      "color":  "#B5AC95"
+                  },
+                  {
+                      "file":  "LK 2118 A.jpg",
+                      "name":  "LK 2118 A",
+                      "color":  "#836A60"
+                  },
+                  {
+                      "file":  "LK 2118 I.jpg",
+                      "name":  "LK 2118 I",
+                      "color":  "#836A60"
+                  },
+                  {
+                      "file":  "LK 2119 I.jpg",
+                      "name":  "LK 2119 I",
+                      "color":  "#3E312E"
+                  },
+                  {
+                      "file":  "LK 2205 A.jpg",
+                      "name":  "LK 2205 A",
+                      "color":  "#000000"
+                  },
+                  {
+                      "file":  "LK 2250 K.jpg",
+                      "name":  "LK 2250 K",
+                      "color":  "#FEFEFE"
+                  },
+                  {
+                      "file":  "LK 2251 K.jpg",
+                      "name":  "LK 2251 K",
+                      "color":  "#FEFEFE"
+                  },
+                  {
+                      "file":  "LK 2252 K.jpg",
+                      "name":  "LK 2252 K",
+                      "color":  "#FEFEFE"
+                  },
+                  {
+                      "file":  "LK 2253 K.jpg",
+                      "name":  "LK 2253 K",
+                      "color":  "#F2F0EB"
+                  },
+                  {
+                      "file":  "LK 2254 K.jpg",
+                      "name":  "LK 2254 K",
+                      "color":  "#C5C4BB"
+                  },
+                  {
+                      "file":  "LK 2256 K.jpg",
+                      "name":  "LK 2256 K",
+                      "color":  "#9E9480"
+                  },
+                  {
+                      "file":  "LK 2257 K.jpg",
+                      "name":  "LK 2257 K",
+                      "color":  "#A48279"
+                  },
+                  {
+                      "file":  "LK 2258 K.jpg",
+                      "name":  "LK 2258 K",
+                      "color":  "#BDBDB7"
+                  },
+                  {
+                      "file":  "LK 2259 K.jpg",
+                      "name":  "LK 2259 K",
+                      "color":  "#9B9EA7"
+                  },
+                  {
+                      "file":  "LK 2260 K.jpg",
+                      "name":  "LK 2260 K",
+                      "color":  "#92A2AC"
+                  },
+                  {
+                      "file":  "LK 2261 K.jpg",
+                      "name":  "LK 2261 K",
+                      "color":  "#839997"
+                  },
+                  {
+                      "file":  "LK 2262 K.jpg",
+                      "name":  "LK 2262 K",
+                      "color":  "#7E828B"
+                  },
+                  {
+                      "file":  "LK 2263 K.jpg",
+                      "name":  "LK 2263 K",
+                      "color":  "#434549"
+                  },
+                  {
+                      "file":  "LK 2264 K.jpg",
+                      "name":  "LK 2264 K",
+                      "color":  "#20212C"
+                  },
+                  {
+                      "file":  "LK 2265 K.jpg",
+                      "name":  "LK 2265 K",
+                      "color":  "#0A0C11"
+                  },
+                  {
+                      "file":  "LK 2266 K.jpg",
+                      "name":  "LK 2266 K",
+                      "color":  "#6C7570"
+                  },
+                  {
+                      "file":  "LK 2267 K.jpg",
+                      "name":  "LK 2267 K",
+                      "color":  "#3A4C5C"
+                  },
+                  {
+                      "file":  "LK 2268 K.jpg",
+                      "name":  "LK 2268 K",
+                      "color":  "#23333E"
+                  },
+                  {
+                      "file":  "LK 2269 K.jpg",
+                      "name":  "LK 2269 K",
+                      "color":  "#9B4133"
+                  },
+                  {
+                      "file":  "LK 2270 K.jpg",
+                      "name":  "LK 2270 K",
+                      "color":  "#4C2520"
+                  },
+                  {
+                      "file":  "LK 2271 K.jpg",
+                      "name":  "LK 2271 K",
+                      "color":  "#332A27"
+                  },
+                  {
+                      "file":  "LK 2272 K.jpg",
+                      "name":  "LK 2272 K",
+                      "color":  "#4E7060"
+                  },
+                  {
+                      "file":  "LK 2273 K.jpg",
+                      "name":  "LK 2273 K",
+                      "color":  "#3A3A3E"
+                  },
+                  {
+                      "file":  "LK 2274 K.jpg",
+                      "name":  "LK 2274 K",
+                      "color":  "#E0D9CE"
+                  },
+                  {
+                      "file":  "LK 2275 K.jpg",
+                      "name":  "LK 2275 K",
+                      "color":  "#000000"
+                  },
+                  {
+                      "file":  "LK 2276 K.jpg",
+                      "name":  "LK 2276 K",
+                      "color":  "#000000"
+                  },
+                  {
+                      "file":  "LK 2277 K.jpg",
+                      "name":  "LK 2277 K",
+                      "color":  "#000000"
+                  },
+                  {
+                      "file":  "LK 2278 K.jpg",
+                      "name":  "LK 2278 K",
+                      "color":  "#000000"
+                  },
+                  {
+                      "file":  "LK 2279 K.jpg",
+                      "name":  "LK 2279 K",
+                      "color":  "#000000"
+                  },
+                  {
+                      "file":  "LK 2280 K.jpg",
+                      "name":  "LK 2280 K",
+                      "color":  "#000000"
+                  },
+                  {
+                      "file":  "LK 2281 K.jpg",
+                      "name":  "LK 2281 K",
+                      "color":  "#000000"
+                  },
+                  {
+                      "file":  "LK 2600 T.jpg",
+                      "name":  "LK 2600 T",
+                      "color":  "#000000"
+                  },
+                  {
+                      "file":  "LK 2601 T.jpg",
+                      "name":  "LK 2601 T",
+                      "color":  "#000000"
+                  },
+                  {
+                      "file":  "LK 2602 I.jpg",
+                      "name":  "LK 2602 I",
+                      "color":  "#767164"
+                  },
+                  {
+                      "file":  "LK 2603 G.jpg",
+                      "name":  "LK 2603 G",
+                      "color":  "#725343"
+                  },
+                  {
+                      "file":  "LK 3100 A.jpg",
+                      "name":  "LK 3100 A",
+                      "color":  "#4C2A18"
+                  },
+                  {
+                      "file":  "LK 3101 A.jpg",
+                      "name":  "LK 3101 A",
+                      "color":  "#231710"
+                  },
+                  {
+                      "file":  "LK 3102 A.jpg",
+                      "name":  "LK 3102 A",
+                      "color":  "#A49275"
+                  },
+                  {
+                      "file":  "LK 3103 D.jpg",
+                      "name":  "LK 3103 D",
+                      "color":  "#675549"
+                  },
+                  {
+                      "file":  "LK 3104 D.jpg",
+                      "name":  "LK 3104 D",
+                      "color":  "#333135"
+                  },
+                  {
+                      "file":  "LK 3105 T.jpg",
+                      "name":  "LK 3105 T",
+                      "color":  "#6E5C45"
+                  },
+                  {
+                      "file":  "LK 3106 A.jpg",
+                      "name":  "LK 3106 A",
+                      "color":  "#A09079"
+                  },
+                  {
+                      "file":  "LK 3107 T.jpg",
+                      "name":  "LK 3107 T",
+                      "color":  "#A79B82"
+                  },
+                  {
+                      "file":  "LK 3108 T.jpg",
+                      "name":  "LK 3108 T",
+                      "color":  "#332A25"
+                  },
+                  {
+                      "file":  "LK 3109 T.jpg",
+                      "name":  "LK 3109 T",
+                      "color":  "#A29B8C"
+                  },
+                  {
+                      "file":  "LK 3110 T.jpg",
+                      "name":  "LK 3110 T",
+                      "color":  "#3A2E23"
+                  },
+                  {
+                      "file":  "LK 3112 R.jpg",
+                      "name":  "LK 3112 R",
+                      "color":  "#231710"
+                  },
+                  {
+                      "file":  "LK 3113 R.jpg",
+                      "name":  "LK 3113 R",
+                      "color":  "#925331"
+                  },
+                  {
+                      "file":  "LK 3114 E.jpg",
+                      "name":  "LK 3114 E",
+                      "color":  "#B7B4A9"
+                  },
+                  {
+                      "file":  "LK 3115 E.jpg",
+                      "name":  "LK 3115 E",
+                      "color":  "#927B5C"
+                  },
+                  {
+                      "file":  "LK 3116 E.jpg",
+                      "name":  "LK 3116 E",
+                      "color":  "#49392E"
+                  },
+                  {
+                      "file":  "LK 3117 E.jpg",
+                      "name":  "LK 3117 E",
+                      "color":  "#70593C"
+                  },
+                  {
+                      "file":  "LK 3118 M.jpg",
+                      "name":  "LK 3118 M",
+                      "color":  "#C6C6C6"
+                  },
+                  {
+                      "file":  "LK 3119 E.jpg",
+                      "name":  "LK 3119 E",
+                      "color":  "#553C29"
+                  },
+                  {
+                      "file":  "LK 3120 E.jpg",
+                      "name":  "LK 3120 E",
+                      "color":  "#302013"
+                  },
+                  {
+                      "file":  "LK 3121 E.jpg",
+                      "name":  "LK 3121 E",
+                      "color":  "#000000"
+                  },
+                  {
+                      "file":  "LK 3122 E.jpg",
+                      "name":  "LK 3122 E",
+                      "color":  "#000000"
+                  },
+                  {
+                      "file":  "LK 3123 E.jpg",
+                      "name":  "LK 3123 E",
+                      "color":  "#000000"
+                  },
+                  {
+                      "file":  "LK 3200 T.jpg",
+                      "name":  "LK 3200 T",
+                      "color":  "#000000"
+                  },
+                  {
+                      "file":  "LK 3201 T.jpg",
+                      "name":  "LK 3201 T",
+                      "color":  "#000000"
+                  },
+                  {
+                      "file":  "LK 3204 T.jpg",
+                      "name":  "LK 3204 T",
+                      "color":  "#000000"
+                  },
+                  {
+                      "file":  "LK 3205 T.jpg",
+                      "name":  "LK 3205 T",
+                      "color":  "#000000"
+                  },
+                  {
+                      "file":  "LK 3206 T.jpg",
+                      "name":  "LK 3206 T",
+                      "color":  "#000000"
+                  },
+                  {
+                      "file":  "LK 3207 T.jpg",
+                      "name":  "LK 3207 T",
+                      "color":  "#000000"
+                  },
+                  {
+                      "file":  "LK 3208 T.jpg",
+                      "name":  "LK 3208 T",
+                      "color":  "#000000"
+                  },
+                  {
+                      "file":  "LK 3209 T.jpg",
+                      "name":  "LK 3209 T",
+                      "color":  "#000000"
+                  },
+                  {
+                      "file":  "LK 3210 T.jpg",
+                      "name":  "LK 3210 T",
+                      "color":  "#000000"
+                  },
+                  {
+                      "file":  "LK 3211 T.jpg",
+                      "name":  "LK 3211 T",
+                      "color":  "#000000"
+                  },
+                  {
+                      "file":  "LK 3212 T.jpg",
+                      "name":  "LK 3212 T",
+                      "color":  "#000000"
+                  },
+                  {
+                      "file":  "LK 3213 T.jpg",
+                      "name":  "LK 3213 T",
+                      "color":  "#000000"
+                  },
+                  {
+                      "file":  "LK 352 T.jpg",
+                      "name":  "LK 352 T",
+                      "color":  "#857B6E"
+                  },
+                  {
+                      "file":  "LK 353 T.jpg",
+                      "name":  "LK 353 T",
+                      "color":  "#3E3C3E"
+                  },
+                  {
+                      "file":  "LK 354 T.jpg",
+                      "name":  "LK 354 T",
+                      "color":  "#534A45"
+                  },
+                  {
+                      "file":  "LK 356 T.jpg",
+                      "name":  "LK 356 T",
+                      "color":  "#A59B89"
+                  },
+                  {
+                      "file":  "LK 357 T.jpg",
+                      "name":  "LK 357 T",
+                      "color":  "#473E37"
+                  },
+                  {
+                      "file":  "LK 358 A.jpg",
+                      "name":  "LK 358 A",
+                      "color":  "#8E897C"
+                  },
+                  {
+                      "file":  "LK 359 D.jpg",
+                      "name":  "LK 359 D",
+                      "color":  "#494035"
+                  },
+                  {
+                      "file":  "LK 362 D.jpg",
+                      "name":  "LK 362 D",
+                      "color":  "#AEA083"
+                  },
+                  {
+                      "file":  "LK 363 D.jpg",
+                      "name":  "LK 363 D",
+                      "color":  "#A5906E"
+                  },
+                  {
+                      "file":  "LK 364 D.jpg",
+                      "name":  "LK 364 D",
+                      "color":  "#B5B5AB"
+                  },
+                  {
+                      "file":  "LK 365 D.jpg",
+                      "name":  "LK 365 D",
+                      "color":  "#A99B87"
+                  },
+                  {
+                      "file":  "LK 366 D.jpg",
+                      "name":  "LK 366 D",
+                      "color":  "#A4947C"
+                  },
+                  {
+                      "file":  "LK 367 D.jpg",
+                      "name":  "LK 367 D",
+                      "color":  "#927052"
+                  },
+                  {
+                      "file":  "LK 369 T.jpg",
+                      "name":  "LK 369 T",
+                      "color":  "#603A20"
+                  },
+                  {
+                      "file":  "LK 400 S.jpg",
+                      "name":  "LK 400 S",
+                      "color":  "#9B9794"
+                  },
+                  {
+                      "file":  "LK 403 S.jpg",
+                      "name":  "LK 403 S",
+                      "color":  "#D4D0CD"
+                  },
+                  {
+                      "file":  "LK 405 A.jpg",
+                      "name":  "LK 405 A",
+                      "color":  "#3C2C25"
+                  },
+                  {
+                      "file":  "LK 409 S.jpg",
+                      "name":  "LK 409 S",
+                      "color":  "#000000"
+                  },
+                  {
+                      "file":  "LK 4104 A.jpg",
+                      "name":  "LK 4104 A",
+                      "color":  "#854C2C"
+                  },
+                  {
+                      "file":  "LK 418 V.jpg",
+                      "name":  "LK 418 V",
+                      "color":  "#FEFEFE"
+                  },
+                  {
+                      "file":  "LK 4300 E.jpg",
+                      "name":  "LK 4300 E",
+                      "color":  "#CDC5BD"
+                  },
+                  {
+                      "file":  "LK 4301 E.jpg",
+                      "name":  "LK 4301 E",
+                      "color":  "#A58B6A"
+                  },
+                  {
+                      "file":  "LK 4302 E.jpg",
+                      "name":  "LK 4302 E",
+                      "color":  "#C7A780"
+                  },
+                  {
+                      "file":  "LK 4303 E.jpg",
+                      "name":  "LK 4303 E",
+                      "color":  "#594939"
+                  },
+                  {
+                      "file":  "LK 4304 E.jpg",
+                      "name":  "LK 4304 E",
+                      "color":  "#A07943"
+                  },
+                  {
+                      "file":  "LK 4305 E.jpg",
+                      "name":  "LK 4305 E",
+                      "color":  "#292929"
+                  },
+                  {
+                      "file":  "LK 4350 E.jpg",
+                      "name":  "LK 4350 E",
+                      "color":  "#372A1C"
+                  },
+                  {
+                      "file":  "LK 4400 E.jpg",
+                      "name":  "LK 4400 E",
+                      "color":  "#594E41"
+                  },
+                  {
+                      "file":  "LK 4401 E.jpg",
+                      "name":  "LK 4401 E",
+                      "color":  "#493E37"
+                  },
+                  {
+                      "file":  "LK 4402 E.jpg",
+                      "name":  "LK 4402 E",
+                      "color":  "#9C7B53"
+                  },
+                  {
+                      "file":  "LK 4403 E.jpg",
+                      "name":  "LK 4403 E",
+                      "color":  "#6E5341"
+                  },
+                  {
+                      "file":  "LK 4404 E.jpg",
+                      "name":  "LK 4404 E",
+                      "color":  "#2A2015"
+                  },
+                  {
+                      "file":  "LK 4405 A.jpg",
+                      "name":  "LK 4405 A",
+                      "color":  "#000000"
+                  },
+                  {
+                      "file":  "LK 4405 E.jpg",
+                      "name":  "LK 4405 E",
+                      "color":  "#40352C"
+                  },
+                  {
+                      "file":  "LK 4406 A.jpg",
+                      "name":  "LK 4406 A",
+                      "color":  "#000000"
+                  },
+                  {
+                      "file":  "LK 4406 E.jpg",
+                      "name":  "LK 4406 E",
+                      "color":  "#574535"
+                  },
+                  {
+                      "file":  "LK 4407 E.jpg",
+                      "name":  "LK 4407 E",
+                      "color":  "#80603E"
+                  },
+                  {
+                      "file":  "LK 4411T LUX.jpg",
+                      "name":  "LK 4411T LUX",
+                      "color":  "#000000"
+                  },
+                  {
+                      "file":  "LK 4412T LUX.jpg",
+                      "name":  "LK 4412T LUX",
+                      "color":  "#000000"
+                  },
+                  {
+                      "file":  "LK 4413T LUX.jpg",
+                      "name":  "LK 4413T LUX",
+                      "color":  "#000000"
+                  },
+                  {
+                      "file":  "LK 4414 A.jpg",
+                      "name":  "LK 4414 A",
+                      "color":  "#000000"
+                  },
+                  {
+                      "file":  "LK 4415 A.jpg",
+                      "name":  "LK 4415 A",
+                      "color":  "#000000"
+                  },
+                  {
+                      "file":  "LK 4416 A.jpg",
+                      "name":  "LK 4416 A",
+                      "color":  "#000000"
+                  },
+                  {
+                      "file":  "LK 4417 A.jpg",
+                      "name":  "LK 4417 A",
+                      "color":  "#000000"
+                  },
+                  {
+                      "file":  "LK 4418 A.jpg",
+                      "name":  "LK 4418 A",
+                      "color":  "#000000"
+                  },
+                  {
+                      "file":  "LK 4420 E.jpg",
+                      "name":  "LK 4420 E",
+                      "color":  "#B0A789"
+                  },
+                  {
+                      "file":  "LK 4421 E.jpg",
+                      "name":  "LK 4421 E",
+                      "color":  "#756750"
+                  },
+                  {
+                      "file":  "LK 4422 A.jpg",
+                      "name":  "LK 4422 A",
+                      "color":  "#503720"
+                  },
+                  {
+                      "file":  "LK 4422 E.jpg",
+                      "name":  "LK 4422 E",
+                      "color":  "#4C3A29"
+                  },
+                  {
+                      "file":  "LK 4423 A.jpg",
+                      "name":  "LK 4423 A",
+                      "color":  "#3A2517"
+                  },
+                  {
+                      "file":  "LK 4424 A.jpg",
+                      "name":  "LK 4424 A",
+                      "color":  "#7B5039"
+                  },
+                  {
+                      "file":  "LK 4425 A.jpg",
+                      "name":  "LK 4425 A",
+                      "color":  "#674931"
+                  },
+                  {
+                      "file":  "LK 4426 A.jpg",
+                      "name":  "LK 4426 A",
+                      "color":  "#554131"
+                  },
+                  {
+                      "file":  "LK 4430 A.jpg",
+                      "name":  "LK 4430 A",
+                      "color":  "#ABABAB"
+                  },
+                  {
+                      "file":  "LK 4430 E.jpg",
+                      "name":  "LK 4430 E",
+                      "color":  "#704325"
+                  },
+                  {
+                      "file":  "LK 4431 A.jpg",
+                      "name":  "LK 4431 A",
+                      "color":  "#827975"
+                  },
+                  {
+                      "file":  "LK 4431 E.jpg",
+                      "name":  "LK 4431 E",
+                      "color":  "#532E18"
+                  },
+                  {
+                      "file":  "LK 4432 A.jpg",
+                      "name":  "LK 4432 A",
+                      "color":  "#B4B0A2"
+                  },
+                  {
+                      "file":  "LK 4432 E.jpg",
+                      "name":  "LK 4432 E",
+                      "color":  "#D7C294"
+                  },
+                  {
+                      "file":  "LK 4433 A.jpg",
+                      "name":  "LK 4433 A",
+                      "color":  "#AEA592"
+                  },
+                  {
+                      "file":  "LK 4433 E.jpg",
+                      "name":  "LK 4433 E",
+                      "color":  "#A58C5E"
+                  },
+                  {
+                      "file":  "LK 4434 A.jpg",
+                      "name":  "LK 4434 A",
+                      "color":  "#776955"
+                  },
+                  {
+                      "file":  "LK 4435 A.jpg",
+                      "name":  "LK 4435 A",
+                      "color":  "#9E927C"
+                  },
+                  {
+                      "file":  "LK 4436 A.jpg",
+                      "name":  "LK 4436 A",
+                      "color":  "#8B7C65"
+                  },
+                  {
+                      "file":  "LK 4437 A.jpg",
+                      "name":  "LK 4437 A",
+                      "color":  "#826C52"
+                  },
+                  {
+                      "file":  "LK 4438 A.jpg",
+                      "name":  "LK 4438 A",
+                      "color":  "#503C2C"
+                  },
+                  {
+                      "file":  "LK 4439 A.jpg",
+                      "name":  "LK 4439 A",
+                      "color":  "#8E6E4E"
+                  },
+                  {
+                      "file":  "LK 4440 A.jpg",
+                      "name":  "LK 4440 A",
+                      "color":  "#945E3C"
+                  },
+                  {
+                      "file":  "LK 4441 A.jpg",
+                      "name":  "LK 4441 A",
+                      "color":  "#957960"
+                  },
+                  {
+                      "file":  "LK 4442 A.jpg",
+                      "name":  "LK 4442 A",
+                      "color":  "#533725"
+                  },
+                  {
+                      "file":  "LK 4443 A.jpg",
+                      "name":  "LK 4443 A",
+                      "color":  "#5E4C37"
+                  },
+                  {
+                      "file":  "LK 4444 A.jpg",
+                      "name":  "LK 4444 A",
+                      "color":  "#4E4037"
+                  },
+                  {
+                      "file":  "LK 4445 A.jpg",
+                      "name":  "LK 4445 A",
+                      "color":  "#402511"
+                  },
+                  {
+                      "file":  "LK 4446 A.jpg",
+                      "name":  "LK 4446 A",
+                      "color":  "#CECEBE"
+                  },
+                  {
+                      "file":  "LK 4447 A.jpg",
+                      "name":  "LK 4447 A",
+                      "color":  "#624C3C"
+                  },
+                  {
+                      "file":  "LK 4448 A.jpg",
+                      "name":  "LK 4448 A",
+                      "color":  "#928982"
+                  },
+                  {
+                      "file":  "LK 4449 A.jpg",
+                      "name":  "LK 4449 A",
+                      "color":  "#CBC5B0"
+                  },
+                  {
+                      "file":  "LK 4450 A.jpg",
+                      "name":  "LK 4450 A",
+                      "color":  "#D9D2C5"
+                  },
+                  {
+                      "file":  "LK 4451 A.jpg",
+                      "name":  "LK 4451 A",
+                      "color":  "#B9B09E"
+                  },
+                  {
+                      "file":  "LK 4452 A.jpg",
+                      "name":  "LK 4452 A",
+                      "color":  "#9E9080"
+                  },
+                  {
+                      "file":  "LK 4453 A.jpg",
+                      "name":  "LK 4453 A",
+                      "color":  "#4C2C11"
+                  },
+                  {
+                      "file":  "LK 4454 A.jpg",
+                      "name":  "LK 4454 A",
+                      "color":  "#2C2111"
+                  },
+                  {
+                      "file":  "LK 4455 A.jpg",
+                      "name":  "LK 4455 A",
+                      "color":  "#BBA282"
+                  },
+                  {
+                      "file":  "LK 4456 A.jpg",
+                      "name":  "LK 4456 A",
+                      "color":  "#ACA28B"
+                  },
+                  {
+                      "file":  "LK 4457 A.jpg",
+                      "name":  "LK 4457 A",
+                      "color":  "#4E3525"
+                  },
+                  {
+                      "file":  "LK 4458 A.jpg",
+                      "name":  "LK 4458 A",
+                      "color":  "#C0B099"
+                  },
+                  {
+                      "file":  "LK 4459 A.jpg",
+                      "name":  "LK 4459 A",
+                      "color":  "#65503E"
+                  },
+                  {
+                      "file":  "LK 4460 A.jpg",
+                      "name":  "LK 4460 A",
+                      "color":  "#B4A994"
+                  },
+                  {
+                      "file":  "LK 4461 A.jpg",
+                      "name":  "LK 4461 A",
+                      "color":  "#CBD0D4"
+                  },
+                  {
+                      "file":  "LK 4462 A.jpg",
+                      "name":  "LK 4462 A",
+                      "color":  "#925721"
+                  },
+                  {
+                      "file":  "LK 4463 A.jpg",
+                      "name":  "LK 4463 A",
+                      "color":  "#605040"
+                  },
+                  {
+                      "file":  "LK 4464 A.jpg",
+                      "name":  "LK 4464 A",
+                      "color":  "#3C2017"
+                  },
+                  {
+                      "file":  "LK 4465 A.jpg",
+                      "name":  "LK 4465 A",
+                      "color":  "#3A3939"
+                  },
+                  {
+                      "file":  "LK 4466 A.jpg",
+                      "name":  "LK 4466 A",
+                      "color":  "#B99975"
+                  },
+                  {
+                      "file":  "LK 4467 A.jpg",
+                      "name":  "LK 4467 A",
+                      "color":  "#352920"
+                  },
+                  {
+                      "file":  "LK 4468 A.jpg",
+                      "name":  "LK 4468 A",
+                      "color":  "#594535"
+                  },
+                  {
+                      "file":  "LK 4470 A.jpg",
+                      "name":  "LK 4470 A",
+                      "color":  "#352318"
+                  },
+                  {
+                      "file":  "LK 4471 A.jpg",
+                      "name":  "LK 4471 A",
+                      "color":  "#372E27"
+                  },
+                  {
+                      "file":  "LK 4472 A.jpg",
+                      "name":  "LK 4472 A",
+                      "color":  "#504131"
+                  },
+                  {
+                      "file":  "LK 4473 A.jpg",
+                      "name":  "LK 4473 A",
+                      "color":  "#B78E67"
+                  },
+                  {
+                      "file":  "LK 4474 A.jpg",
+                      "name":  "LK 4474 A",
+                      "color":  "#90795C"
+                  },
+                  {
+                      "file":  "LK 4475 A.jpg",
+                      "name":  "LK 4475 A",
+                      "color":  "#958063"
+                  },
+                  {
+                      "file":  "LK 4476 A.jpg",
+                      "name":  "LK 4476 A",
+                      "color":  "#999283"
+                  },
+                  {
+                      "file":  "LK 4477 A.jpg",
+                      "name":  "LK 4477 A",
+                      "color":  "#625C52"
+                  },
+                  {
+                      "file":  "LK 4478 A.jpg",
+                      "name":  "LK 4478 A",
+                      "color":  "#BEB095"
+                  },
+                  {
+                      "file":  "LK 4482 P.jpg",
+                      "name":  "LK 4482 P",
+                      "color":  "#977D62"
+                  },
+                  {
+                      "file":  "LK 4483 P.jpg",
+                      "name":  "LK 4483 P",
+                      "color":  "#000000"
+                  },
+                  {
+                      "file":  "LK 4484 P.jpg",
+                      "name":  "LK 4484 P",
+                      "color":  "#776955"
+                  },
+                  {
+                      "file":  "LK 4485 P.jpg",
+                      "name":  "LK 4485 P",
+                      "color":  "#8C929B"
+                  },
+                  {
+                      "file":  "LK 4486 P.jpg",
+                      "name":  "LK 4486 P",
+                      "color":  "#6C573C"
+                  },
+                  {
+                      "file":  "LK 4487 P.jpg",
+                      "name":  "LK 4487 P",
+                      "color":  "#3A3935"
+                  },
+                  {
+                      "file":  "LK 4489 P.jpg",
+                      "name":  "LK 4489 P",
+                      "color":  "#796C57"
+                  },
+                  {
+                      "file":  "LK 4490 P.jpg",
+                      "name":  "LK 4490 P",
+                      "color":  "#C2BDB5"
+                  },
+                  {
+                      "file":  "LK 4491 P.jpg",
+                      "name":  "LK 4491 P",
+                      "color":  "#D2CBC4"
+                  },
+                  {
+                      "file":  "LK 4492 P.jpg",
+                      "name":  "LK 4492 P",
+                      "color":  "#B2A589"
+                  },
+                  {
+                      "file":  "LK 4493 P.jpg",
+                      "name":  "LK 4493 P",
+                      "color":  "#6A6E6C"
+                  },
+                  {
+                      "file":  "LK 4494 P.jpg",
+                      "name":  "LK 4494 P",
+                      "color":  "#828B82"
+                  },
+                  {
+                      "file":  "LK 4501 A.jpg",
+                      "name":  "LK 4501 A",
+                      "color":  "#352315"
+                  },
+                  {
+                      "file":  "LK 4502 A.jpg",
+                      "name":  "LK 4502 A",
+                      "color":  "#67412A"
+                  },
+                  {
+                      "file":  "LK 4503 A.jpg",
+                      "name":  "LK 4503 A",
+                      "color":  "#180E0A"
+                  },
+                  {
+                      "file":  "LK 4504 A.jpg",
+                      "name":  "LK 4504 A",
+                      "color":  "#CDC5AC"
+                  },
+                  {
+                      "file":  "LK 4505 A.jpg",
+                      "name":  "LK 4505 A",
+                      "color":  "#534131"
+                  },
+                  {
+                      "file":  "LK 4506 A.jpg",
+                      "name":  "LK 4506 A",
+                      "color":  "#4A392C"
+                  },
+                  {
+                      "file":  "LK 4507 A.jpg",
+                      "name":  "LK 4507 A",
+                      "color":  "#492E1C"
+                  },
+                  {
+                      "file":  "LK 4508 A.jpg",
+                      "name":  "LK 4508 A",
+                      "color":  "#4C3120"
+                  },
+                  {
+                      "file":  "LK 4509 A.jpg",
+                      "name":  "LK 4509 A",
+                      "color":  "#735237"
+                  },
+                  {
+                      "file":  "LK 451 A.jpg",
+                      "name":  "LK 451 A",
+                      "color":  "#413029"
+                  },
+                  {
+                      "file":  "LK 4510 A.jpg",
+                      "name":  "LK 4510 A",
+                      "color":  "#62432C"
+                  },
+                  {
+                      "file":  "LK 4511 A.jpg",
+                      "name":  "LK 4511 A",
+                      "color":  "#77706C"
+                  },
+                  {
+                      "file":  "LK 4512 A.jpg",
+                      "name":  "LK 4512 A",
+                      "color":  "#9B9789"
+                  },
+                  {
+                      "file":  "LK 4513 A.jpg",
+                      "name":  "LK 4513 A",
+                      "color":  "#C4C2B5"
+                  },
+                  {
+                      "file":  "LK 4514 A.jpg",
+                      "name":  "LK 4514 A",
+                      "color":  "#C0B5A4"
+                  },
+                  {
+                      "file":  "LK 4515 A.jpg",
+                      "name":  "LK 4515 A",
+                      "color":  "#A08E80"
+                  },
+                  {
+                      "file":  "LK 4516 A.jpg",
+                      "name":  "LK 4516 A",
+                      "color":  "#87725A"
+                  },
+                  {
+                      "file":  "LK 4517 A.jpg",
+                      "name":  "LK 4517 A",
+                      "color":  "#5E534C"
+                  },
+                  {
+                      "file":  "LK 4518 A.jpg",
+                      "name":  "LK 4518 A",
+                      "color":  "#3A3531"
+                  },
+                  {
+                      "file":  "LK 4519 A.jpg",
+                      "name":  "LK 4519 A",
+                      "color":  "#3C2A21"
+                  },
+                  {
+                      "file":  "LK 452 A.jpg",
+                      "name":  "LK 452 A",
+                      "color":  "#6A5C4A"
+                  },
+                  {
+                      "file":  "LK 4520 A.jpg",
+                      "name":  "LK 4520 A",
+                      "color":  "#23180E"
+                  },
+                  {
+                      "file":  "LK 4521 A.jpg",
+                      "name":  "LK 4521 A",
+                      "color":  "#D4D5D5"
+                  },
+                  {
+                      "file":  "LK 4522 A.jpg",
+                      "name":  "LK 4522 A",
+                      "color":  "#CDC5B7"
+                  },
+                  {
+                      "file":  "LK 4523 A.jpg",
+                      "name":  "LK 4523 A",
+                      "color":  "#8B7963"
+                  },
+                  {
+                      "file":  "LK 4524 A.jpg",
+                      "name":  "LK 4524 A",
+                      "color":  "#978B79"
+                  },
+                  {
+                      "file":  "LK 4525 A.jpg",
+                      "name":  "LK 4525 A",
+                      "color":  "#635A53"
+                  },
+                  {
+                      "file":  "LK 4526 A.jpg",
+                      "name":  "LK 4526 A",
+                      "color":  "#603A27"
+                  },
+                  {
+                      "file":  "LK 4527 A.jpg",
+                      "name":  "LK 4527 A",
+                      "color":  "#BEA483"
+                  },
+                  {
+                      "file":  "LK 4528 A.jpg",
+                      "name":  "LK 4528 A",
+                      "color":  "#9E7B5A"
+                  },
+                  {
+                      "file":  "LK 4529 A.jpg",
+                      "name":  "LK 4529 A",
+                      "color":  "#C0946C"
+                  },
+                  {
+                      "file":  "LK 4530 A.jpg",
+                      "name":  "LK 4530 A",
+                      "color":  "#BEBBA5"
+                  },
+                  {
+                      "file":  "LK 4531 A.jpg",
+                      "name":  "LK 4531 A",
+                      "color":  "#000000"
+                  },
+                  {
+                      "file":  "LK 4532 A.jpg",
+                      "name":  "LK 4532 A",
+                      "color":  "#A79469"
+                  },
+                  {
+                      "file":  "LK 4533 A.jpg",
+                      "name":  "LK 4533 A",
+                      "color":  "#A9926A"
+                  },
+                  {
+                      "file":  "LK 4534 A.jpg",
+                      "name":  "LK 4534 A",
+                      "color":  "#BEB7AB"
+                  },
+                  {
+                      "file":  "LK 4535 A.jpg",
+                      "name":  "LK 4535 A",
+                      "color":  "#574337"
+                  },
+                  {
+                      "file":  "LK 4536 A.jpg",
+                      "name":  "LK 4536 A",
+                      "color":  "#9B836A"
+                  },
+                  {
+                      "file":  "LK 4537 A.jpg",
+                      "name":  "LK 4537 A",
+                      "color":  "#C5C5C0"
+                  },
+                  {
+                      "file":  "LK 4538 A.jpg",
+                      "name":  "LK 4538 A",
+                      "color":  "#BDBDB4"
+                  },
+                  {
+                      "file":  "LK 4539 A.jpg",
+                      "name":  "LK 4539 A",
+                      "color":  "#C7B7A4"
+                  },
+                  {
+                      "file":  "LK 4540 A.jpg",
+                      "name":  "LK 4540 A",
+                      "color":  "#62574C"
+                  },
+                  {
+                      "file":  "LK 4540 V.jpg",
+                      "name":  "LK 4540 V",
+                      "color":  "#000000"
+                  },
+                  {
+                      "file":  "LK 4541 A.jpg",
+                      "name":  "LK 4541 A",
+                      "color":  "#6A5547"
+                  },
+                  {
+                      "file":  "LK 4542 A.jpg",
+                      "name":  "LK 4542 A",
+                      "color":  "#726353"
+                  },
+                  {
+                      "file":  "LK 4543 A.jpg",
+                      "name":  "LK 4543 A",
+                      "color":  "#A9A7A0"
+                  },
+                  {
+                      "file":  "LK 4544 A.jpg",
+                      "name":  "LK 4544 A",
+                      "color":  "#AE9C7E"
+                  },
+                  {
+                      "file":  "LK 4545 A.jpg",
+                      "name":  "LK 4545 A",
+                      "color":  "#4C4339"
+                  },
+                  {
+                      "file":  "LK 4546 A.jpg",
+                      "name":  "LK 4546 A",
+                      "color":  "#45403C"
+                  },
+                  {
+                      "file":  "LK 4547 A.jpg",
+                      "name":  "LK 4547 A",
+                      "color":  "#5A3E29"
+                  },
+                  {
+                      "file":  "LK 4548 A.jpg",
+                      "name":  "LK 4548 A",
+                      "color":  "#9C8262"
+                  },
+                  {
+                      "file":  "LK 4549 A.jpg",
+                      "name":  "LK 4549 A",
+                      "color":  "#B4A590"
+                  },
+                  {
+                      "file":  "LK 4550 A.jpg",
+                      "name":  "LK 4550 A",
+                      "color":  "#8E8275"
+                  },
+                  {
+                      "file":  "LK 4551 A.jpg",
+                      "name":  "LK 4551 A",
+                      "color":  "#B09C80"
+                  },
+                  {
+                      "file":  "LK 4552 A.jpg",
+                      "name":  "LK 4552 A",
+                      "color":  "#A7A297"
+                  },
+                  {
+                      "file":  "LK 4553 A.jpg",
+                      "name":  "LK 4553 A",
+                      "color":  "#453327"
+                  },
+                  {
+                      "file":  "LK 4554 A.jpg",
+                      "name":  "LK 4554 A",
+                      "color":  "#473323"
+                  },
+                  {
+                      "file":  "LK 4555 A.jpg",
+                      "name":  "LK 4555 A",
+                      "color":  "#4C2E18"
+                  },
+                  {
+                      "file":  "LK 4556 A.jpg",
+                      "name":  "LK 4556 A",
+                      "color":  "#3A200C"
+                  },
+                  {
+                      "file":  "LK 4557 A.jpg",
+                      "name":  "LK 4557 A",
+                      "color":  "#9C7C53"
+                  },
+                  {
+                      "file":  "LK 4558 A.jpg",
+                      "name":  "LK 4558 A",
+                      "color":  "#83694C"
+                  },
+                  {
+                      "file":  "LK 4559 A.jpg",
+                      "name":  "LK 4559 A",
+                      "color":  "#332921"
+                  },
+                  {
+                      "file":  "LK 4560 A.jpg",
+                      "name":  "LK 4560 A",
+                      "color":  "#A59E94"
+                  },
+                  {
+                      "file":  "LK 4561 A.jpg",
+                      "name":  "LK 4561 A",
+                      "color":  "#878983"
+                  },
+                  {
+                      "file":  "LK 4562 A.jpg",
+                      "name":  "LK 4562 A",
+                      "color":  "#4E5050"
+                  },
+                  {
+                      "file":  "LK 4563 A.jpg",
+                      "name":  "LK 4563 A",
+                      "color":  "#C2BBAB"
+                  },
+                  {
+                      "file":  "LK 4564 A.jpg",
+                      "name":  "LK 4564 A",
+                      "color":  "#857B6A"
+                  },
+                  {
+                      "file":  "LK 4565 A.jpg",
+                      "name":  "LK 4565 A",
+                      "color":  "#9E7B59"
+                  },
+                  {
+                      "file":  "LK 4566 A.jpg",
+                      "name":  "LK 4566 A",
+                      "color":  "#7B5740"
+                  },
+                  {
+                      "file":  "LK 4567 A.jpg",
+                      "name":  "LK 4567 A",
+                      "color":  "#A79269"
+                  },
+                  {
+                      "file":  "LK 4568 A.jpg",
+                      "name":  "LK 4568 A",
+                      "color":  "#6A503E"
+                  },
+                  {
+                      "file":  "LK 4569 A.jpg",
+                      "name":  "LK 4569 A",
+                      "color":  "#97734C"
+                  },
+                  {
+                      "file":  "LK 4570 A.jpg",
+                      "name":  "LK 4570 A",
+                      "color":  "#837760"
+                  },
+                  {
+                      "file":  "LK 4571 A.jpg",
+                      "name":  "LK 4571 A",
+                      "color":  "#49301C"
+                  },
+                  {
+                      "file":  "LK 4572 A.jpg",
+                      "name":  "LK 4572 A",
+                      "color":  "#8E7353"
+                  },
+                  {
+                      "file":  "LK 4573 A.jpg",
+                      "name":  "LK 4573 A",
+                      "color":  "#604937"
+                  },
+                  {
+                      "file":  "LK 4574 A.jpg",
+                      "name":  "LK 4574 A",
+                      "color":  "#C0BEB9"
+                  },
+                  {
+                      "file":  "LK 4575 A.jpg",
+                      "name":  "LK 4575 A",
+                      "color":  "#ABA99B"
+                  },
+                  {
+                      "file":  "LK 4576 A.jpg",
+                      "name":  "LK 4576 A",
+                      "color":  "#8C7E65"
+                  },
+                  {
+                      "file":  "LK 4577 A.jpg",
+                      "name":  "LK 4577 A",
+                      "color":  "#59534E"
+                  },
+                  {
+                      "file":  "LK 4578 A.jpg",
+                      "name":  "LK 4578 A",
+                      "color":  "#625955"
+                  },
+                  {
+                      "file":  "LK 4579 A.jpg",
+                      "name":  "LK 4579 A",
+                      "color":  "#353E45"
+                  },
+                  {
+                      "file":  "LK 4580 A.jpg",
+                      "name":  "LK 4580 A",
+                      "color":  "#948265"
+                  },
+                  {
+                      "file":  "LK 4581 A.jpg",
+                      "name":  "LK 4581 A",
+                      "color":  "#705C45"
+                  },
+                  {
+                      "file":  "LK 4582 A.jpg",
+                      "name":  "LK 4582 A",
+                      "color":  "#63472C"
+                  },
+                  {
+                      "file":  "LK 4583 A.jpg",
+                      "name":  "LK 4583 A",
+                      "color":  "#413529"
+                  },
+                  {
+                      "file":  "LK 4584 A.jpg",
+                      "name":  "LK 4584 A",
+                      "color":  "#A59C85"
+                  },
+                  {
+                      "file":  "LK 4585 A.jpg",
+                      "name":  "LK 4585 A",
+                      "color":  "#755539"
+                  },
+                  {
+                      "file":  "LK 4586 A.jpg",
+                      "name":  "LK 4586 A",
+                      "color":  "#A29783"
+                  },
+                  {
+                      "file":  "LK 4587 A.jpg",
+                      "name":  "LK 4587 A",
+                      "color":  "#82735E"
+                  },
+                  {
+                      "file":  "LK 4588 A.jpg",
+                      "name":  "LK 4588 A",
+                      "color":  "#5A4C40"
+                  },
+                  {
+                      "file":  "LK 4589 A.jpg",
+                      "name":  "LK 4589 A",
+                      "color":  "#A7C0C7"
+                  },
+                  {
+                      "file":  "LK 4590 A.jpg",
+                      "name":  "LK 4590 A",
+                      "color":  "#7CA79B"
+                  },
+                  {
+                      "file":  "LK 4591 A.jpg",
+                      "name":  "LK 4591 A",
+                      "color":  "#94A7B2"
+                  },
+                  {
+                      "file":  "LK 4592 A.jpg",
+                      "name":  "LK 4592 A",
+                      "color":  "#405A75"
+                  },
+                  {
+                      "file":  "LK 4593 A.jpg",
+                      "name":  "LK 4593 A",
+                      "color":  "#67755C"
+                  },
+                  {
+                      "file":  "LK 4594 A.jpg",
+                      "name":  "LK 4594 A",
+                      "color":  "#B7AEA9"
+                  },
+                  {
+                      "file":  "LK 4595 A.jpg",
+                      "name":  "LK 4595 A",
+                      "color":  "#856762"
+                  },
+                  {
+                      "file":  "LK 4596 A.jpg",
+                      "name":  "LK 4596 A",
+                      "color":  "#6C4A49"
+                  },
+                  {
+                      "file":  "LK 4597 A.jpg",
+                      "name":  "LK 4597 A",
+                      "color":  "#D7AC99"
+                  },
+                  {
+                      "file":  "LK 4598 A.jpg",
+                      "name":  "LK 4598 A",
+                      "color":  "#C5B490"
+                  },
+                  {
+                      "file":  "LK 4599 A.jpg",
+                      "name":  "LK 4599 A",
+                      "color":  "#5C4A39"
+                  },
+                  {
+                      "file":  "LK 4600 A.jpg",
+                      "name":  "LK 4600 A",
+                      "color":  "#73675A"
+                  },
+                  {
+                      "file":  "LK 4601 A.jpg",
+                      "name":  "LK 4601 A",
+                      "color":  "#9C9283"
+                  },
+                  {
+                      "file":  "LK 4602 A.jpg",
+                      "name":  "LK 4602 A",
+                      "color":  "#696250"
+                  },
+                  {
+                      "file":  "LK 4603 A.jpg",
+                      "name":  "LK 4603 A",
+                      "color":  "#BB9C72"
+                  },
+                  {
+                      "file":  "LK 4604 A.jpg",
+                      "name":  "LK 4604 A",
+                      "color":  "#807969"
+                  },
+                  {
+                      "file":  "LK 4605 A.jpg",
+                      "name":  "LK 4605 A",
+                      "color":  "#B7A282"
+                  },
+                  {
+                      "file":  "LK 4606 A.jpg",
+                      "name":  "LK 4606 A",
+                      "color":  "#735031"
+                  },
+                  {
+                      "file":  "LK 4607 A.jpg",
+                      "name":  "LK 4607 A",
+                      "color":  "#705943"
+                  },
+                  {
+                      "file":  "LK 4608 A.jpg",
+                      "name":  "LK 4608 A",
+                      "color":  "#756240"
+                  },
+                  {
+                      "file":  "LK 4609 A.jpg",
+                      "name":  "LK 4609 A",
+                      "color":  "#B59565"
+                  },
+                  {
+                      "file":  "LK 4610 A.jpg",
+                      "name":  "LK 4610 A",
+                      "color":  "#947C67"
+                  },
+                  {
+                      "file":  "LK 4611 A.jpg",
+                      "name":  "LK 4611 A",
+                      "color":  "#CDCED0"
+                  },
+                  {
+                      "file":  "LK 4612 A.jpg",
+                      "name":  "LK 4612 A",
+                      "color":  "#000000"
+                  },
+                  {
+                      "file":  "LK 4613 A.jpg",
+                      "name":  "LK 4613 A",
+                      "color":  "#000000"
+                  },
+                  {
+                      "file":  "LK 4614 A.jpg",
+                      "name":  "LK 4614 A",
+                      "color":  "#000000"
+                  },
+                  {
+                      "file":  "LK 4615 A.jpg",
+                      "name":  "LK 4615 A",
+                      "color":  "#000000"
+                  },
+                  {
+                      "file":  "LK 4616 A.jpg",
+                      "name":  "LK 4616 A",
+                      "color":  "#000000"
+                  },
+                  {
+                      "file":  "LK 4617 A.jpg",
+                      "name":  "LK 4617 A",
+                      "color":  "#E0E0DE"
+                  },
+                  {
+                      "file":  "LK 4618 A.jpg",
+                      "name":  "LK 4618 A",
+                      "color":  "#000000"
+                  },
+                  {
+                      "file":  "LK 4619 A.jpg",
+                      "name":  "LK 4619 A",
+                      "color":  "#000000"
+                  },
+                  {
+                      "file":  "LK 4621 A.jpg",
+                      "name":  "LK 4621 A",
+                      "color":  "#000000"
+                  },
+                  {
+                      "file":  "LK 4622 A.jpg",
+                      "name":  "LK 4622 A",
+                      "color":  "#000000"
+                  },
+                  {
+                      "file":  "LK 4623 A.jpg",
+                      "name":  "LK 4623 A",
+                      "color":  "#000000"
+                  },
+                  {
+                      "file":  "LK 4624 A.jpg",
+                      "name":  "LK 4624 A",
+                      "color":  "#000000"
+                  },
+                  {
+                      "file":  "LK 4625 A.jpg",
+                      "name":  "LK 4625 A",
+                      "color":  "#000000"
+                  },
+                  {
+                      "file":  "LK 4626T LUX.jpg",
+                      "name":  "LK 4626T LUX",
+                      "color":  "#000000"
+                  },
+                  {
+                      "file":  "LK 4627T LUX.jpg",
+                      "name":  "LK 4627T LUX",
+                      "color":  "#000000"
+                  },
+                  {
+                      "file":  "LK 4628T LUX.jpg",
+                      "name":  "LK 4628T LUX",
+                      "color":  "#000000"
+                  },
+                  {
+                      "file":  "LK 4629T LUX.jpg",
+                      "name":  "LK 4629T LUX",
+                      "color":  "#000000"
+                  },
+                  {
+                      "file":  "LK 4630T LUX.jpg",
+                      "name":  "LK 4630T LUX",
+                      "color":  "#000000"
+                  },
+                  {
+                      "file":  "LK 4631T LUX.jpg",
+                      "name":  "LK 4631T LUX",
+                      "color":  "#000000"
+                  },
+                  {
+                      "file":  "LK 4632T LUX.jpg",
+                      "name":  "LK 4632T LUX",
+                      "color":  "#000000"
+                  },
+                  {
+                      "file":  "LK 4634 D.jpg",
+                      "name":  "LK 4634 D",
+                      "color":  "#000000"
+                  },
+                  {
+                      "file":  "LK 4635 A.jpg",
+                      "name":  "LK 4635 A",
+                      "color":  "#000000"
+                  },
+                  {
+                      "file":  "LK 4636 A.jpg",
+                      "name":  "LK 4636 A",
+                      "color":  "#000000"
+                  },
+                  {
+                      "file":  "LK 4637 A.jpg",
+                      "name":  "LK 4637 A",
+                      "color":  "#000000"
+                  },
+                  {
+                      "file":  "LK 4638 A.jpg",
+                      "name":  "LK 4638 A",
+                      "color":  "#000000"
+                  },
+                  {
+                      "file":  "LK 4639 A.jpg",
+                      "name":  "LK 4639 A",
+                      "color":  "#000000"
+                  },
+                  {
+                      "file":  "LK 4640 A.jpg",
+                      "name":  "LK 4640 A",
+                      "color":  "#000000"
+                  },
+                  {
+                      "file":  "LK 4641 A.jpg",
+                      "name":  "LK 4641 A",
+                      "color":  "#000000"
+                  },
+                  {
+                      "file":  "LK 4642 A.jpg",
+                      "name":  "LK 4642 A",
+                      "color":  "#000000"
+                  },
+                  {
+                      "file":  "LK 4643 A.jpg",
+                      "name":  "LK 4643 A",
+                      "color":  "#000000"
+                  },
+                  {
+                      "file":  "LK 4644 A.jpg",
+                      "name":  "LK 4644 A",
+                      "color":  "#000000"
+                  },
+                  {
+                      "file":  "LK 4645 A.jpg",
+                      "name":  "LK 4645 A",
+                      "color":  "#000000"
+                  },
+                  {
+                      "file":  "LK 4646 A.jpg",
+                      "name":  "LK 4646 A",
+                      "color":  "#000000"
+                  },
+                  {
+                      "file":  "LK 4647 A.jpg",
+                      "name":  "LK 4647 A",
+                      "color":  "#000000"
+                  },
+                  {
+                      "file":  "LK 4648 A.jpg",
+                      "name":  "LK 4648 A",
+                      "color":  "#000000"
+                  },
+                  {
+                      "file":  "LK 4649 A.jpg",
+                      "name":  "LK 4649 A",
+                      "color":  "#000000"
+                  },
+                  {
+                      "file":  "LK 4650 A.jpg",
+                      "name":  "LK 4650 A",
+                      "color":  "#000000"
+                  },
+                  {
+                      "file":  "LK 4651 A.jpg",
+                      "name":  "LK 4651 A",
+                      "color":  "#000000"
+                  },
+                  {
+                      "file":  "LK 4652 A.jpg",
+                      "name":  "LK 4652 A",
+                      "color":  "#000000"
+                  },
+                  {
+                      "file":  "LK 4653 A.jpg",
+                      "name":  "LK 4653 A",
+                      "color":  "#000000"
+                  },
+                  {
+                      "file":  "LK 4654 A.jpg",
+                      "name":  "LK 4654 A",
+                      "color":  "#000000"
+                  },
+                  {
+                      "file":  "LK 4655 A.jpg",
+                      "name":  "LK 4655 A",
+                      "color":  "#000000"
+                  },
+                  {
+                      "file":  "LK 4656 A.jpg",
+                      "name":  "LK 4656 A",
+                      "color":  "#000000"
+                  },
+                  {
+                      "file":  "LK 4659T LUX.jpg",
+                      "name":  "LK 4659T LUX",
+                      "color":  "#000000"
+                  },
+                  {
+                      "file":  "LK 4660T LUX.jpg",
+                      "name":  "LK 4660T LUX",
+                      "color":  "#000000"
+                  },
+                  {
+                      "file":  "LK 4661T LUX.jpg",
+                      "name":  "LK 4661T LUX",
+                      "color":  "#000000"
+                  },
+                  {
+                      "file":  "LK 4662T LUX.jpg",
+                      "name":  "LK 4662T LUX",
+                      "color":  "#000000"
+                  },
+                  {
+                      "file":  "LK 4663T LUX.jpg",
+                      "name":  "LK 4663T LUX",
+                      "color":  "#000000"
+                  },
+                  {
+                      "file":  "LK 4664T LUX.jpg",
+                      "name":  "LK 4664T LUX",
+                      "color":  "#000000"
+                  },
+                  {
+                      "file":  "LK 4665T LUX.jpg",
+                      "name":  "LK 4665T LUX",
+                      "color":  "#000000"
+                  },
+                  {
+                      "file":  "LK 4666T LUX.jpg",
+                      "name":  "LK 4666T LUX",
+                      "color":  "#000000"
+                  },
+                  {
+                      "file":  "LK 4667T LUX.jpg",
+                      "name":  "LK 4667T LUX",
+                      "color":  "#000000"
+                  },
+                  {
+                      "file":  "LK 4668T LUX.jpg",
+                      "name":  "LK 4668T LUX",
+                      "color":  "#000000"
+                  },
+                  {
+                      "file":  "LK 4669T LUX.jpg",
+                      "name":  "LK 4669T LUX",
+                      "color":  "#000000"
+                  },
+                  {
+                      "file":  "LK 4670T LUX.jpg",
+                      "name":  "LK 4670T LUX",
+                      "color":  "#000000"
+                  },
+                  {
+                      "file":  "LK 4671T LUX.jpg",
+                      "name":  "LK 4671T LUX",
+                      "color":  "#000000"
+                  },
+                  {
+                      "file":  "LK 4672T LUX.jpg",
+                      "name":  "LK 4672T LUX",
+                      "color":  "#000000"
+                  },
+                  {
+                      "file":  "LK 4674 A.jpg",
+                      "name":  "LK 4674 A",
+                      "color":  "#000000"
+                  },
+                  {
+                      "file":  "LK 4675T LUX.jpg",
+                      "name":  "LK 4675T LUX",
+                      "color":  "#000000"
+                  },
+                  {
+                      "file":  "LK 4676T LUX.jpg",
+                      "name":  "LK 4676T LUX",
+                      "color":  "#000000"
+                  },
+                  {
+                      "file":  "LK 4800T LUX.jpg",
+                      "name":  "LK 4800T LUX",
+                      "color":  "#000000"
+                  },
+                  {
+                      "file":  "LK 4801T LUX.jpg",
+                      "name":  "LK 4801T LUX",
+                      "color":  "#000000"
+                  },
+                  {
+                      "file":  "LK 4802T LUX.jpg",
+                      "name":  "LK 4802T LUX",
+                      "color":  "#000000"
+                  },
+                  {
+                      "file":  "LK 4803T LUX.jpg",
+                      "name":  "LK 4803T LUX",
+                      "color":  "#000000"
+                  },
+                  {
+                      "file":  "LK 4804T LUX.jpg",
+                      "name":  "LK 4804T LUX",
+                      "color":  "#000000"
+                  },
+                  {
+                      "file":  "LK 4805T LUX.jpg",
+                      "name":  "LK 4805T LUX",
+                      "color":  "#000000"
+                  },
+                  {
+                      "file":  "LK 4806T LUX.jpg",
+                      "name":  "LK 4806T LUX",
+                      "color":  "#000000"
+                  },
+                  {
+                      "file":  "LK 4807 A.jpg",
+                      "name":  "LK 4807 A",
+                      "color":  "#000000"
+                  },
+                  {
+                      "file":  "LK 5000 D.jpg",
+                      "name":  "LK 5000 D",
+                      "color":  "#111111"
+                  },
+                  {
+                      "file":  "LK 5001 D.jpg",
+                      "name":  "LK 5001 D",
+                      "color":  "#5C1C1E"
+                  },
+                  {
+                      "file":  "LK 5002 D.jpg",
+                      "name":  "LK 5002 D",
+                      "color":  "#EEEEEE"
+                  },
+                  {
+                      "file":  "LK 5003 T.jpg",
+                      "name":  "LK 5003 T",
+                      "color":  "#D2D2CB"
+                  },
+                  {
+                      "file":  "LK 5004 T.jpg",
+                      "name":  "LK 5004 T",
+                      "color":  "#627262"
+                  },
+                  {
+                      "file":  "LK 5005 A.jpg",
+                      "name":  "LK 5005 A",
+                      "color":  "#F2F0EE"
+                  },
+                  {
+                      "file":  "LK 5006 A.jpg",
+                      "name":  "LK 5006 A",
+                      "color":  "#F9F9F9"
+                  },
+                  {
+                      "file":  "LK 5007 A.jpg",
+                      "name":  "LK 5007 A",
+                      "color":  "#959999"
+                  },
+                  {
+                      "file":  "LK 5100 A.jpg",
+                      "name":  "LK 5100 A",
+                      "color":  "#876A52"
+                  },
+                  {
+                      "file":  "LK 5101 A.jpg",
+                      "name":  "LK 5101 A",
+                      "color":  "#271813"
+                  },
+                  {
+                      "file":  "LK 5102 A.jpg",
+                      "name":  "LK 5102 A",
+                      "color":  "#97806E"
+                  },
+                  {
+                      "file":  "LK 5103 D.jpg",
+                      "name":  "LK 5103 D",
+                      "color":  "#211E1E"
+                  },
+                  {
+                      "file":  "LK 5109 D.jpg",
+                      "name":  "LK 5109 D",
+                      "color":  "#E7D9B9"
+                  },
+                  {
+                      "file":  "LK 5110 D.jpg",
+                      "name":  "LK 5110 D",
+                      "color":  "#BEB5AB"
+                  },
+                  {
+                      "file":  "LK 5200 A.jpg",
+                      "name":  "LK 5200 A",
+                      "color":  "#000000"
+                  },
+                  {
+                      "file":  "LK 5201 A.jpg",
+                      "name":  "LK 5201 A",
+                      "color":  "#000000"
+                  },
+                  {
+                      "file":  "LK 5202 A.jpg",
+                      "name":  "LK 5202 A",
+                      "color":  "#000000"
+                  },
+                  {
+                      "file":  "LK 5203 A.jpg",
+                      "name":  "LK 5203 A",
+                      "color":  "#000000"
+                  },
+                  {
+                      "file":  "LK 5300 D.jpg",
+                      "name":  "LK 5300 D",
+                      "color":  "#000000"
+                  },
+                  {
+                      "file":  "LK 5301 D.jpg",
+                      "name":  "LK 5301 D",
+                      "color":  "#000000"
+                  },
+                  {
+                      "file":  "LK 5302 D.jpg",
+                      "name":  "LK 5302 D",
+                      "color":  "#000000"
+                  },
+                  {
+                      "file":  "LK 6000 T.jpg",
+                      "name":  "LK 6000 T",
+                      "color":  "#922C29"
+                  },
+                  {
+                      "file":  "LK 6001 T.jpg",
+                      "name":  "LK 6001 T",
+                      "color":  "#E0E0E0"
+                  },
+                  {
+                      "file":  "LK 6002 T.jpg",
+                      "name":  "LK 6002 T",
+                      "color":  "#212121"
+                  },
+                  {
+                      "file":  "LK 6003 T.jpg",
+                      "name":  "LK 6003 T",
+                      "color":  "#836E59"
+                  },
+                  {
+                      "file":  "LK 6004 T.jpg",
+                      "name":  "LK 6004 T",
+                      "color":  "#201817"
+                  },
+                  {
+                      "file":  "LK 6005 T.jpg",
+                      "name":  "LK 6005 T",
+                      "color":  "#493123"
+                  },
+                  {
+                      "file":  "LK 6006 T.jpg",
+                      "name":  "LK 6006 T",
+                      "color":  "#493527"
+                  },
+                  {
+                      "file":  "LK 6007 T.jpg",
+                      "name":  "LK 6007 T",
+                      "color":  "#978B79"
+                  },
+                  {
+                      "file":  "LK 6008 T.jpg",
+                      "name":  "LK 6008 T",
+                      "color":  "#9C947E"
+                  },
+                  {
+                      "file":  "LK 6009 D.jpg",
+                      "name":  "LK 6009 D",
+                      "color":  "#CEA439"
+                  },
+                  {
+                      "file":  "LK 6010 D.jpg",
+                      "name":  "LK 6010 D",
+                      "color":  "#CBDDE4"
+                  },
+                  {
+                      "file":  "LK 6011 T.jpg",
+                      "name":  "LK 6011 T",
+                      "color":  "#3A3027"
+                  },
+                  {
+                      "file":  "LK 700 D.jpg",
+                      "name":  "LK 700 D",
+                      "color":  "#FEFEFE"
+                  },
+                  {
+                      "file":  "LK 701 D.jpg",
+                      "name":  "LK 701 D",
+                      "color":  "#E2E2E2"
+                  },
+                  {
+                      "file":  "LK 702 A.jpg",
+                      "name":  "LK 702 A",
+                      "color":  "#E0DDD4"
+                  },
+                  {
+                      "file":  "LK 703 D.jpg",
+                      "name":  "LK 703 D",
+                      "color":  "#EEEBE2"
+                  },
+                  {
+                      "file":  "LK 704 D.jpg",
+                      "name":  "LK 704 D",
+                      "color":  "#E7E0CE"
+                  },
+                  {
+                      "file":  "LK 705 D.jpg",
+                      "name":  "LK 705 D",
+                      "color":  "#DDC9BD"
+                  },
+                  {
+                      "file":  "LK 706 A.jpg",
+                      "name":  "LK 706 A",
+                      "color":  "#EEEBE2"
+                  },
+                  {
+                      "file":  "LK 707 T.jpg",
+                      "name":  "LK 707 T",
+                      "color":  "#FDFDFD"
+                  },
+                  {
+                      "file":  "LK 708 T.jpg",
+                      "name":  "LK 708 T",
+                      "color":  "#131513"
+                  },
+                  {
+                      "file":  "LK 7100 A.jpg",
+                      "name":  "LK 7100 A",
+                      "color":  "#D59901"
+                  },
+                  {
+                      "file":  "LK 7101 D.jpg",
+                      "name":  "LK 7101 D",
+                      "color":  "#1A5EB2"
+                  },
+                  {
+                      "file":  "LK 7102 D.jpg",
+                      "name":  "LK 7102 D",
+                      "color":  "#00379B"
+                  },
+                  {
+                      "file":  "LK 7120 M.jpg",
+                      "name":  "LK 7120 M",
+                      "color":  "#C5CDD5"
+                  },
+                  {
+                      "file":  "LK 7121 M.jpg",
+                      "name":  "LK 7121 M",
+                      "color":  "#BBB590"
+                  },
+                  {
+                      "file":  "LK 7122 M.jpg",
+                      "name":  "LK 7122 M",
+                      "color":  "#B2C9CB"
+                  },
+                  {
+                      "file":  "LK 7123 M.jpg",
+                      "name":  "LK 7123 M",
+                      "color":  "#7E4511"
+                  },
+                  {
+                      "file":  "LK 7124 M.jpg",
+                      "name":  "LK 7124 M",
+                      "color":  "#945535"
+                  },
+                  {
+                      "file":  "LK 8000 3D.jpg",
+                      "name":  "LK 8000 3D",
+                      "color":  "#F9F9F9"
+                  },
+                  {
+                      "file":  "LK 8001 3D.jpg",
+                      "name":  "LK 8001 3D",
+                      "color":  "#9B9590"
+                  },
+                  {
+                      "file":  "LK 8002 3D.jpg",
+                      "name":  "LK 8002 3D",
+                      "color":  "#131313"
+                  },
+                  {
+                      "file":  "LK 8003 G.jpg",
+                      "name":  "LK 8003 G",
+                      "color":  "#DEFDFE"
+                  },
+                  {
+                      "file":  "LK 8004 G.jpg",
+                      "name":  "LK 8004 G",
+                      "color":  "#407B92"
+                  },
+                  {
+                      "file":  "LK 8005 G.jpg",
+                      "name":  "LK 8005 G",
+                      "color":  "#014C59"
+                  },
+                  {
+                      "file":  "LK 8006 G.jpg",
+                      "name":  "LK 8006 G",
+                      "color":  "#83B4C2"
+                  },
+                  {
+                      "file":  "LK 8007 G.jpg",
+                      "name":  "LK 8007 G",
+                      "color":  "#87827E"
+                  },
+                  {
+                      "file":  "LK 8008 G.jpg",
+                      "name":  "LK 8008 G",
+                      "color":  "#656363"
+                  },
+                  {
+                      "file":  "LK 8011 X.jpg",
+                      "name":  "LK 8011 X",
+                      "color":  "#BEBEBD"
+                  },
+                  {
+                      "file":  "LK 8012 H.jpg",
+                      "name":  "LK 8012 H",
+                      "color":  "#000000"
+                  },
+                  {
+                      "file":  "LK 8013 H.jpg",
+                      "name":  "LK 8013 H",
+                      "color":  "#000000"
+                  },
+                  {
+                      "file":  "LK 8014 H.jpg",
+                      "name":  "LK 8014 H",
+                      "color":  "#000000"
+                  },
+                  {
+                      "file":  "LK 8015 H.jpg",
+                      "name":  "LK 8015 H",
+                      "color":  "#000000"
+                  },
+                  {
+                      "file":  "LK 8016 H.jpg",
+                      "name":  "LK 8016 H",
+                      "color":  "#000000"
+                  },
+                  {
+                      "file":  "LK 8017 H.jpg",
+                      "name":  "LK 8017 H",
+                      "color":  "#000000"
+                  },
+                  {
+                      "file":  "LK 8018 H.jpg",
+                      "name":  "LK 8018 H",
+                      "color":  "#000000"
+                  },
+                  {
+                      "file":  "LK 8101 G.jpg",
+                      "name":  "LK 8101 G",
+                      "color":  "#A08562"
+                  },
+                  {
+                      "file":  "LK 8102 G.jpg",
+                      "name":  "LK 8102 G",
+                      "color":  "#696250"
+                  },
+                  {
+                      "file":  "LK 8103 G.jpg",
+                      "name":  "LK 8103 G",
+                      "color":  "#696252"
+                  },
+                  {
+                      "file":  "LK 8104 G.jpg",
+                      "name":  "LK 8104 G",
+                      "color":  "#705A4C"
+                  },
+                  {
+                      "file":  "LK 8105 G.jpg",
+                      "name":  "LK 8105 G",
+                      "color":  "#5E5750"
+                  },
+                  {
+                      "file":  "LK 8106 G.jpg",
+                      "name":  "LK 8106 G",
+                      "color":  "#674A31"
+                  },
+                  {
+                      "file":  "LK 8108 G.jpg",
+                      "name":  "LK 8108 G",
+                      "color":  "#877960"
+                  },
+                  {
+                      "file":  "LK 8109 G.jpg",
+                      "name":  "LK 8109 G",
+                      "color":  "#372A20"
+                  },
+                  {
+                      "file":  "LK 8110 G.jpg",
+                      "name":  "LK 8110 G",
+                      "color":  "#A09C97"
+                  },
+                  {
+                      "file":  "LK 8111 G.jpg",
+                      "name":  "LK 8111 G",
+                      "color":  "#909497"
+                  },
+                  {
+                      "file":  "LK 8115 G.jpg",
+                      "name":  "LK 8115 G",
+                      "color":  "#271813"
+                  },
+                  {
+                      "file":  "LK 8116 G.jpg",
+                      "name":  "LK 8116 G",
+                      "color":  "#62452A"
+                  },
+                  {
+                      "file":  "LK 8117 G.jpg",
+                      "name":  "LK 8117 G",
+                      "color":  "#202021"
+                  },
+                  {
+                      "file":  "LK 8118 G.jpg",
+                      "name":  "LK 8118 G",
+                      "color":  "#67625C"
+                  },
+                  {
+                      "file":  "LK 8119 X.jpg",
+                      "name":  "LK 8119 X",
+                      "color":  "#6C6C6A"
+                  },
+                  {
+                      "file":  "LK 8120 G.jpg",
+                      "name":  "LK 8120 G",
+                      "color":  "#838077"
+                  },
+                  {
+                      "file":  "LK 8121 G.jpg",
+                      "name":  "LK 8121 G",
+                      "color":  "#999997"
+                  },
+                  {
+                      "file":  "LK 8122 G.jpg",
+                      "name":  "LK 8122 G",
+                      "color":  "#302C2A"
+                  },
+                  {
+                      "file":  "LK 8123 G.jpg",
+                      "name":  "LK 8123 G",
+                      "color":  "#1E2025"
+                  },
+                  {
+                      "file":  "LK 8124 G.jpg",
+                      "name":  "LK 8124 G",
+                      "color":  "#000000"
+                  },
+                  {
+                      "file":  "LK 8125 G.jpg",
+                      "name":  "LK 8125 G",
+                      "color":  "#000000"
+                  },
+                  {
+                      "file":  "LK 8126 K.jpg",
+                      "name":  "LK 8126 K",
+                      "color":  "#000000"
+                  },
+                  {
+                      "file":  "LK 8127 X.jpg",
+                      "name":  "LK 8127 X",
+                      "color":  "#252321"
+                  },
+                  {
+                      "file":  "LK 8128 H.jpg",
+                      "name":  "LK 8128 H",
+                      "color":  "#000000"
+                  },
+                  {
+                      "file":  "LK 8129 X.jpg",
+                      "name":  "LK 8129 X",
+                      "color":  "#256C54"
+                  },
+                  {
+                      "file":  "LK 8130 H.jpg",
+                      "name":  "LK 8130 H",
+                      "color":  "#000000"
+                  },
+                  {
+                      "file":  "LK 8131 H.jpg",
+                      "name":  "LK 8131 H",
+                      "color":  "#000000"
+                  },
+                  {
+                      "file":  "LK 8132 H.jpg",
+                      "name":  "LK 8132 H",
+                      "color":  "#000000"
+                  },
+                  {
+                      "file":  "LK 8133 H.jpg",
+                      "name":  "LK 8133 H",
+                      "color":  "#000000"
+                  },
+                  {
+                      "file":  "LK 8134 K.jpg",
+                      "name":  "LK 8134 K",
+                      "color":  "#000000"
+                  },
+                  {
+                      "file":  "LK 8135 K.jpg",
+                      "name":  "LK 8135 K",
+                      "color":  "#000000"
+                  },
+                  {
+                      "file":  "LK 8136 G.jpg",
+                      "name":  "LK 8136 G",
+                      "color":  "#000000"
+                  },
+                  {
+                      "file":  "LK 8137 G.jpg",
+                      "name":  "LK 8137 G",
+                      "color":  "#000000"
+                  },
+                  {
+                      "file":  "LK 980 A.jpg",
+                      "name":  "LK 980 A",
+                      "color":  "#15100C"
+                  },
+                  {
+                      "file":  "LK 981 A.jpg",
+                      "name":  "LK 981 A",
+                      "color":  "#3A3530"
+                  },
+                  {
+                      "file":  "LK 982 A.jpg",
+                      "name":  "LK 982 A",
+                      "color":  "#7B7267"
+                  },
+                  {
+                      "file":  "LK 983 A.jpg",
+                      "name":  "LK 983 A",
+                      "color":  "#9C9985"
+                  },
+                  {
+                      "file":  "LK 986 T.jpg",
+                      "name":  "LK 986 T",
+                      "color":  "#856C4E"
+                  },
+                  {
+                      "file":  "LK 987 T.jpg",
+                      "name":  "LK 987 T",
+                      "color":  "#B4A48C"
+                  },
+                  {
+                      "file":  "LK 989 A.jpg",
+                      "name":  "LK 989 A",
+                      "color":  "#908573"
+                  },
+                  {
+                      "file":  "LK 990 A.jpg",
+                      "name":  "LK 990 A",
+                      "color":  "#352920"
+                  },
+                  {
+                      "file":  "LK 9905 D.jpg",
+                      "name":  "LK 9905 D",
+                      "color":  "#2E251E"
+                  },
+                  {
+                      "file":  "LK 9906 T.jpg",
+                      "name":  "LK 9906 T",
+                      "color":  "#C2BEB7"
+                  },
+                  {
+                      "file":  "LK 9907 T.jpg",
+                      "name":  "LK 9907 T",
+                      "color":  "#27272A"
+                  },
+                  {
+                      "file":  "LK 9908 E.jpg",
+                      "name":  "LK 9908 E",
+                      "color":  "#B9B4A7"
+                  },
+                  {
+                      "file":  "LK 9909 E.jpg",
+                      "name":  "LK 9909 E",
+                      "color":  "#94806E"
+                  },
+                  {
+                      "file":  "LK 9910 E.jpg",
+                      "name":  "LK 9910 E",
+                      "color":  "#95806A"
+                  },
+                  {
+                      "file":  "LK 9911 E.jpg",
+                      "name":  "LK 9911 E",
+                      "color":  "#50453E"
+                  },
+                  {
+                      "file":  "LK 9912 E.jpg",
+                      "name":  "LK 9912 E",
+                      "color":  "#352E2A"
+                  },
+                  {
+                      "file":  "LK 9913 E.jpg",
+                      "name":  "LK 9913 E",
+                      "color":  "#21110A"
+                  },
+                  {
+                      "file":  "LK 992 A.jpg",
+                      "name":  "LK 992 A",
+                      "color":  "#271A11"
+                  },
+                  {
+                      "file":  "LK 993 D.jpg",
+                      "name":  "LK 993 D",
+                      "color":  "#736047"
+                  },
+                  {
+                      "file":  "LK 995 A.jpg",
+                      "name":  "LK 995 A",
+                      "color":  "#2A1E1C"
+                  },
+                  {
+                      "file":  "LK 998 T.jpg",
+                      "name":  "LK 998 T",
+                      "color":  "#181718"
+                  },
+                  {
+                      "file":  "LK 9986 T.jpg",
+                      "name":  "LK 9986 T",
+                      "color":  "#856C4E"
+                  },
+                  {
+                      "file":  "LK AFP12.jpg",
+                      "name":  "LK AFP12",
+                      "color":  "#E2DBC7"
+                  },
+                  {
+                      "file":  "LK AFP16.jpg",
+                      "name":  "LK AFP16",
+                      "color":  "#F4F4F2"
+                  },
+                  {
+                      "file":  "LK AFP17.jpg",
+                      "name":  "LK AFP17",
+                      "color":  "#FEFEFE"
+                  },
+                  {
+                      "file":  "LK AFP18 A.jpg",
+                      "name":  "LK AFP18 A",
+                      "color":  "#C9C9C7"
+                  },
+                  {
+                      "file":  "LK AFP18.jpg",
+                      "name":  "LK AFP18",
+                      "color":  "#E0E2DE"
+                  },
+                  {
+                      "file":  "LK AFP19.jpg",
+                      "name":  "LK AFP19",
+                      "color":  "#6E6E6E"
+                  },
+                  {
+                      "file":  "LK AFP20.jpg",
+                      "name":  "LK AFP20",
+                      "color":  "#0E0E0E"
+                  },
+                  {
+                      "file":  "LK B80 B.jpg",
+                      "name":  "LK B80 B",
+                      "color":  "#D9D9DB"
+                  },
+                  {
+                      "file":  "LK B81 B.jpg",
+                      "name":  "LK B81 B",
+                      "color":  "#BDBEBD"
+                  },
+                  {
+                      "file":  "LK B82 B.jpg",
+                      "name":  "LK B82 B",
+                      "color":  "#3C5340"
+                  },
+                  {
+                      "file":  "LK C07 C.jpg",
+                      "name":  "LK C07 C",
+                      "color":  "#000000"
+                  },
+                  {
+                      "file":  "LK C09 F.jpg",
+                      "name":  "LK C09 F",
+                      "color":  "#B20010"
+                  },
+                  {
+                      "file":  "LK C11 C.jpg",
+                      "name":  "LK C11 C",
+                      "color":  "#F9F7F7"
+                  },
+                  {
+                      "file":  "LK C12 F.jpg",
+                      "name":  "LK C12 F",
+                      "color":  "#F9F9F9"
+                  },
+                  {
+                      "file":  "LK PF4421 D.jpg",
+                      "name":  "LK PF4421 D",
+                      "color":  "#BEAEA0"
+                  },
+                  {
+                      "file":  "LK PF4423 A.jpg",
+                      "name":  "LK PF4423 A",
+                      "color":  "#3A2517"
+                  },
+                  {
+                      "file":  "LK PF4425 A.jpg",
+                      "name":  "LK PF4425 A",
+                      "color":  "#674931"
+                  },
+                  {
+                      "file":  "LK PF4444 A.jpg",
+                      "name":  "LK PF4444 A",
+                      "color":  "#4E4037"
+                  },
+                  {
+                      "file":  "LK PF4488 P.jpg",
+                      "name":  "LK PF4488 P",
+                      "color":  "#A7A495"
+                  },
+                  {
+                      "file":  "LK PF4533 A.jpg",
+                      "name":  "LK PF4533 A",
+                      "color":  "#A9926A"
+                  },
+                  {
+                      "file":  "LK PF4558 A.jpg",
+                      "name":  "LK PF4558 A",
+                      "color":  "#83694C"
+                  },
+                  {
+                      "file":  "LK PF4560 A.jpg",
+                      "name":  "LK PF4560 A",
+                      "color":  "#A59E94"
+                  },
+                  {
+                      "file":  "LK PF4569 A.jpg",
+                      "name":  "LK PF4569 A",
+                      "color":  "#97734C"
+                  },
+                  {
+                      "file":  "LK PF4571 A.jpg",
+                      "name":  "LK PF4571 A",
+                      "color":  "#49301C"
+                  },
+                  {
+                      "file":  "LK PF4573 A.jpg",
+                      "name":  "LK PF4573 A",
+                      "color":  "#604937"
+                  },
+                  {
+                      "file":  "LK PF4585 A.jpg",
+                      "name":  "LK PF4585 A",
+                      "color":  "#755539"
+                  },
+                  {
+                      "file":  "LK PF4598 A.jpg",
+                      "name":  "LK PF4598 A",
+                      "color":  "#C5B490"
+                  },
+                  {
+                      "file":  "LK PF4600 A.jpg",
+                      "name":  "LK PF4600 A",
+                      "color":  "#73675A"
+                  },
+                  {
+                      "file":  "LK PL2200.jpg",
+                      "name":  "LK PL2200",
+                      "color":  "#BBAE94"
+                  },
+                  {
+                      "file":  "LK PL2201.jpg",
+                      "name":  "LK PL2201",
+                      "color":  "#A99577"
+                  },
+                  {
+                      "file":  "LK PL2202.jpg",
+                      "name":  "LK PL2202",
+                      "color":  "#6A5A45"
+                  },
+                  {
+                      "file":  "LK PL2203.jpg",
+                      "name":  "LK PL2203",
+                      "color":  "#5E554A"
+                  },
+                  {
+                      "file":  "LK PL2204.jpg",
+                      "name":  "LK PL2204",
+                      "color":  "#79695C"
+                  },
+                  {
+                      "file":  "LK PL2205.jpg",
+                      "name":  "LK PL2205",
+                      "color":  "#6E6052"
+                  },
+                  {
+                      "file":  "LL 2250.jpg",
+                      "name":  "LL 2250",
+                      "color":  "#FEFEFE"
+                  },
+                  {
+                      "file":  "LL 2250N.jpg",
+                      "name":  "LL 2250N",
+                      "color":  "#FEFEFE"
+                  },
+                  {
+                      "file":  "LL 2251.jpg",
+                      "name":  "LL 2251",
+                      "color":  "#FEFEFE"
+                  },
+                  {
+                      "file":  "LL 2251N.jpg",
+                      "name":  "LL 2251N",
+                      "color":  "#FEFEFE"
+                  },
+                  {
+                      "file":  "LL 2252.jpg",
+                      "name":  "LL 2252",
+                      "color":  "#FEFEFE"
+                  },
+                  {
+                      "file":  "LL 2252N.jpg",
+                      "name":  "LL 2252N",
+                      "color":  "#FEFEFE"
+                  },
+                  {
+                      "file":  "LL 2253.jpg",
+                      "name":  "LL 2253",
+                      "color":  "#F2F0EB"
+                  },
+                  {
+                      "file":  "LL 2253N.jpg",
+                      "name":  "LL 2253N",
+                      "color":  "#F2F0EB"
+                  },
+                  {
+                      "file":  "LL 2254.jpg",
+                      "name":  "LL 2254",
+                      "color":  "#C2BEB2"
+                  },
+                  {
+                      "file":  "LL 2254N.jpg",
+                      "name":  "LL 2254N",
+                      "color":  "#C2BEB2"
+                  },
+                  {
+                      "file":  "LL 2255.jpg",
+                      "name":  "LL 2255",
+                      "color":  "#B0A790"
+                  },
+                  {
+                      "file":  "LL 2256.jpg",
+                      "name":  "LL 2256",
+                      "color":  "#8B837B"
+                  },
+                  {
+                      "file":  "LL 2256N.jpg",
+                      "name":  "LL 2256N",
+                      "color":  "#8B837B"
+                  },
+                  {
+                      "file":  "LL 2257.jpg",
+                      "name":  "LL 2257",
+                      "color":  "#A48279"
+                  },
+                  {
+                      "file":  "LL 2257N.jpg",
+                      "name":  "LL 2257N",
+                      "color":  "#A48279"
+                  },
+                  {
+                      "file":  "LL 2258.jpg",
+                      "name":  "LL 2258",
+                      "color":  "#BDBDB7"
+                  },
+                  {
+                      "file":  "LL 2258N.jpg",
+                      "name":  "LL 2258N",
+                      "color":  "#BDBDB7"
+                  },
+                  {
+                      "file":  "LL 2259.jpg",
+                      "name":  "LL 2259",
+                      "color":  "#9B9EA7"
+                  },
+                  {
+                      "file":  "LL 2260.jpg",
+                      "name":  "LL 2260",
+                      "color":  "#92A2AC"
+                  },
+                  {
+                      "file":  "LL 2261.jpg",
+                      "name":  "LL 2261",
+                      "color":  "#839997"
+                  },
+                  {
+                      "file":  "LL 2262.jpg",
+                      "name":  "LL 2262",
+                      "color":  "#7E828B"
+                  },
+                  {
+                      "file":  "LL 2262N.jpg",
+                      "name":  "LL 2262N",
+                      "color":  "#7E828B"
+                  },
+                  {
+                      "file":  "LL 2263.jpg",
+                      "name":  "LL 2263",
+                      "color":  "#434549"
+                  },
+                  {
+                      "file":  "LL 2263N.jpg",
+                      "name":  "LL 2263N",
+                      "color":  "#434549"
+                  },
+                  {
+                      "file":  "LL 2264.jpg",
+                      "name":  "LL 2264",
+                      "color":  "#20212C"
+                  },
+                  {
+                      "file":  "LL 2265.jpg",
+                      "name":  "LL 2265",
+                      "color":  "#0A0C11"
+                  },
+                  {
+                      "file":  "LL 2265N.jpg",
+                      "name":  "LL 2265N",
+                      "color":  "#0A0C11"
+                  },
+                  {
+                      "file":  "LL 2266.jpg",
+                      "name":  "LL 2266",
+                      "color":  "#6C7570"
+                  },
+                  {
+                      "file":  "LL 2266N.jpg",
+                      "name":  "LL 2266N",
+                      "color":  "#6C7570"
+                  },
+                  {
+                      "file":  "LL 2267.jpg",
+                      "name":  "LL 2267",
+                      "color":  "#3A4C5C"
+                  },
+                  {
+                      "file":  "LL 2268.jpg",
+                      "name":  "LL 2268",
+                      "color":  "#23333E"
+                  },
+                  {
+                      "file":  "LL 2269.jpg",
+                      "name":  "LL 2269",
+                      "color":  "#9B4133"
+                  },
+                  {
+                      "file":  "LL 2270.jpg",
+                      "name":  "LL 2270",
+                      "color":  "#4C2520"
+                  },
+                  {
+                      "file":  "LL 2271.jpg",
+                      "name":  "LL 2271",
+                      "color":  "#332A27"
+                  },
+                  {
+                      "file":  "LL 2271N.jpg",
+                      "name":  "LL 2271N",
+                      "color":  "#332A27"
+                  },
+                  {
+                      "file":  "LL 2272.jpg",
+                      "name":  "LL 2272",
+                      "color":  "#4E7060"
+                  },
+                  {
+                      "file":  "LL 2272N.jpg",
+                      "name":  "LL 2272N",
+                      "color":  "#4E7060"
+                  },
+                  {
+                      "file":  "LL 2273.jpg",
+                      "name":  "LL 2273",
+                      "color":  "#3A3A3E"
+                  },
+                  {
+                      "file":  "LL 2273N.jpg",
+                      "name":  "LL 2273N",
+                      "color":  "#3A3A3E"
+                  },
+                  {
+                      "file":  "LL 2274.jpg",
+                      "name":  "LL 2274",
+                      "color":  "#E0D9CE"
+                  },
+                  {
+                      "file":  "LL 2274N.jpg",
+                      "name":  "LL 2274N",
+                      "color":  "#E0D9CE"
+                  },
+                  {
+                      "file":  "LL 2275.jpg",
+                      "name":  "LL 2275",
+                      "color":  "#000000"
+                  },
+                  {
+                      "file":  "LL 2276.jpg",
+                      "name":  "LL 2276",
+                      "color":  "#000000"
+                  },
+                  {
+                      "file":  "LL 2277.jpg",
+                      "name":  "LL 2277",
+                      "color":  "#000000"
+                  },
+                  {
+                      "file":  "LL 2278.jpg",
+                      "name":  "LL 2278",
+                      "color":  "#000000"
+                  },
+                  {
+                      "file":  "LL 2279.jpg",
+                      "name":  "LL 2279",
+                      "color":  "#000000"
+                  },
+                  {
+                      "file":  "LL 2280.jpg",
+                      "name":  "LL 2280",
+                      "color":  "#000000"
+                  },
+                  {
+                      "file":  "LL 2281.jpg",
+                      "name":  "LL 2281",
+                      "color":  "#000000"
+                  },
+                  {
+                      "file":  "LL 2500.jpg",
+                      "name":  "LL 2500",
+                      "color":  "#000000"
+                  },
+                  {
+                      "file":  "LL 2501.jpg",
+                      "name":  "LL 2501",
+                      "color":  "#000000"
+                  },
+                  {
+                      "file":  "LL 2502.jpg",
+                      "name":  "LL 2502",
+                      "color":  "#000000"
+                  },
+                  {
+                      "file":  "LL 2503.jpg",
+                      "name":  "LL 2503",
+                      "color":  "#000000"
+                  },
+                  {
+                      "file":  "LL 2504.jpg",
+                      "name":  "LL 2504",
+                      "color":  "#000000"
+                  },
+                  {
+                      "file":  "LL PL2200.jpg",
+                      "name":  "LL PL2200",
+                      "color":  "#BBAE94"
+                  },
+                  {
+                      "file":  "LL PL2201.jpg",
+                      "name":  "LL PL2201",
+                      "color":  "#C2A789"
+                  },
+                  {
+                      "file":  "LL PL2202.jpg",
+                      "name":  "LL PL2202",
+                      "color":  "#754A2E"
+                  },
+                  {
+                      "file":  "LL PL2203.jpg",
+                      "name":  "LL PL2203",
+                      "color":  "#8B7B63"
+                  },
+                  {
+                      "file":  "LL PL2204.jpg",
+                      "name":  "LL PL2204",
+                      "color":  "#79695C"
+                  },
+                  {
+                      "file":  "LL PL2205.jpg",
+                      "name":  "LL PL2205",
+                      "color":  "#6E6052"
+                  }
+              ]
+}

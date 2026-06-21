@@ -6,29 +6,31 @@ import Image from "next/image";
 import Link from "next/link";
 
 const QUOTES = [
-  { text: "Ít hơn là nhiều hơn.", author: "Ludwig Mies van der Rohe" },
-  { text: "Hình thức đi sau công năng.", author: "Louis Sullivan" },
-  { text: "Nhà là một cỗ máy để ở.", author: "Le Corbusier" },
-  { text: "Kiến trúc là một trò chơi bậc thầy, chính xác và lộng lẫy của các khối hình được kết hợp với nhau dưới ánh sáng.", author: "Le Corbusier" },
-  { text: "Hình thức và công năng là một.", author: "Frank Lloyd Wright" },
-  { text: "Có đến 360 độ, tại sao cứ phải bám lấy một độ?", author: "Zaha Hadid" },
-  { text: "Bạn hỏi viên gạch: 'Mày muốn gì hở gạch?' và viên gạch trả lời: 'Tôi thích một vòm cuốn'.", author: "Louis Kahn" },
-  { text: "Kiến trúc nên nói lên tiếng nói của thời gian và không gian nơi nó đứng, nhưng phải khao khát sự trường tồn.", author: "Frank Gehry" },
-  { text: "Chúng ta định hình các tòa nhà; sau đó chúng định hình chúng ta.", author: "Winston Churchill" },
-  { text: "Kiến trúc là âm nhạc đóng băng.", author: "Johann Wolfgang von Goethe" },
-  { text: "Chúa ngự trị trong các chi tiết.", author: "Ludwig Mies van der Rohe" },
-  { text: "Bất kỳ công trình kiến trúc nào không thể hiện được sự thanh bình đều là một sai lầm.", author: "Luis Barragán" },
-  { text: "Một căn phòng không phải là một căn phòng nếu thiếu đi ánh sáng tự nhiên.", author: "Louis Kahn" },
-  { text: "Đường thẳng thuộc về con người, đường cong thuộc về Thượng đế.", author: "Antoni Gaudí" },
-  { text: "Kiến trúc là nỗ lực làm cho thế giới giống với những giấc mơ của chúng ta hơn một chút.", author: "Bjarke Ingels" },
-  { text: "Là một kiến trúc sư, bạn thiết kế cho hiện tại, với sự nhận thức về quá khứ, hướng tới một tương lai về cơ bản là chưa biết trước.", author: "Norman Foster" },
-  { text: "Kiến trúc là ý chí của một thời đại được chuyển hóa vào không gian.", author: "Ludwig Mies van der Rohe" },
-  { text: "Nghệ thuật nguyên thủy chính là kiến trúc. Không có một nền kiến trúc của riêng mình, chúng ta không có linh hồn của nền văn minh chính mình.", author: "Frank Lloyd Wright" },
-  { text: "Kiến trúc là một công việc rất nguy hiểm. Nếu bạn tạo ra một kiến trúc tồi, bạn sẽ áp đặt sự xấu xí lên một nơi nào đó trong cả trăm năm.", author: "Renzo Piano" },
-  { text: "Tôi không tin kiến trúc phải nói quá nhiều. Nó nên giữ im lặng và để thiên nhiên trong vỏ bọc của gió và ánh sáng mặt trời.", author: "Tadao Ando" },
-  { text: "Trong tất cả các tác phẩm của tôi, ánh sáng là yếu tố kiểm soát quan trọng.", author: "Tadao Ando" },
-  { text: "Tôi thích vẽ hơn trò chuyện. Vẽ thì nhanh hơn và lại có ít chỗ cho sự dối trá.", author: "Le Corbusier" },
+  { text: "Tôi không nhớ nổi bất kì thứ gì trong tuổi thơ tôi mà không liên quan tới công trình.", author: "Renzo Piano" },
+  { text: "Một thiết kế chưa được coi là hoàn thành cho đến khi ai đó sử dụng nó.", author: "Brenda Laurel" },
+  { text: "Sẽ không bao giờ có kiến trúc sư vĩ đại hay công trình vĩ đại nếu không có những chủ đầu tư vĩ đại.", author: "Emilio Ambasz" },
+  { text: "Kiến trúc không dựa trên bê tông, thép hay các yếu tố của đất. Nó dựa trên sự kỳ diệu.", author: "Daniel Libeskind" },
+  { text: "Khi bạn có một không gian lớn để chinh phục, đường cong là giải pháp tự nhiên.", author: "Oscar Niemeyer" },
+  { text: "Đơn giản là tinh tế cuối cùng.", author: "Leonardo da Vinci" },
+  { text: "Mỗi tình huống mới đòi hỏi một kiến trúc mới.", author: "Jean Nouvel" },
+  { text: "Kiến trúc không phải là một mô hình kinh doanh mang lại cảm hứng, đó là một quy trình hợp lý để làm những điều hợp lý và hy vọng những điều đó tạo ra cái đẹp, chỉ đơn giản là như vậy.", author: "Harry Seidler" },
+  { text: "Tôi yêu giấy. Một tập giấy dày và một cây bút chì, còn tôi là nội dung.", author: "Cecil Balmond" },
+  { text: "Một trong những nét quyến rũ của kiến trúc là mỗi lần bắt đầu công việc là như phải làm lại từ đầu.", author: "Renzo Piano" },
+  { text: "Kiến trúc không chỉ là lý thuyết, bạn đừng nhìn một toà nhà theo cách của bạn.", author: "Arthur Erickson" },
+  { text: "Bất kỳ sản phẩm kiến trúc nào mà không thể hiện được sự thanh thản thì đó là một sai lầm.", author: "Luis Barragán" },
+  { text: "Tôi tin rằng chúng tôi — những kiến trúc sư có thể ảnh hưởng đến chất lượng sống của người dân.", author: "Richard Rogers" },
+  { text: "Tay nắm cửa là những cái bắt tay của toà nhà.", author: "Juhani Pallasmaa" },
+  { text: "Không có gì đòi hỏi sự quan tâm của kiến trúc sư hơn tỷ lệ của các toà nhà.", author: "Vitruvius" },
+  { text: "Ý tưởng tốt đến từ khắp mọi nơi. Việc nhận ra một ý tưởng tốt quan trọng hơn việc sáng tác ra nó.", author: "Jeanne Gang" },
+  { text: "Kiến trúc là một biểu hiện của giá trị.", author: "Norman Foster" },
+  { text: "Là một kiến trúc sư, tôi nghĩ rằng kỹ năng tốt nhất của mình là thành quả của sự phối hợp giữa tay và mắt. Tôi có thể chuyển một bản phác thảo thành một mô hình rồi một toà nhà.", author: "Frank Gehry" },
   { text: "Không gian là hơi thở của nghệ thuật.", author: "Frank Lloyd Wright" },
+  { text: "Khi người ta không thoả mãn với ngôi nhà đang sống, họ trở thành kiến trúc sư.", author: "Renzo Piano" },
+  { text: "Kiến trúc không phải là phương tiện truyền đạt cảm xúc cá nhân dành cho tôi.", author: "Zaha Hadid" },
+  { text: "Chúng tôi kiến trúc nên những tòa nhà và sau đó chúng cũng “kiến trúc” cuộc đời của chúng tôi.", author: "Winston Churchill" },
+  { text: "Vẻ đẹp của tòa nhà không phải là thứ mà bạn nhìn vào; phần kết cấu xây dựng của nền móng mới là thứ sẽ được chứng minh theo thời gian.", author: "David Allan Coe" },
+  { text: "Kiến trúc tuyệt vời là như cách của nó sau khi mặt trời lặn; có lẽ đến lúc về đêm kiến trúc mới thực sự là nghệ thuật trong đêm, giống như nghệ thuật của pháo hoa.", author: "Gilbert K. Chesterton" },
+  { text: "Nghệ thuật là mẹ của kiến trúc. Nếu không có một kiến trúc riêng cho mình, chúng ta cũng không có tâm hồn bên trong ta.", author: "Frank Lloyd Wright" },
 ];
 
 const HERO_IMAGES = [
@@ -113,7 +115,7 @@ export function Hero() {
             <motion.h1
               key={quoteIndex}
               className="font-display italic tracking-tight text-white"
-              style={{ fontSize: "clamp(0.78rem, 1.25vw, 1.87rem)" }}
+              style={{ fontSize: "clamp(0.94rem, 1.5vw, 2.24rem)" }}
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
@@ -135,6 +137,18 @@ export function Hero() {
           `}</style>
           <Link
             href="/dashboard"
+            onClick={() => {
+              // Phát nhạc chào mừng khi vào không gian làm việc. Đây là một
+              // thao tác click của người dùng nên trình duyệt cho phép phát tiếng.
+              // Điều hướng /dashboard là soft-navigation nên Audio vẫn chạy tiếp.
+              try {
+                const audio = new Audio("/intro.mp3");
+                audio.volume = 0.7;
+                void audio.play();
+              } catch {
+                // không phát được nhạc thì vẫn cho vào không gian làm việc
+              }
+            }}
             className="hero-btn group relative inline-flex items-center gap-3 overflow-hidden rounded-full px-7 py-3.5 text-sm font-semibold text-slate-800 transition-all duration-300 hover:scale-105 hover:gap-4"
             style={{ background: "linear-gradient(105deg, #4b5563 0%, #e2e8f0 30%, #f8fafc 48%, #e2e8f0 58%, #94a3b8 75%, #475569 100%)" }}
           >

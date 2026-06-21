@@ -124,11 +124,20 @@ export const quickActions: QuickAction[] = [
     ],
   },
   {
-    label: "Thuyết minh AI",
-    description: "Hỗ trợ viết thuyết minh, bóc tách vật tư",
-    href: "/dossier",
-    icon: "document",
-    cta: "Viết thuyết minh",
+    label: "Hồ sơ và dự toán",
+    description: "Bóc tách vật liệu & nội thất từ ảnh → dự toán",
+    href: "",
+    icon: "calculator",
+    cta: "Mở dự toán",
+    items: [
+      {
+        label: "Bốc Vật liệu AI",
+        description: "AI đọc ảnh → liệt kê vật liệu/nội thất + link mua + xuất Excel",
+        href: "/material-takeoff",
+        icon: "box",
+        cta: "Bóc vật liệu",
+      },
+    ],
   },
 ];
 

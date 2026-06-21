@@ -1,6 +1,10 @@
-import { getGeminiModel, getGeminiEmbeddingModel } from './gemini'
+import { getGeminiEmbeddingModel } from './gemini'
+import { deepseekGenerateChat } from './deepseek'
+import { DEEPSEEK_MODELS } from './ai-models'
 import type { KnowledgeChatMessage, MatchedChunk } from './knowledge-types'
 
+// Embedding (tìm kiếm vector) BẮT BUỘC dùng Gemini text-embedding-004 — DeepSeek
+// không có endpoint embedding. Chỉ phần SINH CÂU TRẢ LỜI mới dùng DeepSeek V4 Pro.
 export async function embedText(text: string): Promise<number[]> {
   const model = getGeminiEmbeddingModel()
   const result = await model.embedContent(text)
@@ -12,8 +16,6 @@ export async function generateAnswer(
   chunks: MatchedChunk[],
   history: KnowledgeChatMessage[]
 ): Promise<string> {
-  const model = getGeminiModel()
-
   const context = chunks
     .map((c, i) => `[${i + 1}] Nguồn: ${c.document_name}\n${c.content}`)
     .join('\n\n---\n\n')
@@ -26,19 +28,17 @@ Trả lời bằng tiếng Việt.
 TÀI LIỆU THAM KHẢO:
 ${context}`
 
-  const chatHistory = [
-    { role: 'user' as const, parts: [{ text: systemPrompt }] },
-    {
-      role: 'model' as const,
-      parts: [{ text: 'Đã hiểu. Tôi sẽ trả lời dựa trên tài liệu được cung cấp và trích dẫn nguồn rõ ràng.' }],
-    },
+  const messages = [
     ...history.map((m) => ({
-      role: m.role === 'user' ? ('user' as const) : ('model' as const),
-      parts: [{ text: m.content }],
+      role: m.role === 'user' ? ('user' as const) : ('assistant' as const),
+      content: m.content,
     })),
+    { role: 'user' as const, content: question },
   ]
 
-  const chat = model.startChat({ history: chatHistory })
-  const result = await chat.sendMessage(question)
-  return result.response.text()
+  return deepseekGenerateChat({
+    model: DEEPSEEK_MODELS[0].id, // deepseek-v4-pro
+    system: systemPrompt,
+    messages,
+  })
 }

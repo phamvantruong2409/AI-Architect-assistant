@@ -1,4 +1,5 @@
-import { getGeminiModel } from './gemini'
+import { deepseekGenerateText } from './deepseek'
+import { DEEPSEEK_MODELS } from './ai-models'
 import type { RegCheck, RegReport } from './regulatory-types'
 import {
   getSetbackRule,
@@ -11,12 +12,12 @@ import {
   ZONING_TYPE_LABELS,
 } from './regulatory-regulations'
 
+// LƯU Ý: integration DeepSeek hiện chỉ nhận text → phần đọc ẢNH mặt bằng (imageBase64)
+// không còn được phân tích. Tham số giữ lại để tương thích chữ ký lời gọi nhưng bị bỏ qua.
 export async function analyzeRegulatory(
   check: RegCheck,
-  imageBase64?: string
+  _imageBase64?: string
 ): Promise<Omit<RegReport, 'id' | 'check_id' | 'generated_at' | 'gemini_model'>> {
-  const model = getGeminiModel()
-
   const setbackRule = getSetbackRule(check.floors)
   const maxDensity = MAX_DENSITY[check.building_type]
   const maxFAR = MAX_FAR[check.building_type]
@@ -71,7 +72,6 @@ Tỷ lệ cửa sổ tối thiểu (TCVN 4474): ≥ ${LIGHTING_RULES.window_rati
 
 === YÊU CẦU PHÂN TÍCH ===
 Kiểm tra toàn bộ 7 hạng mục: khoảng lùi mặt tiền, khoảng lùi hông, khoảng lùi sau, mật độ xây dựng, FAR, chiều cao, PCCC hành lang, thông gió chiếu sáng.
-${imageBase64 ? 'Đã có ảnh mặt bằng đính kèm — phân tích thêm nếu phát hiện bất thường.' : ''}
 
 Trả về JSON với cấu trúc CHÍNH XÁC sau:
 
@@ -96,13 +96,14 @@ Trả về JSON với cấu trúc CHÍNH XÁC sau:
 Chỉ liệt kê violations thực sự có vấn đề. Nếu hạng mục nào đạt thì đưa vào passed_checks.
 Chỉ trả về JSON thuần túy.`
 
-  const parts: Parameters<typeof model.generateContent>[0] = imageBase64
-    ? [prompt, { inlineData: { mimeType: 'image/jpeg' as const, data: imageBase64 } }]
-    : prompt
+  const raw = (
+    await deepseekGenerateText({ model: DEEPSEEK_MODELS[0].id, prompt })
+  ).trim()
 
-  const result = await model.generateContent(parts)
-  const text = result.response.text().trim()
-  const cleaned = text.replace(/^```json\n?/, '').replace(/\n?```$/, '').trim()
+  // DeepSeek pro có thể bọc ```json hoặc thêm chữ quanh JSON — cắt theo dấu { } ngoài cùng.
+  const start = raw.indexOf('{')
+  const end = raw.lastIndexOf('}')
+  const cleaned = start >= 0 && end > start ? raw.slice(start, end + 1) : raw
 
   return JSON.parse(cleaned)
 }

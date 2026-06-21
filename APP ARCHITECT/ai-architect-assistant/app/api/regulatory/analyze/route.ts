@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServiceClient } from '@/lib/supabase'
 import { analyzeRegulatory } from '@/lib/regulatory-gemini'
-import { DEFAULT_GEMINI_MODEL } from '@/lib/gemini-models'
+import { DEEPSEEK_MODELS } from '@/lib/ai-models'
+import { deepseekErrorMessage } from '@/lib/deepseek'
 import type { CheckFormData } from '@/lib/regulatory-types'
 
 export async function POST(req: NextRequest) {
@@ -75,12 +76,7 @@ export async function POST(req: NextRequest) {
     analysisResult = await analyzeRegulatory(checkRow, floorplan_image_base64)
   } catch (e) {
     await supabase.from('reg_checks').update({ status: 'error' }).eq('id', checkRow.id)
-    const msg = e instanceof Error ? e.message : String(e)
-    const isQuota = msg.includes('429') || msg.toLowerCase().includes('quota') || msg.toLowerCase().includes('resource_exhausted')
-    const userMsg = isQuota
-      ? 'Gemini API hết quota (429). Vui lòng kiểm tra GEMINI_API_KEY tại aistudio.google.com.'
-      : `Phân tích AI thất bại: ${msg}`
-    return NextResponse.json({ error: userMsg }, { status: 500 })
+    return NextResponse.json({ error: `Phân tích AI thất bại: ${deepseekErrorMessage(e)}` }, { status: 500 })
   }
 
   const { data: reportRow, error: reportErr } = await supabase
@@ -91,7 +87,7 @@ export async function POST(req: NextRequest) {
       compliance_summary: analysisResult.compliance_summary,
       violations: analysisResult.violations,
       passed_checks: analysisResult.passed_checks,
-      gemini_model: DEFAULT_GEMINI_MODEL,
+      gemini_model: DEEPSEEK_MODELS[0].id, // cột giữ tên cũ; nay lưu deepseek-v4-pro
     })
     .select()
     .single()

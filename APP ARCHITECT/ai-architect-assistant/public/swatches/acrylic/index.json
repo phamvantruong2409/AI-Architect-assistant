@@ -1,0 +1,602 @@
+﻿{
+    "type":  "acrylic",
+    "size":  256,
+    "count":  119,
+    "items":  [
+                  {
+                      "file":  "ACRYLIC ACR 4012.jpg",
+                      "name":  "ACRYLIC ACR 4012",
+                      "color":  "#000000"
+                  },
+                  {
+                      "file":  "ACRYLIC ACR 466.jpg",
+                      "name":  "ACRYLIC ACR 466",
+                      "color":  "#000000"
+                  },
+                  {
+                      "file":  "ACRYLIC ACR 475.jpg",
+                      "name":  "ACRYLIC ACR 475",
+                      "color":  "#000000"
+                  },
+                  {
+                      "file":  "ACRYLIC ARC 402.jpg",
+                      "name":  "ACRYLIC ARC 402",
+                      "color":  "#000000"
+                  },
+                  {
+                      "file":  "ACRYLIC ARC 404.jpg",
+                      "name":  "ACRYLIC ARC 404",
+                      "color":  "#000000"
+                  },
+                  {
+                      "file":  "ACRYLIC ARC 411.jpg",
+                      "name":  "ACRYLIC ARC 411",
+                      "color":  "#000000"
+                  },
+                  {
+                      "file":  "ACRYLIC ARC 421.jpg",
+                      "name":  "ACRYLIC ARC 421",
+                      "color":  "#000000"
+                  },
+                  {
+                      "file":  "ACRYLIC ARC 491.jpg",
+                      "name":  "ACRYLIC ARC 491",
+                      "color":  "#000000"
+                  },
+                  {
+                      "file":  "ACRYLIC ARC 492.jpg",
+                      "name":  "ACRYLIC ARC 492",
+                      "color":  "#000000"
+                  },
+                  {
+                      "file":  "ACRYLIC ARC 502.jpg",
+                      "name":  "ACRYLIC ARC 502",
+                      "color":  "#000000"
+                  },
+                  {
+                      "file":  "ACRYLIC ARC 503.jpg",
+                      "name":  "ACRYLIC ARC 503",
+                      "color":  "#000000"
+                  },
+                  {
+                      "file":  "ACRYLIC ARC 612.jpg",
+                      "name":  "ACRYLIC ARC 612",
+                      "color":  "#000000"
+                  },
+                  {
+                      "file":  "ARC 73.jpg",
+                      "name":  "ARC 73",
+                      "color":  "#947C5E"
+                  },
+                  {
+                      "file":  "ARC 74.jpg",
+                      "name":  "ARC 74",
+                      "color":  "#29170A"
+                  },
+                  {
+                      "file":  "ARC 75.jpg",
+                      "name":  "ARC 75",
+                      "color":  "#A29789"
+                  },
+                  {
+                      "file":  "ARC 76.jpg",
+                      "name":  "ARC 76",
+                      "color":  "#594A3C"
+                  },
+                  {
+                      "file":  "ARC 77.jpg",
+                      "name":  "ARC 77",
+                      "color":  "#706250"
+                  },
+                  {
+                      "file":  "ARC 78.jpg",
+                      "name":  "ARC 78",
+                      "color":  "#605040"
+                  },
+                  {
+                      "file":  "ARC 79.jpg",
+                      "name":  "ARC 79",
+                      "color":  "#754729"
+                  },
+                  {
+                      "file":  "ARC 80.jpg",
+                      "name":  "ARC 80",
+                      "color":  "#5E4E43"
+                  },
+                  {
+                      "file":  "ARC 81.jpg",
+                      "name":  "ARC 81",
+                      "color":  "#20180E"
+                  },
+                  {
+                      "file":  "ARC 82.jpg",
+                      "name":  "ARC 82",
+                      "color":  "#635A50"
+                  },
+                  {
+                      "file":  "ARC 83.jpg",
+                      "name":  "ARC 83",
+                      "color":  "#4A493E"
+                  },
+                  {
+                      "file":  "ARC 84.jpg",
+                      "name":  "ARC 84",
+                      "color":  "#959282"
+                  },
+                  {
+                      "file":  "ARC 85.jpg",
+                      "name":  "ARC 85",
+                      "color":  "#BEB7A5"
+                  },
+                  {
+                      "file":  "ARC 86.jpg",
+                      "name":  "ARC 86",
+                      "color":  "#392C20"
+                  },
+                  {
+                      "file":  "ARC 87.jpg",
+                      "name":  "ARC 87",
+                      "color":  "#20170E"
+                  },
+                  {
+                      "file":  "ARC 88.jpg",
+                      "name":  "ARC 88",
+                      "color":  "#A9906C"
+                  },
+                  {
+                      "file":  "ARC 89.jpg",
+                      "name":  "ARC 89",
+                      "color":  "#4C2C17"
+                  },
+                  {
+                      "file":  "ARC 90.jpg",
+                      "name":  "ARC 90",
+                      "color":  "#3E2E1E"
+                  },
+                  {
+                      "file":  "ARC 91.jpg",
+                      "name":  "ARC 91",
+                      "color":  "#6A5E50"
+                  },
+                  {
+                      "file":  "ARC 92.jpg",
+                      "name":  "ARC 92",
+                      "color":  "#634730"
+                  },
+                  {
+                      "file":  "ARC 93.jpg",
+                      "name":  "ARC 93",
+                      "color":  "#604023"
+                  },
+                  {
+                      "file":  "ARC 94.jpg",
+                      "name":  "ARC 94",
+                      "color":  "#654023"
+                  },
+                  {
+                      "file":  "ARC 95.jpg",
+                      "name":  "ARC 95",
+                      "color":  "#5E5349"
+                  },
+                  {
+                      "file":  "ARC 96.jpg",
+                      "name":  "ARC 96",
+                      "color":  "#352317"
+                  },
+                  {
+                      "file":  "EARC 11.jpg",
+                      "name":  "EARC 11",
+                      "color":  "#FEFEFE"
+                  },
+                  {
+                      "file":  "EARC 12N.jpg",
+                      "name":  "EARC 12N",
+                      "color":  "#E6E0D5"
+                  },
+                  {
+                      "file":  "EARC 13.jpg",
+                      "name":  "EARC 13",
+                      "color":  "#BDB2A0"
+                  },
+                  {
+                      "file":  "EARC 14.jpg",
+                      "name":  "EARC 14",
+                      "color":  "#6E0103"
+                  },
+                  {
+                      "file":  "EARC 16.jpg",
+                      "name":  "EARC 16",
+                      "color":  "#4E5052"
+                  },
+                  {
+                      "file":  "EARC 17.jpg",
+                      "name":  "EARC 17",
+                      "color":  "#8C8263"
+                  },
+                  {
+                      "file":  "EARC 18.jpg",
+                      "name":  "EARC 18",
+                      "color":  "#909090"
+                  },
+                  {
+                      "file":  "EARC 32.jpg",
+                      "name":  "EARC 32",
+                      "color":  "#333333"
+                  },
+                  {
+                      "file":  "EARC 42.jpg",
+                      "name":  "EARC 42",
+                      "color":  "#F7F7F7"
+                  },
+                  {
+                      "file":  "EARC 71.jpg",
+                      "name":  "EARC 71",
+                      "color":  "#EBEEEE"
+                  },
+                  {
+                      "file":  "EARC 72.jpg",
+                      "name":  "EARC 72",
+                      "color":  "#070707"
+                  },
+                  {
+                      "file":  "PARC 01.jpg",
+                      "name":  "PARC 01",
+                      "color":  "#F2F2ED"
+                  },
+                  {
+                      "file":  "PARC 02.jpg",
+                      "name":  "PARC 02",
+                      "color":  "#000000"
+                  },
+                  {
+                      "file":  "PARC 03.jpg",
+                      "name":  "PARC 03",
+                      "color":  "#3E0101"
+                  },
+                  {
+                      "file":  "PARC 04.jpg",
+                      "name":  "PARC 04",
+                      "color":  "#291503"
+                  },
+                  {
+                      "file":  "PARC 05.jpg",
+                      "name":  "PARC 05",
+                      "color":  "#B29980"
+                  },
+                  {
+                      "file":  "PARC 06.jpg",
+                      "name":  "PARC 06",
+                      "color":  "#696E07"
+                  },
+                  {
+                      "file":  "PARC 07.jpg",
+                      "name":  "PARC 07",
+                      "color":  "#5E3E23"
+                  },
+                  {
+                      "file":  "PARC 08.jpg",
+                      "name":  "PARC 08",
+                      "color":  "#20110A"
+                  },
+                  {
+                      "file":  "PARC 100.jpg",
+                      "name":  "PARC 100",
+                      "color":  "#F6F4EE"
+                  },
+                  {
+                      "file":  "PARC 101.jpg",
+                      "name":  "PARC 101",
+                      "color":  "#B7B2B2"
+                  },
+                  {
+                      "file":  "PARC 102.jpg",
+                      "name":  "PARC 102",
+                      "color":  "#7E7C7C"
+                  },
+                  {
+                      "file":  "PARC 103.jpg",
+                      "name":  "PARC 103",
+                      "color":  "#8BA9AB"
+                  },
+                  {
+                      "file":  "PARC 104.jpg",
+                      "name":  "PARC 104",
+                      "color":  "#6E83A2"
+                  },
+                  {
+                      "file":  "PARC 105.jpg",
+                      "name":  "PARC 105",
+                      "color":  "#6A696A"
+                  },
+                  {
+                      "file":  "PARC 106.jpg",
+                      "name":  "PARC 106",
+                      "color":  "#303030"
+                  },
+                  {
+                      "file":  "PARC 107.jpg",
+                      "name":  "PARC 107",
+                      "color":  "#0A1121"
+                  },
+                  {
+                      "file":  "PARC 108.jpg",
+                      "name":  "PARC 108",
+                      "color":  "#000000"
+                  },
+                  {
+                      "file":  "PARC 109.jpg",
+                      "name":  "PARC 109",
+                      "color":  "#000000"
+                  },
+                  {
+                      "file":  "PARC 10N.jpg",
+                      "name":  "PARC 10N",
+                      "color":  "#F2F0ED"
+                  },
+                  {
+                      "file":  "PARC 110.jpg",
+                      "name":  "PARC 110",
+                      "color":  "#000000"
+                  },
+                  {
+                      "file":  "PARC 111.jpg",
+                      "name":  "PARC 111",
+                      "color":  "#625A49"
+                  },
+                  {
+                      "file":  "PARC 112.jpg",
+                      "name":  "PARC 112",
+                      "color":  "#F4E05E"
+                  },
+                  {
+                      "file":  "PARC 113.jpg",
+                      "name":  "PARC 113",
+                      "color":  "#F4825C"
+                  },
+                  {
+                      "file":  "PARC 114.jpg",
+                      "name":  "PARC 114",
+                      "color":  "#40796A"
+                  },
+                  {
+                      "file":  "PARC 19N.jpg",
+                      "name":  "PARC 19N",
+                      "color":  "#796A5A"
+                  },
+                  {
+                      "file":  "PARC 22.jpg",
+                      "name":  "PARC 22",
+                      "color":  "#20010C"
+                  },
+                  {
+                      "file":  "PARC 23.jpg",
+                      "name":  "PARC 23",
+                      "color":  "#FE6700"
+                  },
+                  {
+                      "file":  "PARC 24.jpg",
+                      "name":  "PARC 24",
+                      "color":  "#35302E"
+                  },
+                  {
+                      "file":  "PARC 25.jpg",
+                      "name":  "PARC 25",
+                      "color":  "#898989"
+                  },
+                  {
+                      "file":  "PARC 26.jpg",
+                      "name":  "PARC 26",
+                      "color":  "#151515"
+                  },
+                  {
+                      "file":  "PARC 28.jpg",
+                      "name":  "PARC 28",
+                      "color":  "#FEFEFE"
+                  },
+                  {
+                      "file":  "PARC 30.jpg",
+                      "name":  "PARC 30",
+                      "color":  "#B0B0AB"
+                  },
+                  {
+                      "file":  "PARC 35.jpg",
+                      "name":  "PARC 35",
+                      "color":  "#8C7B69"
+                  },
+                  {
+                      "file":  "PARC 36.jpg",
+                      "name":  "PARC 36",
+                      "color":  "#131313"
+                  },
+                  {
+                      "file":  "PARC 41.jpg",
+                      "name":  "PARC 41",
+                      "color":  "#E7C437"
+                  },
+                  {
+                      "file":  "PARC 43.jpg",
+                      "name":  "PARC 43",
+                      "color":  "#7CC743"
+                  },
+                  {
+                      "file":  "PARC 48.jpg",
+                      "name":  "PARC 48",
+                      "color":  "#E0D9CE"
+                  },
+                  {
+                      "file":  "PARC 49.jpg",
+                      "name":  "PARC 49",
+                      "color":  "#F0DECB"
+                  },
+                  {
+                      "file":  "PARC 50.jpg",
+                      "name":  "PARC 50",
+                      "color":  "#D9D9D9"
+                  },
+                  {
+                      "file":  "PARC 51.jpg",
+                      "name":  "PARC 51",
+                      "color":  "#AEAB9E"
+                  },
+                  {
+                      "file":  "PARC 52.jpg",
+                      "name":  "PARC 52",
+                      "color":  "#8E877C"
+                  },
+                  {
+                      "file":  "PARC 53.jpg",
+                      "name":  "PARC 53",
+                      "color":  "#3A3525"
+                  },
+                  {
+                      "file":  "PARC 54.jpg",
+                      "name":  "PARC 54",
+                      "color":  "#312C2C"
+                  },
+                  {
+                      "file":  "PARC 55.jpg",
+                      "name":  "PARC 55",
+                      "color":  "#CDD049"
+                  },
+                  {
+                      "file":  "PARC 56.jpg",
+                      "name":  "PARC 56",
+                      "color":  "#E96A17"
+                  },
+                  {
+                      "file":  "PARC 57.jpg",
+                      "name":  "PARC 57",
+                      "color":  "#C2010C"
+                  },
+                  {
+                      "file":  "PARC 58.jpg",
+                      "name":  "PARC 58",
+                      "color":  "#0E4A50"
+                  },
+                  {
+                      "file":  "PARC 59.jpg",
+                      "name":  "PARC 59",
+                      "color":  "#2E5573"
+                  },
+                  {
+                      "file":  "PARC 60.jpg",
+                      "name":  "PARC 60",
+                      "color":  "#C5B5A4"
+                  },
+                  {
+                      "file":  "PARC 60N.jpg",
+                      "name":  "PARC 60N",
+                      "color":  "#C5B5A4"
+                  },
+                  {
+                      "file":  "PARC 61.jpg",
+                      "name":  "PARC 61",
+                      "color":  "#402510"
+                  },
+                  {
+                      "file":  "PARC 62.jpg",
+                      "name":  "PARC 62",
+                      "color":  "#1E1815"
+                  },
+                  {
+                      "file":  "PARC 65.jpg",
+                      "name":  "PARC 65",
+                      "color":  "#F7F2E7"
+                  },
+                  {
+                      "file":  "PARC 66.jpg",
+                      "name":  "PARC 66",
+                      "color":  "#C2B7AE"
+                  },
+                  {
+                      "file":  "PARC 67.jpg",
+                      "name":  "PARC 67",
+                      "color":  "#948773"
+                  },
+                  {
+                      "file":  "PARC 68.jpg",
+                      "name":  "PARC 68",
+                      "color":  "#ABAEB2"
+                  },
+                  {
+                      "file":  "PARC 69.jpg",
+                      "name":  "PARC 69",
+                      "color":  "#A2AEBB"
+                  },
+                  {
+                      "file":  "PARC 70.jpg",
+                      "name":  "PARC 70",
+                      "color":  "#3A3A3A"
+                  },
+                  {
+                      "file":  "ZEN 01.jpg",
+                      "name":  "ZEN 01",
+                      "color":  "#F7F7F7"
+                  },
+                  {
+                      "file":  "ZEN 02.jpg",
+                      "name":  "ZEN 02",
+                      "color":  "#C0E2E0"
+                  },
+                  {
+                      "file":  "ACR 296.jpg",
+                      "name":  "ACR 296",
+                      "color":  "#41332A"
+                  },
+                  {
+                      "file":  "ARC 2402.jpg",
+                      "name":  "ARC 2402",
+                      "color":  "#D6C4A8"
+                  },
+                  {
+                      "file":  "ARC 2404.jpg",
+                      "name":  "ARC 2404",
+                      "color":  "#A2916F"
+                  },
+                  {
+                      "file":  "ARC 2475.jpg",
+                      "name":  "ARC 2475",
+                      "color":  "#D4C29F"
+                  },
+                  {
+                      "file":  "ARC 2492.jpg",
+                      "name":  "ARC 2492",
+                      "color":  "#4A3C2C"
+                  },
+                  {
+                      "file":  "ARC 2502.jpg",
+                      "name":  "ARC 2502",
+                      "color":  "#644F3A"
+                  },
+                  {
+                      "file":  "ARC 2503.jpg",
+                      "name":  "ARC 2503",
+                      "color":  "#947A5C"
+                  },
+                  {
+                      "file":  "ARC 2612.jpg",
+                      "name":  "ARC 2612",
+                      "color":  "#66533F"
+                  },
+                  {
+                      "file":  "ARC 285.jpg",
+                      "name":  "ARC 285",
+                      "color":  "#D2C2A1"
+                  },
+                  {
+                      "file":  "ARC 286.jpg",
+                      "name":  "ARC 286",
+                      "color":  "#48382A"
+                  },
+                  {
+                      "file":  "ARC 288.jpg",
+                      "name":  "ARC 288",
+                      "color":  "#C9AB7F"
+                  },
+                  {
+                      "file":  "ARC 293.jpg",
+                      "name":  "ARC 293",
+                      "color":  "#714F31"
+                  }
+              ]
+}

@@ -95,6 +95,27 @@ export async function deepseekGenerateText(opts: {
 }
 
 /**
+ * Sinh văn bản một lần (không stream) từ NHIỀU lượt hội thoại (system + lịch sử).
+ * Dùng cho hỏi-đáp RAG thư viện tài liệu — trả `message.content`, bỏ qua phần
+ * `reasoning_content` (suy luận) của bản pro.
+ */
+export async function deepseekGenerateChat(opts: {
+  model: string;
+  system?: string;
+  messages: DeepSeekMessage[];
+}): Promise<string> {
+  const messages: DeepSeekMessage[] = [];
+  if (opts.system) messages.push({ role: "system", content: opts.system });
+  messages.push(...opts.messages);
+
+  const res = await postChat({ model: opts.model, messages, stream: false, ...thinkingParams(opts.model) });
+  const data = (await res.json()) as {
+    choices?: { message?: { content?: string } }[];
+  };
+  return (data.choices?.[0]?.message?.content ?? "").toString();
+}
+
+/**
  * Stream câu trả lời (chỉ `delta.content`, bỏ qua `reasoning_content`) dưới dạng
  * text thuần — khớp với định dạng stream Gemini mà client chat đang đọc.
  */
