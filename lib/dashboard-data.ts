@@ -107,6 +107,13 @@ export const quickActions: QuickAction[] = [
         icon: "cube",
         cta: "Phân tích khối",
       },
+      {
+        label: "Image to AutoCAD",
+        description: "AI đọc ảnh mặt bằng → tường/cửa/phòng/nội thất → xuất DWG chuẩn trên template",
+        href: "/image-to-autocad",
+        icon: "blueprint",
+        cta: "Số hoá mặt bằng",
+      },
     ],
   },
   {

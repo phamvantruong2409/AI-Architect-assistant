@@ -9,6 +9,10 @@ const SETTINGS_FILE = path.join(DATA_DIR, "settings.json");
 interface Settings {
   storageRoot?: string;
   geminiApiKey?: string;
+  /** Đường dẫn accoreconsole.exe (AutoCAD chạy nền). Trống = tự dò. */
+  acadAccorePath?: string;
+  /** File template .dwg dùng làm nền khi xuất bản vẽ (Image to AutoCAD). */
+  cadTemplatePath?: string;
 }
 
 function readSettings(): Settings {
@@ -49,6 +53,30 @@ export function setGeminiApiKey(key: string): void {
   const trimmed = key.trim();
   if (trimmed) settings.geminiApiKey = trimmed;
   else delete settings.geminiApiKey;
+  writeSettings(settings);
+}
+
+export function getAcadAccorePath(): string {
+  return readSettings().acadAccorePath?.trim() || "";
+}
+
+export function setAcadAccorePath(p: string): void {
+  const settings = readSettings();
+  const trimmed = p.trim();
+  if (trimmed) settings.acadAccorePath = trimmed;
+  else delete settings.acadAccorePath;
+  writeSettings(settings);
+}
+
+export function getCadTemplatePath(): string {
+  return readSettings().cadTemplatePath?.trim() || "";
+}
+
+export function setCadTemplatePath(p: string): void {
+  const settings = readSettings();
+  const trimmed = p.trim();
+  if (trimmed) settings.cadTemplatePath = trimmed;
+  else delete settings.cadTemplatePath;
   writeSettings(settings);
 }
 
