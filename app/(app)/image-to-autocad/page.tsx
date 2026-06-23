@@ -8,6 +8,7 @@ import { startTask, dismissTask } from "@/lib/tasks";
 import { useTask } from "@/hooks/useTasks";
 import { MAX_IMAGE_BYTES, type CadPlan, type PlanAnalysis } from "@/lib/image-to-cad-types";
 import { planToDxf } from "@/lib/dxf-writer";
+import { ImageAnnotator, type ImageAnnotatorHandle } from "@/components/image-to-cad/ImageAnnotator";
 
 function slugify(name: string): string {
   return (
@@ -28,18 +29,44 @@ interface EnvState {
   hasTemplate: boolean;
 }
 
-/** Xem trước mặt bằng: tường dày, cửa, phòng, nội thất. Lật trục Y cho đúng chiều. */
+/** Nhãn tiếng Việt cho từng loại cấu kiện (hiển thị trong xem trước). */
+const FEATURE_LABELS: Record<string, string> = {
+  stairs: "Cầu thang",
+  ramp: "Dốc",
+  elevator: "Thang máy",
+  void: "Thông tầng",
+  planter: "Bồn cây",
+  tree: "Cây",
+  pond: "Hồ nước",
+  column: "Cột",
+};
+
+/** Xem trước mặt bằng: tường dày, cửa, phòng, nội thất, cấu kiện. Lật trục Y cho đúng chiều. */
 function PlanPreview({ plan }: { plan: CadPlan }) {
   const ext = Math.max(plan.width, plan.height, 1000);
   const pad = ext * 0.08;
-  const W = plan.width + pad * 2;
-  const H = plan.height + pad * 2;
   const fy = (y: number) => plan.height - y;
   const lw = ext / 250;
 
+  // Khung bao gồm cả KHAY nội thất nằm phía trên mặt bằng (y > height).
+  let minX = 0;
+  let maxX = plan.width;
+  let minY = 0;
+  let maxY = plan.height;
+  for (const f of [...plan.furniture, ...plan.features]) {
+    const hw = Math.max(f.width, f.depth) / 2;
+    minX = Math.min(minX, f.x - hw);
+    maxX = Math.max(maxX, f.x + hw);
+    minY = Math.min(minY, f.y - hw);
+    maxY = Math.max(maxY, f.y + hw);
+  }
+  const top = plan.height - maxY; // mép trên trong toạ độ SVG (đã lật Y)
+  const W = maxX - minX + pad * 2;
+  const H = maxY - minY + pad * 2;
+
   return (
     <svg
-      viewBox={`${-pad} ${-pad} ${W} ${H}`}
+      viewBox={`${minX - pad} ${top - pad} ${W} ${H}`}
       className="h-auto w-full rounded-card border border-border bg-white"
       style={{ aspectRatio: `${W} / ${H}` }}
     >
@@ -62,7 +89,7 @@ function PlanPreview({ plan }: { plan: CadPlan }) {
           x2={w.x2}
           y2={fy(w.y2)}
           stroke="#1f2937"
-          strokeWidth={w.thickness}
+          strokeWidth={w.thickness > 0 ? w.thickness : lw}
           strokeLinecap="butt"
         />
       ))}
@@ -120,6 +147,40 @@ function PlanPreview({ plan }: { plan: CadPlan }) {
           />
         );
       })}
+      {/* Cấu kiện: khung bao + ký hiệu + nhãn */}
+      {plan.features.map((f, i) => {
+        const r = (f.rotation * Math.PI) / 180;
+        const c = Math.cos(r);
+        const s = Math.sin(r);
+        const corners: [number, number][] = [
+          [-f.width / 2, -f.depth / 2],
+          [f.width / 2, -f.depth / 2],
+          [f.width / 2, f.depth / 2],
+          [-f.width / 2, f.depth / 2],
+        ].map(([lx, ly]) => [f.x + lx * c - ly * s, f.y + lx * s + ly * c]);
+        const round = f.kind === "tree" || f.kind === "planter" || f.kind === "pond";
+        const solid = f.kind === "column";
+        const col = solid ? "#475569" : round ? "#16a34a" : "#7c3aed";
+        const fs = ext / 55;
+        return (
+          <g key={`feat${i}`}>
+            <polygon
+              points={corners.map(([x, y]) => `${x},${fy(y)}`).join(" ")}
+              fill={solid ? col : round ? "rgba(22,163,74,0.10)" : "rgba(124,58,237,0.10)"}
+              stroke={col}
+              strokeWidth={lw}
+            />
+            {f.kind === "tree" && (
+              <circle cx={f.x} cy={fy(f.y)} r={Math.min(f.width, f.depth) / 2} fill="none" stroke={col} strokeWidth={lw} />
+            )}
+            {!solid && (
+              <text x={f.x} y={fy(f.y)} fontSize={fs} textAnchor="middle" fill={col} style={{ fontWeight: 600 }}>
+                {FEATURE_LABELS[f.kind] ?? f.kind}
+              </text>
+            )}
+          </g>
+        );
+      })}
       {/* Nhãn phòng */}
       {plan.rooms.map((r, i) => {
         const cx = r.points.reduce((a, p) => a + p[0], 0) / r.points.length;
@@ -135,7 +196,7 @@ function PlanPreview({ plan }: { plan: CadPlan }) {
             fill="#0f766e"
             style={{ fontWeight: 600 }}
           >
-            {r.name}
+            {r.name.toUpperCase()}
             {r.area > 0 && (
               <tspan x={cx} dy={fs * 1.1} fontSize={fs * 0.8} fill="#6b7280">
                 {r.area.toFixed(1)} m²
@@ -161,6 +222,7 @@ export default function ImageToAutocadPage() {
   const [exporting, setExporting] = useState(false);
   const [exportStage, setExportStage] = useState("");
   const fileRef = useRef<HTMLInputElement>(null);
+  const annotatorRef = useRef<ImageAnnotatorHandle>(null);
 
   const describeTask = useTask("image2cad:describe");
   const describing = describeTask?.status === "running";
@@ -244,7 +306,7 @@ export default function ImageToAutocadPage() {
   }
 
   // BƯỚC 1 — AI phân tích "mặt bằng có gì" thành văn bản để người dùng sửa.
-  function handleDescribe() {
+  async function handleDescribe() {
     if (!imageBase64) {
       setError("Vui lòng tải lên ảnh mặt bằng");
       return;
@@ -253,9 +315,14 @@ export default function ImageToAutocadPage() {
     setPlan(null);
     setAnalysis(null);
     setAnalysisNotes("");
-    const payload = { imageBase64, mimeType };
+    // Dán phẳng nét vẽ/chú thích của người dùng vào ảnh (nếu có) để AI đọc luôn.
+    const annotated = await annotatorRef.current?.getAnnotated();
+    const payload = {
+      imageBase64: annotated?.base64 ?? imageBase64,
+      mimeType: annotated?.mimeType ?? mimeType,
+    };
     const curPreview = preview;
-    const curMime = mimeType;
+    const curMime = payload.mimeType;
     startTask({
       id: "image2cad:describe",
       type: "describe",
@@ -276,16 +343,21 @@ export default function ImageToAutocadPage() {
   }
 
   // BƯỚC 2 — Dựng bản vẽ hình học THEO bản phân tích (đã sửa) làm đề bài.
-  function handleBuild() {
+  async function handleBuild() {
     if (!imageBase64) {
       setError("Vui lòng tải lên ảnh mặt bằng");
       return;
     }
     setError(null);
     setPlan(null);
-    const payload = { imageBase64, mimeType, analysis: analysis ?? undefined };
+    const annotated = await annotatorRef.current?.getAnnotated();
+    const payload = {
+      imageBase64: annotated?.base64 ?? imageBase64,
+      mimeType: annotated?.mimeType ?? mimeType,
+      analysis: analysis ?? undefined,
+    };
     const curPreview = preview;
-    const curMime = mimeType;
+    const curMime = payload.mimeType;
     startTask({
       id: "image2cad:analyze",
       type: "analyze",
@@ -388,9 +460,9 @@ export default function ImageToAutocadPage() {
           ) : (
             <>
               ⚠ {!env.hasAutocad && "Chưa thấy AutoCAD trên máy. "}
-              {!env.hasTemplate && "Chưa cấu hình file template. "}
-              Bạn vẫn tải được DXF cơ bản (không cần AutoCAD); để có DWG chuẩn hãy cài AutoCAD &amp; chọn template trong
-              Cài đặt.
+              {!env.hasTemplate && "Chưa tìm thấy file template đóng gói. "}
+              Bạn vẫn tải được DXF cơ bản (không cần AutoCAD); chỉ cần CÀI AutoCAD là app tự kết nối &amp; xuất DWG chuẩn
+              (template đã tích hợp sẵn, không phải cấu hình gì).
             </>
           )}
         </div>
@@ -406,8 +478,7 @@ export default function ImageToAutocadPage() {
         />
         {preview ? (
           <div className="space-y-3">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={preview} alt="Ảnh mặt bằng" className="max-h-72 rounded-card border border-border object-contain" />
+            <ImageAnnotator ref={annotatorRef} src={preview} />
             <Button size="sm" variant="secondary" onClick={() => fileRef.current?.click()}>
               Đổi ảnh khác
             </Button>
@@ -501,7 +572,8 @@ export default function ImageToAutocadPage() {
               <h2 className="font-display text-xl">{plan.title}</h2>
               <p className="text-sm text-foreground-soft">
                 {plan.walls.length} tường · {plan.openings.length} cửa · {plan.rooms.length} phòng ·{" "}
-                {plan.furniture.length} nội thất · {plan.dimensions.length} kích thước · ~
+                {plan.furniture.length} nội thất · {plan.features.length} cấu kiện ·{" "}
+                {plan.dimensions.length} kích thước · ~
                 {(plan.width / 1000).toFixed(2)}×{(plan.height / 1000).toFixed(2)} m
               </p>
             </div>

@@ -82,6 +82,38 @@ export interface CadFurniture {
   rotation: number;
 }
 
+/**
+ * CÔNG NĂNG / CẤU KIỆN khác trong mặt bằng (ngoài tường/cửa/nội thất): cầu thang, bồn
+ * cây, cây, thang máy, ô thông tầng, dốc ram, hồ nước, cột. Generator vẽ ký hiệu kỹ
+ * thuật tương ứng. Dùng chung khung x,y,width,depth,rotation như nội thất cho nhất quán.
+ */
+export type FeatureKind =
+  | "stairs" // cầu thang (vẽ bậc + mũi tên đi lên)
+  | "planter" // bồn cây / bồn hoa (khung + cây)
+  | "tree" // cây (tán tròn)
+  | "elevator" // thang máy (ô + dấu chéo)
+  | "void" // ô thông tầng / giếng trời (ô + chéo)
+  | "ramp" // dốc / ram dắt xe (mũi tên + bậc thưa)
+  | "pond" // hồ nước / bể cảnh (khung + sóng nước)
+  | "column"; // cột (ô đặc)
+
+export interface CadFeature {
+  kind: FeatureKind;
+  /** Tâm cấu kiện (mm). */
+  x: number;
+  y: number;
+  /** Bề rộng (mm) theo trục cục bộ X trước khi xoay. */
+  width: number;
+  /** Bề sâu (mm) theo trục cục bộ Y trước khi xoay. */
+  depth: number;
+  /** Góc xoay quanh tâm (độ). Với cầu thang/ram: hướng ĐI LÊN = +Y cục bộ. */
+  rotation: number;
+  /** Cầu thang/ram: số bậc (mặc định suy theo chiều dài nếu thiếu). */
+  steps?: number;
+  /** Nhãn hiển thị tuỳ chọn (vd "THÔNG TẦNG", "DỐC"). */
+  label?: string;
+}
+
 /** Một đường KÍCH THƯỚC tuyến tính giữa 2 điểm. */
 export interface CadDimension {
   x1: number;
@@ -104,6 +136,8 @@ export interface CadPlan {
   openings: CadOpening[];
   rooms: CadRoom[];
   furniture: CadFurniture[];
+  /** Cấu kiện/công năng khác: cầu thang, bồn cây, thang máy, cột… */
+  features: CadFeature[];
   dimensions: CadDimension[];
   /** Ghi chú/cảnh báo của AI về độ tin cậy hoặc phần không đọc được. */
   notes?: string;

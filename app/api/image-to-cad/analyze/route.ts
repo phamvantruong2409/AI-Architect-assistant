@@ -1,4 +1,5 @@
 import { analyzePlan } from "@/lib/image-to-cad-gemini";
+import { trayFurniture } from "@/lib/cad-layout";
 import { geminiErrorCode, geminiErrorMessage } from "@/lib/gemini-error";
 import { MAX_IMAGE_BYTES, type ImageToCadRequest } from "@/lib/image-to-cad-types";
 
@@ -22,6 +23,8 @@ export async function POST(req: Request) {
 
   try {
     const result = await analyzePlan(body);
+    // Xếp nội thất thành khay block phía trên mặt bằng (preview & export dùng chung).
+    trayFurniture(result);
     return Response.json(result);
   } catch (error) {
     console.error("Image to CAD analyze error:", error);

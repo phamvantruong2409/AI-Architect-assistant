@@ -17,6 +17,34 @@ const execFileAsync = promisify(execFile);
 /** Đường dẫn mặc định template (máy phát triển). Người dùng nên đặt trong Cài đặt. */
 const DEFAULT_TEMPLATE = "D:/3. KIEN TRUC AI/CAD/A3 AiArcAssis.dwg";
 
+/** Tên file template ĐÓNG GÓI theo app (đặt trong public/cad-templates). */
+const BUNDLED_TEMPLATE = "A3 AiArcAssis.dwg";
+
+/**
+ * Dò template ĐÓNG GÓI sẵn trong app (public/cad-templates). Ở dev cwd = gốc app; bản
+ * Electron standalone cwd = thư mục standalone (đã copy 'public'); thêm dự phòng cạnh
+ * module & resourcesPath. Nhờ vậy người dùng KHÔNG phải tự chọn template. Trả null nếu
+ * không thấy (vd build thiếu file).
+ */
+function resolveBundledTemplate(): string | null {
+  const candidates = [
+    path.join(process.cwd(), "public", "cad-templates", BUNDLED_TEMPLATE),
+    path.join(process.cwd(), "cad-templates", BUNDLED_TEMPLATE),
+    path.join(__dirname, "..", "public", "cad-templates", BUNDLED_TEMPLATE),
+    path.join(__dirname, "..", "..", "public", "cad-templates", BUNDLED_TEMPLATE),
+  ];
+  const res = process.env["RESOURCES_PATH"] || (process as { resourcesPath?: string }).resourcesPath;
+  if (res) candidates.push(path.join(res, "standalone", "public", "cad-templates", BUNDLED_TEMPLATE));
+  for (const c of candidates) {
+    try {
+      if (fs.existsSync(c)) return c;
+    } catch {
+      /* bỏ qua */
+    }
+  }
+  return null;
+}
+
 /** Dò accoreconsole.exe: ưu tiên cấu hình, sau đó các bản AutoCAD đã cài. */
 export function detectAccore(): string | null {
   const configured = getAcadAccorePath();
@@ -46,10 +74,12 @@ export function detectAccore(): string | null {
   return found[0] ?? null;
 }
 
-/** Đường dẫn template: cấu hình → mặc định (nếu tồn tại). */
+/** Đường dẫn template: cấu hình người dùng → template ĐÓNG GÓI → mặc định máy dev. */
 export function resolveTemplate(): string | null {
   const configured = getCadTemplatePath();
   if (configured && fs.existsSync(configured)) return configured;
+  const bundled = resolveBundledTemplate();
+  if (bundled) return bundled;
   if (fs.existsSync(DEFAULT_TEMPLATE)) return DEFAULT_TEMPLATE;
   return null;
 }
@@ -107,22 +137,32 @@ export async function exportPlanToDwg(plan: CadPlan): Promise<ExportResult> {
   // ASCII thuần (tiếng Việt đã mã hoá qua (chr) trong LISP).
   fs.writeFileSync(scrPath, scr, "ascii");
 
-  let log = "";
+  let raw: Buffer = Buffer.alloc(0);
   try {
     const { stdout } = await execFileAsync(accore, ["/i", template, "/s", scrPath], {
       timeout: 180_000,
       maxBuffer: 16 * 1024 * 1024,
       windowsHide: true,
+      encoding: "buffer",
     });
-    log = stdout?.toString() ?? "";
+    raw = stdout as unknown as Buffer;
   } catch (err) {
     // accore đôi khi trả mã thoát ≠ 0 do "Function cancelled" lúc QUIT — bỏ qua nếu
     // file đầu ra vẫn được tạo.
-    log = (err as { stdout?: Buffer })?.stdout?.toString() ?? String(err);
+    raw = ((err as { stdout?: Buffer })?.stdout as Buffer) ?? Buffer.alloc(0);
   }
+  // accoreconsole in stdout dạng wide-char (mỗi ký tự ASCII kèm 1 byte 0x00). Bỏ NUL
+  // để đọc được thông điệp lỗi (vd "Unknown command ...").
+  const log = Buffer.from(raw.filter((b) => b !== 0)).toString("latin1");
 
   if (!fs.existsSync(outPath)) {
-    throw new Error("AutoCAD không tạo được file DWG. Kiểm tra template & quyền ghi.");
+    // Trích phần đuôi log (nơi lỗi xuất hiện) để người dùng/nhà phát triển biết NGUYÊN
+    // NHÂN thật thay vì thông báo chung chung.
+    const tail = log.replace(/\s+/g, " ").trim().slice(-400);
+    throw new Error(
+      "AutoCAD không tạo được file DWG. Kiểm tra template & quyền ghi." +
+        (tail ? ` (AutoCAD: …${tail})` : "")
+    );
   }
   const dwg = fs.readFileSync(outPath);
 

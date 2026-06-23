@@ -5,6 +5,7 @@
 // thước lên ĐÚNG layer template, rồi lưu DWG.
 
 import type {
+  CadFeature,
   CadFurniture,
   CadOpening,
   CadPlan,
@@ -18,7 +19,7 @@ import {
   type BlockDef,
   type DoorBlockDef,
 } from "@/lib/cad-blocks";
-import { layoutFurniture } from "@/lib/cad-layout";
+import { trayFurniture } from "@/lib/cad-layout";
 
 /** Tên layer CHÍNH XÁC trong template A3 AiArcAssis.dwg (lấy bằng accoreconsole). */
 export const LAYER = {
@@ -190,6 +191,21 @@ function drawWall(L: Lisp, wallLayer: string, wall: CadWall, wallOpenings: CadOp
   const h = wall.thickness / 2;
   const A: Pt = [wall.x1, wall.y1];
 
+  // TƯỜNG 1 NÉT THẤY (thickness 0): vẽ đúng tim tường thành các đoạn LINE, không
+  // thicken/không hatch (LINE không bị bước REGION/UNION/hatch chọn).
+  if (wall.thickness <= 0) {
+    for (const seg of solidSegments(wall, wallOpenings, len)) {
+      L.line(
+        wallLayer,
+        A[0] + dx * seg.t0,
+        A[1] + dy * seg.t0,
+        A[0] + dx * seg.t1,
+        A[1] + dy * seg.t1
+      );
+    }
+    return;
+  }
+
   for (const seg of solidSegments(wall, wallOpenings, len)) {
     // Nối dài 2 đầu KHÔNG giáp cửa thêm 1 nửa bề dày để các tường chắc chắn
     // chồng nhau ở góc → UNION làm sạch góc đẹp. Đầu giáp cửa giữ nguyên.
@@ -228,6 +244,11 @@ function drawOpening(L: Lisp, doorLayer: string, wall: CadWall, op: CadOpening) 
   const By = A[1] + dy * b;
 
   if (op.kind === "window") {
+    // Tường 1 nét (h≈0): cửa sổ chỉ là 1 nét trên tim, tránh vẽ 3 nét trùng nhau.
+    if (h < 1) {
+      L.line(doorLayer, Ax, Ay, Bx, By);
+      return;
+    }
     // 3 nét song song trong lỗ: 2 mép tường + tim cửa sổ.
     L.line(doorLayer, Ax + nx * h, Ay + ny * h, Bx + nx * h, By + ny * h);
     L.line(doorLayer, Ax - nx * h, Ay - ny * h, Bx - nx * h, By - ny * h);
@@ -399,6 +420,206 @@ function drawFurniture(L: Lisp, furLayer: string, f: CadFurniture) {
   }
 }
 
+// ───────────────────────── Ban công / Logia (lan can) ─────────────────────────
+
+/** Bỏ dấu + thường hoá để so khớp tên phòng. */
+function normName(s: string): string {
+  return s
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[̀-ͯ]/g, "");
+}
+
+const BALCONY_RE = /(ban\s*cong|logia|loi?gia)/;
+const WC_RE = /(wc|ve\s*sinh|toilet|nha\s*ve\s*sinh)/;
+
+/**
+ * Ký hiệu CỐT cao độ: tam giác chỉ xuống (đỉnh tại x,y) + số cao độ phía trên, trên
+ * layer chữ. Dùng đánh dấu sàn thấp hơn (vd WC -0.050).
+ */
+function drawCote(L: Lisp, x: number, y: number, size: number, text: string) {
+  const s = size;
+  L.pline(
+    "LT",
+    [
+      [x - s / 2, y + s],
+      [x + s / 2, y + s],
+      [x, y],
+    ],
+    true
+  );
+  L.mtext("LT", x, y + s * 1.7, size, vnStr(text));
+}
+
+/** Điểm (x,y) có nằm SÁT một đoạn tường (trong dung sai) không. */
+function nearWall(x: number, y: number, wall: CadWall, tol: number): boolean {
+  const len = Math.hypot(wall.x2 - wall.x1, wall.y2 - wall.y1);
+  if (len < 1) return false;
+  const dx = (wall.x2 - wall.x1) / len;
+  const dy = (wall.y2 - wall.y1) / len;
+  const t = (x - wall.x1) * dx + (y - wall.y1) * dy;
+  if (t < -tol || t > len + tol) return false;
+  const px = wall.x1 + dx * t;
+  const py = wall.y1 + dy * t;
+  return Math.hypot(x - px, y - py) <= tol;
+}
+
+/** Cạnh phòng (a→b) có GIÁP TƯỜNG không (3 điểm mẫu đều sát tường nào đó). */
+function edgeOnWall(a: Pt, b: Pt, walls: CadWall[]): boolean {
+  const samples: Pt[] = [
+    [a[0] * 0.75 + b[0] * 0.25, a[1] * 0.75 + b[1] * 0.25],
+    [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2],
+    [a[0] * 0.25 + b[0] * 0.75, a[1] * 0.25 + b[1] * 0.75],
+  ];
+  return samples.every((p) =>
+    walls.some((w) => nearWall(p[0], p[1], w, Math.max(120, w.thickness / 2 + 120)))
+  );
+}
+
+/**
+ * Vẽ LAN CAN cho ban công/logia: cạnh GIÁP TƯỜNG bỏ qua (tường đã vẽ); cạnh HỞ vẽ
+ * NÉT THẤY (mép sàn) + 1 nét lan can lùi vào trong. Ban công thường 1 cạnh giáp tường +
+ * 3 cạnh hở; logia 3 cạnh giáp tường + 1 cạnh hở — tự suy theo hình học, không cần đếm.
+ */
+function drawBalconyRailings(L: Lisp, plan: CadPlan) {
+  for (const room of plan.rooms) {
+    if (!BALCONY_RE.test(normName(room.name))) continue;
+    const pts = room.points;
+    if (pts.length < 3) continue;
+    const cx = pts.reduce((s, p) => s + p[0], 0) / pts.length;
+    const cy = pts.reduce((s, p) => s + p[1], 0) / pts.length;
+    for (let i = 0; i < pts.length; i++) {
+      const a = pts[i];
+      const b = pts[(i + 1) % pts.length];
+      if (edgeOnWall(a, b, plan.walls)) continue; // cạnh giáp tường: giữ nguyên tường cũ
+      // Cạnh HỞ → nét thấy (mép sàn) + lan can lùi vào trong.
+      L.line("LW", a[0], a[1], b[0], b[1]);
+      const len = Math.hypot(b[0] - a[0], b[1] - a[1]) || 1;
+      let nx = -(b[1] - a[1]) / len;
+      let ny = (b[0] - a[0]) / len;
+      const mx = (a[0] + b[0]) / 2;
+      const my = (a[1] + b[1]) / 2;
+      if (nx * (cx - mx) + ny * (cy - my) < 0) {
+        nx = -nx;
+        ny = -ny;
+      }
+      const off = 100; // lan can lùi vào 100mm
+      L.line("LW", a[0] + nx * off, a[1] + ny * off, b[0] + nx * off, b[1] + ny * off);
+    }
+  }
+}
+
+// ───────────────────────── Cấu kiện / công năng ─────────────────────────
+
+/**
+ * Vẽ 1 CẤU KIỆN (cầu thang, bồn cây, cây, thang máy, ô thông tầng, dốc, hồ): hình học
+ * trên layer nội thất (LF), nhãn trên layer chữ (LT). Cột vẽ riêng (drawColumn).
+ */
+function drawFeature(L: Lisp, f: CadFeature) {
+  const hw = f.width / 2;
+  const hd = f.depth / 2;
+  const tf = (x: number, y: number): Pt => rot(f.x, f.y, f.rotation, x, y);
+  const ln = (a: Pt, b: Pt) => L.line("LF", a[0], a[1], b[0], b[1]);
+  const box: Pt[] = [tf(-hw, -hd), tf(hw, -hd), tf(hw, hd), tf(-hw, hd)];
+
+  // Mũi tên ĐI LÊN dọc +Y cục bộ (cầu thang/ram), chấm tròn ở chân.
+  const upArrow = (clear: number) => {
+    const y0 = -hd + clear;
+    const y1 = hd - clear;
+    ln(tf(0, y0), tf(0, y1));
+    const hLen = Math.min(300, (f.depth - 2 * clear) * 0.35);
+    const hWid = Math.min(hw * 0.4, 180);
+    ln(tf(0, y1), tf(-hWid, y1 - hLen));
+    ln(tf(0, y1), tf(hWid, y1 - hLen));
+    const [sx, sy] = tf(0, y0);
+    L.circle("LF", sx, sy, Math.min(80, hw * 0.15));
+  };
+
+  const labelAt = (text: string) => {
+    const [cx, cy] = tf(0, 0);
+    const th = Math.min(300, Math.max(120, Math.min(f.width, f.depth) / 4));
+    L.mtext("LT", cx, cy, th, vnStr(text));
+  };
+
+  switch (f.kind) {
+    case "stairs": {
+      L.pline("LF", box, true);
+      const steps = f.steps && f.steps > 1 ? f.steps : Math.max(2, Math.round(f.depth / 270));
+      for (let i = 1; i < steps; i++) {
+        const y = -hd + (f.depth * i) / steps;
+        ln(tf(-hw, y), tf(hw, y));
+      }
+      upArrow(Math.min(250, hd * 0.15));
+      break;
+    }
+    case "ramp": {
+      L.pline("LF", box, true);
+      const steps = f.steps && f.steps > 1 ? f.steps : 6;
+      for (let i = 1; i < steps; i++) {
+        const y = -hd + (f.depth * i) / steps;
+        ln(tf(-hw, y), tf(hw, y));
+      }
+      upArrow(Math.min(250, hd * 0.15));
+      labelAt(f.label ?? "DOC");
+      break;
+    }
+    case "elevator":
+    case "void": {
+      L.pline("LF", box, true);
+      ln(tf(-hw, -hd), tf(hw, hd));
+      ln(tf(-hw, hd), tf(hw, -hd));
+      labelAt(f.label ?? (f.kind === "elevator" ? "THANG MAY" : "THONG TANG"));
+      break;
+    }
+    case "planter": {
+      L.pline("LF", box, true);
+      const inset = Math.min(120, hw * 0.3, hd * 0.3);
+      L.pline(
+        "LF",
+        [
+          tf(-hw + inset, -hd + inset),
+          tf(hw - inset, -hd + inset),
+          tf(hw - inset, hd - inset),
+          tf(-hw + inset, hd - inset),
+        ],
+        true
+      );
+      const [cx, cy] = tf(0, 0);
+      const r = Math.min(hw, hd) * 0.45;
+      L.circle("LF", cx, cy, r);
+      L.circle("LF", cx, cy, r * 0.55);
+      break;
+    }
+    case "tree": {
+      const [cx, cy] = tf(0, 0);
+      const r = Math.min(hw, hd);
+      L.circle("LF", cx, cy, r);
+      L.circle("LF", cx, cy, r * 0.62);
+      L.circle("LF", cx, cy, Math.min(60, r * 0.12));
+      break;
+    }
+    case "pond": {
+      L.pline("LF", box, true);
+      for (const k of [-0.4, 0, 0.4]) {
+        ln(tf(-hw * 0.8, hd * k), tf(hw * 0.8, hd * k));
+      }
+      if (f.label) labelAt(f.label);
+      break;
+    }
+    default:
+      L.pline("LF", box, true);
+  }
+}
+
+/** CỘT: ô ĐẶC (hatch SOLID) trên layer cột — đặt CLAYER/HPLAYER = LC trước khi gọi. */
+function drawColumn(L: Lisp, f: CadFeature) {
+  const hw = f.width / 2;
+  const hd = f.depth / 2;
+  const tf = (x: number, y: number): Pt => rot(f.x, f.y, f.rotation, x, y);
+  L.pline("LC", [tf(-hw, -hd), tf(hw, -hd), tf(hw, hd), tf(-hw, hd)], true);
+  L.raw('(command "_.-HATCH" "_P" "SOLID" "_S" (entlast) "" "")');
+}
+
 // ───────────────────────── Chèn BLOCK THẬT ─────────────────────────
 
 /** Chèn 1 món nội thất bằng block thật (đã chuẩn hoá mm, tâm tại gốc). */
@@ -496,8 +717,11 @@ export function planToLisp(plan: CadPlan, blocksDir?: string | null): string {
   const L = new Lisp();
   const useBlocks = Boolean(blocksDir);
 
-  // Bố trí lại nội thất (kẹp trong phòng, không đè tường/không chồng nhau).
-  layoutFurniture(plan);
+  // Dữ liệu cũ có thể thiếu mảng features — chuẩn hoá để không vỡ.
+  if (!Array.isArray(plan.features)) plan.features = [];
+
+  // Xếp nội thất thành khay block PHÍA TRÊN mặt bằng để người dùng tự kéo vào vị trí.
+  trayFurniture(plan);
 
   // Biến layer (dựng ASCII-safe). Dùng trong (cons 8 <var>).
   L.raw('(setvar "CMDECHO" 0)');
@@ -510,6 +734,7 @@ export function planToLisp(plan: CadPlan, blocksDir?: string | null): string {
   L.raw(`(setq LH ${vnStr(LAYER.hatch)})`);
   L.raw(`(setq LD ${vnStr(LAYER.door)})`);
   L.raw(`(setq LF ${vnStr(LAYER.furniture)})`);
+  L.raw(`(setq LC ${vnStr(LAYER.column)})`);
   L.raw(`(setq LT ${vnStr(LAYER.text)})`);
   L.raw(`(setq LM ${vnStr(LAYER.dim)})`);
 
@@ -545,12 +770,18 @@ export function planToLisp(plan: CadPlan, blocksDir?: string | null): string {
     L.raw('))');
   }
 
+  // 1b) Ban công/Logia: vẽ lan can ở cạnh HỞ (cạnh giáp tường giữ nguyên tường).
+  drawBalconyRailings(L, plan);
+
   // 2) Cửa. Cửa đi dùng BLOCK thật (cua900/cua750) khi có thư viện; cửa sổ & cửa lệch
   // chuẩn vẫn vẽ tham số. (Lỗ mở trên tường đã được trừ ở bước drawWall.)
   if (useBlocks) L.raw('(setvar "CLAYER" LD)');
   for (const op of plan.openings) {
     const wall = plan.walls[op.wallIndex];
     if (!wall) continue;
+    // Cửa đi / lỗ mở RỘNG > 1m (cửa chính lớn, lối thông): CHỈ đục lỗ, để TRỐNG —
+    // không cánh, không block (lỗ trên tường đã được trừ ở drawWall).
+    if (op.kind === "door" && op.width > 1000) continue;
     const doorDef = op.kind === "door" && useBlocks ? pickDoorBlock(op.width) : null;
     if (doorDef) insertDoorBlock(L, blocksDir!, wall, op, doorDef);
     else drawOpening(L, "LD", wall, op);
@@ -565,44 +796,100 @@ export function planToLisp(plan: CadPlan, blocksDir?: string | null): string {
     else drawFurniture(L, "LF", f);
   }
 
+  // 3b) Cấu kiện/công năng: cầu thang, bồn cây, cây, thang máy, ô thông tầng, dốc, hồ.
+  const featGeom = plan.features.filter((f) => f.kind !== "column");
+  const featCols = plan.features.filter((f) => f.kind === "column");
+  for (const f of featGeom) drawFeature(L, f);
+  if (featCols.length > 0) {
+    L.raw('(setvar "CLAYER" LC)');
+    L.raw('(setvar "HPLAYER" LC)');
+    for (const f of featCols) drawColumn(L, f);
+  }
+
   // 4) Nhãn phòng (MTEXT 2 dòng: tên + diện tích).
   const extent = Math.max(plan.width, plan.height, 1000);
   const th = Math.min(400, Math.max(150, extent / 60));
   for (const r of plan.rooms) {
     const cx = r.points.reduce((s, p) => s + p[0], 0) / r.points.length;
     const cy = r.points.reduce((s, p) => s + p[1], 0) / r.points.length;
+    // Tên phòng IN HOA toàn bộ; dòng diện tích "50.0 m2" giữ nguyên (không in hoa "m2").
+    const nameUpper = r.name.toUpperCase();
     const label =
-      r.area > 0 ? vnStr(`${r.name}\\P${r.area.toFixed(1)} m2`) : vnStr(r.name);
+      r.area > 0 ? vnStr(`${nameUpper}\\P${r.area.toFixed(1)} m2`) : vnStr(nameUpper);
     L.mtext("LT", cx, cy, th, label);
-  }
-
-  // 5) Kích thước (DIMLINEAR, dùng dimstyle template; ép entity về layer DIM).
-  if (plan.dimensions.length > 0) {
-    L.raw('(setvar "DIMASSOC" 2)');
-    L.raw('(setvar "CLAYER" LM)');
-    const ccx = plan.width / 2;
-    const ccy = plan.height / 2;
-    for (const dmn of plan.dimensions) {
-      const mx = (dmn.x1 + dmn.x2) / 2;
-      const my = (dmn.y1 + dmn.y2) / 2;
-      const len = Math.hypot(dmn.x2 - dmn.x1, dmn.y2 - dmn.y1) || 1;
-      let nx = -(dmn.y2 - dmn.y1) / len;
-      let ny = (dmn.x2 - dmn.x1) / len;
-      // Đẩy đường kích thước ra XA tâm bản vẽ.
-      if ((mx - ccx) * nx + (my - ccy) * ny < 0) {
-        nx = -nx;
-        ny = -ny;
-      }
-      const off = 700;
-      const p3x = mx + nx * off;
-      const p3y = my + ny * off;
-      L.raw(
-        `(command "_.DIMLINEAR" "_non" ${pt(dmn.x1, dmn.y1)} "_non" ${pt(dmn.x2, dmn.y2)} "_non" ${pt(p3x, p3y)})`
-      );
-      // Ép kích thước vừa tạo về đúng layer DIM của template.
-      L.raw('(if (setq e1 (entlast)) (entmod (subst (cons 8 LM) (assoc 8 (entget e1)) (entget e1))))');
+    // Nhà vệ sinh: cốt sàn mặc định THẤP HƠN 0.050 so với sàn ở/bếp/khách → ghi cote -0.050.
+    if (WC_RE.test(normName(r.name))) {
+      drawCote(L, cx, cy - th * 2, th * 0.9, "-0.050");
     }
   }
+
+  // 5) Kích thước: 2 ĐƯỜNG DIM mỗi phương — đường TRONG (gần nhà) dim từng NHỊP giữa các
+  //    giao tường; đường NGOÀI (xa hơn) dim TỔNG. Tự dựng từ vị trí tường, không dùng
+  //    dimension AI cho. Phương ngang đặt phía dưới, phương đứng đặt bên trái.
+  if (plan.walls.length > 0) {
+    let minX = Infinity;
+    let minY = Infinity;
+    let maxX = -Infinity;
+    let maxY = -Infinity;
+    for (const w of plan.walls) {
+      minX = Math.min(minX, w.x1, w.x2);
+      maxX = Math.max(maxX, w.x1, w.x2);
+      minY = Math.min(minY, w.y1, w.y2);
+      maxY = Math.max(maxY, w.y1, w.y2);
+    }
+
+    // Gom các trạm gần nhau (< 80mm) thành 1.
+    const cluster = (vals: number[]): number[] => {
+      const s = [...vals].sort((a, b) => a - b);
+      const out: number[] = [];
+      for (const v of s) if (out.length === 0 || Math.abs(v - out[out.length - 1]) > 80) out.push(v);
+      return out;
+    };
+
+    // Trạm X = tường ĐỨNG; trạm Y = tường NGANG; luôn kèm 2 mép bao.
+    const xs = [minX, maxX];
+    const ys = [minY, maxY];
+    for (const w of plan.walls) {
+      const dxw = Math.abs(w.x2 - w.x1);
+      const dyw = Math.abs(w.y2 - w.y1);
+      if (dxw <= dyw && dxw < 200) xs.push((w.x1 + w.x2) / 2);
+      if (dyw <= dxw && dyw < 200) ys.push((w.y1 + w.y2) / 2);
+    }
+    const X = cluster(xs);
+    const Y = cluster(ys);
+
+    const ext = Math.max(maxX - minX, maxY - minY, 1000);
+    const o1 = Math.max(700, ext * 0.035); // đường trong (nhịp)
+    const o2 = o1 + Math.max(700, ext * 0.045); // đường ngoài (tổng)
+
+    L.raw('(setvar "DIMASSOC" 2)');
+    L.raw('(setvar "CLAYER" LM)');
+    const forceLayer = '(if (setq e1 (entlast)) (entmod (subst (cons 8 LM) (assoc 8 (entget e1)) (entget e1))))';
+    const dimH = (x1: number, x2: number, yb: number, yLine: number) => {
+      L.raw(
+        `(command "_.DIMLINEAR" "_non" ${pt(x1, yb)} "_non" ${pt(x2, yb)} "_H" "_non" ${pt((x1 + x2) / 2, yLine)})`
+      );
+      L.raw(forceLayer);
+    };
+    const dimV = (y1: number, y2: number, xb: number, xLine: number) => {
+      L.raw(
+        `(command "_.DIMLINEAR" "_non" ${pt(xb, y1)} "_non" ${pt(xb, y2)} "_V" "_non" ${pt(xLine, (y1 + y2) / 2)})`
+      );
+      L.raw(forceLayer);
+    };
+
+    // Ngang (dưới): trong = từng nhịp X; ngoài = tổng.
+    for (let i = 0; i < X.length - 1; i++) dimH(X[i], X[i + 1], minY, minY - o1);
+    if (X.length > 2) dimH(X[0], X[X.length - 1], minY, minY - o2);
+    // Đứng (trái): trong = từng nhịp Y; ngoài = tổng.
+    for (let i = 0; i < Y.length - 1; i++) dimV(Y[i], Y[i + 1], minX, minX - o1);
+    if (Y.length > 2) dimV(Y[0], Y[Y.length - 1], minX, minX - o2);
+  }
+
+  // 6) (KHÔNG dùng OVERKILL) — accoreconsole KHÔNG nạp lệnh OVERKILL (báo "Unknown
+  //    command", làm hỏng cả script → không lưu được DWG). Nét trùng ở tường đã được
+  //    REGION+UNION làm sạch ở bước 1; phần còn lại chấp nhận giữ nguyên.
+  L.raw('(setvar "CMDECHO" 0)');
 
   L.raw('(princ "\\nPLAN_DRAWN")');
   return L.lines.join("\n");
