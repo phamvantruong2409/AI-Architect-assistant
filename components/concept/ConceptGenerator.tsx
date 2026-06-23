@@ -30,13 +30,13 @@ export function ConceptGenerator() {
       const json = await res.json();
       if (!res.ok) {
         if (json.code === "QUOTA_EXCEEDED") markRateLimited(model);
-        throw new Error(json.error || "Sinh concept thất bại");
+        throw new Error(json.error || "Tạo sinh concept thất bại");
       }
       const result = json.concepts as Concept[];
       recordAiCall(model, estimateTokens(brief.description) + estimateTokens(JSON.stringify(result)));
       setConcepts(result);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Sinh concept thất bại");
+      setError(err instanceof Error ? err.message : "Tạo sinh concept thất bại");
     } finally {
       setLoading(false);
     }
@@ -80,7 +80,7 @@ export function ConceptGenerator() {
 
       {loading && (
         <div className="space-y-5">
-          <ProgressBar percent={pct} label="AI đang sinh concept" />
+          <ProgressBar percent={pct} label="AI đang tạo sinh concept" />
           <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {[0, 1, 2].map((i) => (
               <div

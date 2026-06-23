@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createServiceClient } from '@/lib/supabase'
 import { chunkText } from '@/lib/knowledge-chunker'
 import { embedText } from '@/lib/knowledge-gemini'
+import { geminiErrorCode, geminiErrorMessage } from '@/lib/gemini-error'
 
 const EMBED_DELAY_MS = 200
 
@@ -51,11 +52,18 @@ export async function POST(
 
     return NextResponse.json({ success: true, chunk_count: chunks.length })
   } catch (err) {
-    const message = err instanceof Error ? err.message : 'Lỗi không xác định'
+    // Embedding dùng Gemini → thiếu key báo "hãy nhập key" thay vì lỗi kỹ thuật khó hiểu.
+    const code = geminiErrorCode(err)
+    const message = code === 'UNKNOWN'
+      ? (err instanceof Error ? err.message : 'Lỗi không xác định')
+      : geminiErrorMessage(err)
     await supabase
       .from('knowledge_documents')
       .update({ status: 'error', error_message: message })
       .eq('id', id)
-    return NextResponse.json({ error: message }, { status: 500 })
+    return NextResponse.json(
+      { error: message, code },
+      { status: code === 'NO_API_KEY' ? 400 : 500 }
+    )
   }
 }

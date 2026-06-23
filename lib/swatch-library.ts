@@ -1,6 +1,6 @@
 // Thư viện swatch gỗ công nghiệp An Cường (ảnh tí hon trong public/swatches/<type>/).
 // Khớp vật liệu trong ảnh render với swatch gần nhất theo MÀU (không gian Lab) — chạy
-// hoàn toàn ở client, 0 API. Index do scripts/build-swatches.ps1 sinh ra.
+// hoàn toàn ở client, 0 API. Index do scripts/build-swatches.ps1 tạo sinh ra.
 
 export const SWATCH_TYPES = ["mfc", "laminate", "veneer", "acrylic"] as const;
 export type SwatchType = (typeof SWATCH_TYPES)[number];

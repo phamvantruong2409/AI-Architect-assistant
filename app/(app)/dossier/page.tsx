@@ -143,12 +143,12 @@ export default function DossierPage() {
       const json = await res.json();
       if (!res.ok) {
         if (json.code === "QUOTA_EXCEEDED") markRateLimited(model);
-        throw new Error(json.error || "Sinh thuyết minh thất bại");
+        throw new Error(json.error || "Tạo sinh thuyết minh thất bại");
       }
       recordAiCall(model, estimateTokens(JSON.stringify(form)) + estimateTokens(JSON.stringify(json)));
       setResult(json);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Sinh thuyết minh thất bại");
+      setError(err instanceof Error ? err.message : "Tạo sinh thuyết minh thất bại");
     } finally {
       setLoading(false);
     }
@@ -195,7 +195,7 @@ export default function DossierPage() {
       <div>
         <h1 className="font-display text-2xl">Thuyết minh AI</h1>
         <p className="mt-1 text-sm text-foreground-soft">
-          Sinh thuyết minh thiết kế hoàn chỉnh từ thông tin công trình — xuất Word / PDF chỉ trong vài giây.
+          Tạo sinh thuyết minh thiết kế hoàn chỉnh từ thông tin công trình — xuất Word / PDF chỉ trong vài giây.
         </p>
       </div>
 
@@ -346,7 +346,7 @@ export default function DossierPage() {
 
         <div className="flex justify-end">
           <Button onClick={handleGenerate} disabled={loading}>
-            {loading ? `Đang soạn thuyết minh... ${pct}%` : "✨ Sinh thuyết minh"}
+            {loading ? `Đang soạn thuyết minh... ${pct}%` : "✨ Tạo sinh thuyết minh"}
           </Button>
         </div>
       </Card>

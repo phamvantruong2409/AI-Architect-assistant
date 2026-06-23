@@ -68,7 +68,7 @@ function stopFake(id: string) {
 }
 
 export interface StartTaskOptions {
-  /** Khoá ổn định để reconnect (vd theo session). Bỏ trống → tự sinh. */
+  /** Khoá ổn định để reconnect (vd theo session). Bỏ trống → tự tạo sinh. */
   id?: string;
   type: string;
   label: string;

@@ -235,7 +235,7 @@ export interface NewsItem {
 export const newsItems: NewsItem[] = [
   {
     id: "1",
-    title: "Mới: Sinh Prompt Render cho D5 sắp ra mắt",
+    title: "Mới: Tạo sinh Prompt Render cho D5 sắp ra mắt",
     time: "Giai đoạn 2",
   },
   {
@@ -245,7 +245,7 @@ export const newsItems: NewsItem[] = [
   },
   {
     id: "3",
-    title: "Mẹo: Dùng Sinh Concept để so sánh 3 hướng phong cách",
+    title: "Mẹo: Dùng Tạo sinh Concept để so sánh 3 hướng phong cách",
     time: "Hướng dẫn",
   },
 ];

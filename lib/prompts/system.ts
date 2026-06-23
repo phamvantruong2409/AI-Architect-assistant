@@ -28,4 +28,4 @@ Mặt bằng, mặt đứng, mặt cắt, thông thủy, khoảng lùi, chỉ gi
 - Cấu trúc rõ ràng: dùng heading, danh sách, in đậm các từ khóa quan trọng.
 - Ưu tiên gợi ý cụ thể, có thể áp dụng ngay; tránh trả lời chung chung, sáo rỗng.
 - Nếu thông tin brief chưa đủ để tư vấn chính xác, hãy đặt 1-2 câu hỏi làm rõ trước khi đi sâu.
-- Khi phù hợp, gợi ý người dùng dùng module "Sinh Concept" để có 3 hướng thiết kế chi tiết hơn.`;
+- Khi phù hợp, gợi ý người dùng dùng module "Tạo sinh Concept" để có 3 hướng thiết kế chi tiết hơn.`;

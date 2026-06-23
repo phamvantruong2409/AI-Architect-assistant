@@ -1,5 +1,5 @@
 // Câu hỏi gợi ý cho AI Chat — đổi MỖI NGÀY, bám xu hướng & quy chuẩn hiện hành.
-// Sinh bằng DeepSeek, cache trong bộ nhớ theo ngày (chỉ gọi AI 1 lần/ngày). Lỗi → fallback tĩnh.
+// Tạo sinh bằng DeepSeek, cache trong bộ nhớ theo ngày (chỉ gọi AI 1 lần/ngày). Lỗi → fallback tĩnh.
 
 import { generateDailyChatQuestions } from "@/lib/suggestions-ai";
 import { DEFAULT_CHAT_QUESTIONS } from "@/lib/suggestions";

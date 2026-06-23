@@ -68,7 +68,7 @@ export function newId(): string {
     : `${Date.now()}-${Math.random().toString(36).slice(2)}`;
 }
 
-/** Tạo một mục mới (tự sinh id + mốc thời gian). */
+/** Tạo một mục mới (tự tạo sinh id + mốc thời gian). */
 export function makeItem(data: { title: string; text: string; images: string[] }): PromptLibraryItem {
   const now = Date.now();
   return {

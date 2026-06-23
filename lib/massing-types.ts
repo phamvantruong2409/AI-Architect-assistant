@@ -38,7 +38,7 @@ export interface MassingResult {
 
 export const MAX_IMAGE_BYTES = 8 * 1024 * 1024; // 8MB
 
-/** Số phương án hình khối AI sinh ra để người dùng tham khảo. */
+/** Số phương án hình khối AI tạo sinh ra để người dùng tham khảo. */
 export const MASSING_VARIANT_COUNT = 2;
 
 /** Hướng xử lý khối cho từng phương án — cùng áp dụng đề xuất cải thiện, khác cách triển khai. */

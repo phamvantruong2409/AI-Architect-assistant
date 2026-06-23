@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 
 /**
- * % tiến trình MÔ PHỎNG cho các tác vụ AI không báo tiến trình thật (LLM sinh văn
+ * % tiến trình MÔ PHỎNG cho các tác vụ AI không báo tiến trình thật (LLM tạo sinh văn
  * bản, phân tích ảnh...). Khi `active`: % bò dần lên tới `cap` (~95%), chậm dần khi
  * gần cap để không bao giờ "đứng" ở 100% trước khi xong. Khi xong (active chuyển
  * false sau khi từng true): nhảy 100% rồi về 0 sau một nhịp ngắn.

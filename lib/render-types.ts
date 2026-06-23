@@ -9,7 +9,7 @@ export const MAX_IMAGE_BYTES = 8 * 1024 * 1024;
 /** Số ảnh tối đa cho một lần render. */
 export const MAX_RENDER_IMAGES = 4;
 
-/** Backend sinh ảnh. */
+/** Backend tạo sinh ảnh. */
 export type RenderModelId = "gemini-image-pro" | "gemini-image" | "flux-controlnet";
 
 export interface RenderModelInfo {
@@ -280,7 +280,7 @@ export const SCENE_CONTEXTS: SceneContextOption[] = [
   },
 ];
 
-/** Một prompt đề xuất (toggle/sửa được) do AI sinh ra. */
+/** Một prompt đề xuất (toggle/sửa được) do AI tạo sinh ra. */
 export interface RenderSuggestion {
   id: string;
   /** Nhãn ngắn tiếng Việt (vd "Vật liệu hoàn thiện"). */

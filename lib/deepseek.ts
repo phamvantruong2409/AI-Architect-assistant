@@ -77,7 +77,7 @@ async function postChat(
   throw lastErr;
 }
 
-/** Sinh văn bản một lần (không stream). Dùng cho thuyết minh, brief khảo sát. */
+/** Tạo sinh văn bản một lần (không stream). Dùng cho thuyết minh, brief khảo sát. */
 export async function deepseekGenerateText(opts: {
   model: string;
   prompt: string;
@@ -95,7 +95,7 @@ export async function deepseekGenerateText(opts: {
 }
 
 /**
- * Sinh văn bản một lần (không stream) từ NHIỀU lượt hội thoại (system + lịch sử).
+ * Tạo sinh văn bản một lần (không stream) từ NHIỀU lượt hội thoại (system + lịch sử).
  * Dùng cho hỏi-đáp RAG thư viện tài liệu — trả `message.content`, bỏ qua phần
  * `reasoning_content` (suy luận) của bản pro.
  */

@@ -1,4 +1,4 @@
-// Bộ sinh AutoLISP từ mô hình mặt bằng (CadPlan). LISP sinh ra là THUẦN ASCII: mọi
+// Bộ tạo sinh AutoLISP từ mô hình mặt bằng (CadPlan). LISP tạo sinh ra là THUẦN ASCII: mọi
 // chữ tiếng Việt (tên layer, tên phòng…) được dựng bằng (chr <mã Unicode>) nên không
 // dính lỗi codepage. AutoCAD (accoreconsole) nạp & chạy LISP này TRÊN template của
 // người dùng → vẽ tường (2 nét + hatch), cửa khoét tường, nội thất, ghi chú, kích
@@ -75,7 +75,7 @@ export function vnStr(s: string): string {
   return `(strcat ${parts.join(" ")})`;
 }
 
-// ───────────────────────── Helpers entmake (sinh dòng LISP) ─────────────────────────
+// ───────────────────────── Helpers entmake (tạo sinh dòng LISP) ─────────────────────────
 
 class Lisp {
   lines: string[] = [];
@@ -710,7 +710,7 @@ function insertDoorBlock(L: Lisp, dir: string, wall: CadWall, op: CadOpening, de
 // ───────────────────────── Tổng hợp ─────────────────────────
 
 /**
- * Sinh toàn bộ LISP vẽ mặt bằng (KHÔNG gồm lệnh lưu/thoát — runner sẽ bọc).
+ * Tạo sinh toàn bộ LISP vẽ mặt bằng (KHÔNG gồm lệnh lưu/thoát — runner sẽ bọc).
  * Trả về chuỗi nhiều dòng, mỗi dòng là 1 form LISP hoàn chỉnh.
  */
 export function planToLisp(plan: CadPlan, blocksDir?: string | null): string {

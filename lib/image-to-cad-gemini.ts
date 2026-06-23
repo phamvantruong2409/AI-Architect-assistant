@@ -179,7 +179,7 @@ function normalizeDimensions(raw: unknown): CadDimension[] {
 
 /**
  * BƯỚC 1 (trung gian) — đọc ẢNH MẶT BẰNG và mô tả "mặt bằng có gì" thành VĂN BẢN
- * tiếng Việt có cấu trúc, để người dùng ĐỌC & SỬA trước khi dựng hình. KHÔNG sinh
+ * tiếng Việt có cấu trúc, để người dùng ĐỌC & SỬA trước khi dựng hình. KHÔNG tạo sinh
  * toạ độ ở bước này — chỉ nhận diện & diễn giải công năng/bố cục/kích thước.
  */
 export async function describePlan(req: ImageToCadRequest): Promise<PlanAnalysis> {

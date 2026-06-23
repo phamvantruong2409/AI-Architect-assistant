@@ -1,5 +1,5 @@
 // Bộ ghi DXF thuần TypeScript — KHÔNG phụ thuộc native, chạy được cả server lẫn
-// trình duyệt. Sinh DXF R12 (AC1009): định dạng đơn giản, hợp lệ, mở trực tiếp
+// trình duyệt. Tạo sinh DXF R12 (AC1009): định dạng đơn giản, hợp lệ, mở trực tiếp
 // trong AutoCAD và hầu hết phần mềm CAD. Toạ độ tính bằng mm, gốc dưới-trái.
 //
 // Vì sao R12: không cần handle cho từng đối tượng, cấu trúc tối thiểu mà vẫn đủ

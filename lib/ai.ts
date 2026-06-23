@@ -8,7 +8,7 @@ import {
 import { geminiErrorCode, geminiErrorMessage } from "./gemini-error";
 
 /**
- * Sinh văn bản (không stream) qua provider tương ứng với model id.
+ * Tạo sinh văn bản (không stream) qua provider tương ứng với model id.
  * Dùng cho các tác vụ chỉ-text: thuyết minh (dossier), phân tích brief khảo sát.
  */
 export async function generateTextLLM(opts: {

@@ -17,7 +17,7 @@ const features = [
   },
   {
     icon: WandIcon,
-    title: "Sinh concept từ brief",
+    title: "Tạo sinh concept từ brief",
     description: "Nhập yêu cầu khách hàng, nhận 3 hướng phong cách.",
   },
   {

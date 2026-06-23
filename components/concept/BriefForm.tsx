@@ -133,7 +133,7 @@ export function BriefForm({
       </div>
 
       <Button type="submit" disabled={loading} className="w-full sm:w-auto">
-        {loading ? "Đang tạo concept..." : "Sinh 3 hướng Concept"}
+        {loading ? "Đang tạo concept..." : "Tạo sinh 3 hướng Concept"}
       </Button>
     </form>
   );

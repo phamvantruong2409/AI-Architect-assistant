@@ -10,7 +10,7 @@ export function PromptBar() {
   const [suggestions, setSuggestions] = useState<string[]>(DEFAULT_SUGGESTIONS);
   const router = useRouter();
 
-  // Tải gợi ý theo ngày (do AI sinh, bám bối cảnh hôm nay); lỗi thì giữ mặc định.
+  // Tải gợi ý theo ngày (do AI tạo sinh, bám bối cảnh hôm nay); lỗi thì giữ mặc định.
   useEffect(() => {
     let alive = true;
     fetch("/api/suggestions")

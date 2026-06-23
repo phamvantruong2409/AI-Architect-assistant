@@ -23,7 +23,7 @@ const ACKED_VERSION_KEY = "notif-acked-version";
 /**
  * Trung tâm thông báo cho cái chuông ở sidebar. Gộp 2 nguồn:
  *  1. Tin do admin đăng trên Supabase (bảng `announcements`).
- *  2. Thẻ "đã cập nhật lên vX" sinh tự động khi version app đổi so với lần trước.
+ *  2. Thẻ "đã cập nhật lên vX" tạo sinh tự động khi version app đổi so với lần trước.
  *
  * Trạng thái đã đọc lưu ở localStorage (mốc thời gian + version đã xác nhận),
  * nên chấm đỏ tự tắt sau khi mở chuông.

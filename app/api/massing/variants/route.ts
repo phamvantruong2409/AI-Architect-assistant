@@ -1,4 +1,4 @@
-// Sinh 2 PHƯƠNG ÁN sửa đổi hình khối từ ảnh người dùng (img2img Gemini, khổ 1K).
+// Tạo sinh 2 PHƯƠNG ÁN sửa đổi hình khối từ ảnh người dùng (img2img Gemini, khổ 1K).
 // Cả hai phương án đều áp dụng các đề xuất cải thiện từ bước phân tích, khác nhau ở
 // cách triển khai khối (tinh chỉnh vs. mạnh dạn). Dùng model Flash image (1K, nhanh & rẻ).
 

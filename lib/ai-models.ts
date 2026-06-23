@@ -20,7 +20,7 @@ export const AI_MODELS = [...GEMINI_MODELS, ...DEEPSEEK_MODELS] as const;
 // Model cho tác vụ tài liệu (thuyết minh): chỉ Gemini + DeepSeek Pro.
 export const DOC_MODELS = [...GEMINI_MODELS, DEEPSEEK_MODELS[0]] as const;
 
-// Model cho "Nhiệm vụ thiết kế" (sinh brief, chỉ-text): Gemini + cả DeepSeek Pro & Flash.
+// Model cho "Nhiệm vụ thiết kế" (tạo sinh brief, chỉ-text): Gemini + cả DeepSeek Pro & Flash.
 export const BRIEF_MODELS = [...GEMINI_MODELS, ...DEEPSEEK_MODELS] as const;
 
 export type AiModelId = GeminiModelId | DeepSeekModelId;

@@ -145,7 +145,7 @@ function ChatSessionInner({
   }, [messages]);
 
   // Khi không truyền suggestions riêng (vd chat mặc định) → tải câu hỏi gợi ý
-  // theo ngày do AI sinh, bám xu hướng hiện tại; lỗi/offline thì giữ mặc định.
+  // theo ngày do AI tạo sinh, bám xu hướng hiện tại; lỗi/offline thì giữ mặc định.
   const [dailyQuestions, setDailyQuestions] = useState<string[] | null>(null);
   useEffect(() => {
     if (suggestions) return;

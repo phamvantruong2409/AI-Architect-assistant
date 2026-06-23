@@ -1,7 +1,7 @@
 import { deepseekGenerateText } from "@/lib/deepseek";
 import { SUGGESTION_COUNT, CHAT_QUESTION_COUNT } from "@/lib/suggestions";
 
-/** Model dùng để sinh gợi ý — DeepSeek Flash (nhanh, đã tắt suy luận). */
+/** Model dùng để tạo sinh gợi ý — DeepSeek Flash (nhanh, đã tắt suy luận). */
 const SUGGESTIONS_MODEL = "deepseek-v4-flash";
 
 /** Bỏ rào ```json ... ``` nếu model lỡ bọc markdown quanh JSON. */
@@ -14,7 +14,7 @@ function stripFence(text: string): string {
 }
 
 /**
- * Sinh các gợi ý "đề bài thiết kế" ngắn cho thanh nhập ý tưởng — bám bối cảnh
+ * Tạo sinh các gợi ý "đề bài thiết kế" ngắn cho thanh nhập ý tưởng — bám bối cảnh
  * NGÀY HÔM NAY (mùa, thời tiết, dịp trong năm, xu hướng kiến trúc/nội thất gần đây).
  * Dùng DeepSeek (text-only). Trả về mảng cụm từ tiếng Việt; ném lỗi nếu phản hồi
  * không hợp lệ (caller tự fallback).
@@ -56,7 +56,7 @@ Chỉ trả về JSON.`;
 }
 
 /**
- * Sinh các CÂU HỎI gợi ý cho AI Chat — đổi mỗi ngày, bám xu hướng kiến trúc/nội
+ * Tạo sinh các CÂU HỎI gợi ý cho AI Chat — đổi mỗi ngày, bám xu hướng kiến trúc/nội
  * thất & quy chuẩn hiện hành. Đây là câu hỏi kiến thức (thuật ngữ, quy chuẩn,
  * vật liệu, phong cách), KHÁC với brief thiết kế. Trả mảng tiếng Việt; ném lỗi
  * nếu phản hồi không hợp lệ (caller tự fallback).

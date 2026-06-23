@@ -15,7 +15,7 @@ export interface BriefRecord {
   status: "pending" | "completed";
   detail?: string; // thông tin chi tiết KTS tự nhập
   answers?: SurveyAnswers; // dữ liệu cũ (giữ để tương thích)
-  brief?: string; // nhiệm vụ thiết kế (Markdown) do AI sinh
+  brief?: string; // nhiệm vụ thiết kế (Markdown) do AI tạo sinh
   created_at: string;
   completed_at?: string;
 }
@@ -84,7 +84,7 @@ export function getBriefDetail(record: BriefRecord): string {
   return typeof legacy === "string" ? legacy : "";
 }
 
-// Lưu nhiệm vụ thiết kế do AI sinh và đánh dấu dự án hoàn thành.
+// Lưu nhiệm vụ thiết kế do AI tạo sinh và đánh dấu dự án hoàn thành.
 export async function setBriefById(id: string, brief: string): Promise<void> {
   const records = readAll();
   const record = records.find((r) => r.id === id);

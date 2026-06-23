@@ -1,5 +1,5 @@
 // Gợi ý "đề bài thiết kế" cho thanh nhập ý tưởng — đổi MỖI NGÀY, bám bối cảnh hiện tại.
-// Sinh bằng Gemini, cache trong bộ nhớ theo ngày (chỉ gọi AI 1 lần/ngày). Lỗi → fallback tĩnh.
+// Tạo sinh bằng DeepSeek, cache trong bộ nhớ theo ngày (chỉ gọi AI 1 lần/ngày). Lỗi → fallback tĩnh.
 
 import { generateDailySuggestions } from "@/lib/suggestions-ai";
 import { DEFAULT_SUGGESTIONS } from "@/lib/suggestions";

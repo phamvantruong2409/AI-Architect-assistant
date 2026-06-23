@@ -50,7 +50,7 @@ export async function POST(
 
   const body = await req.json().catch(() => ({}));
   const model = typeof body?.model === "string" ? body.model : undefined;
-  // Cho phép gửi kèm thông tin mới nhất để lưu trước khi sinh.
+  // Cho phép gửi kèm thông tin mới nhất để lưu trước khi tạo sinh.
   const detail = typeof body?.detail === "string" ? body.detail : getBriefDetail(record);
   if (!detail.trim()) {
     return Response.json({ error: "Hãy nhập thông tin chi tiết trước khi đề xuất" }, { status: 400 });

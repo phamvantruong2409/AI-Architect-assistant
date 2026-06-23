@@ -11,16 +11,7 @@ import { ConfirmDeleteDialog } from "@/components/chat/ConfirmDeleteDialog";
 import { AmbientSound } from "./AmbientSound";
 import { NotificationBell } from "./NotificationBell";
 import { navItems } from "./nav-items";
-import { SettingsIcon, StarIcon, TrashIcon, CubeIcon, ShieldIcon, BrainIcon, RocketIcon, PaletteIcon, PencilIcon, ChevronDownIcon } from "./icons";
-import { useAiUsage } from "@/hooks/useAiUsage";
-import { MODEL_LIMITS, DEFAULT_LIMIT } from "@/lib/ai-usage";
-import { GEMINI_MODELS, DEFAULT_GEMINI_MODEL } from "@/lib/gemini-models";
-
-function formatTokens(n: number): string {
-  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(n % 1_000_000 === 0 ? 0 : 1)}M`;
-  if (n >= 1_000) return `${(n / 1_000).toFixed(n % 1_000 === 0 ? 0 : 1)}K`;
-  return String(n);
-}
+import { SettingsIcon, TrashIcon, CubeIcon, ShieldIcon, BrainIcon, RocketIcon, PaletteIcon, PencilIcon, ChevronDownIcon } from "./icons";
 
 const studioItems = [
   {
@@ -64,18 +55,6 @@ export function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
   const [pendingDelete, setPendingDelete] = useState<ChatSession | null>(null);
   const [isStudioOpen, setIsStudioOpen] = useState(true);
   const [userName, setUserName] = useState("Người dùng");
-  const { stats, rateLimited } = useAiUsage();
-
-  const limit = MODEL_LIMITS[DEFAULT_GEMINI_MODEL] ?? DEFAULT_LIMIT;
-  const tpmCap = limit.tpm;
-  const rpdCap = limit.rpd;
-  const tpmPct = Math.min(100, Math.round((stats.tpm / tpmCap) * 100));
-  const rpdPct = rpdCap ? Math.min(100, Math.round((stats.rpd / rpdCap) * 100)) : Math.min(100, stats.rpd);
-  const rpdReached = rpdCap !== null && stats.rpd >= rpdCap;
-  const all429 = GEMINI_MODELS.every((m) => rateLimited[m.id]);
-  const allLimited = all429 || rpdReached; // hết lượt: do 429 hoặc chạm trần RPD/ngày
-  const primaryLimited = rateLimited[DEFAULT_GEMINI_MODEL];
-  const fallback = GEMINI_MODELS.find((m) => m.id !== DEFAULT_GEMINI_MODEL && !rateLimited[m.id]);
 
   useEffect(() => {
     const stored = localStorage.getItem("user-name");
@@ -248,60 +227,6 @@ export function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
       </div>
 
       <div className="space-y-3 px-3 pb-[50px]">
-        <div className="rounded-card border border-sidebar-border bg-sidebar-surface p-4">
-          <div className="flex items-center justify-between text-accent">
-            <span className="flex items-center gap-2">
-              <StarIcon className="h-4 w-4" />
-              <span className="text-sm font-medium text-sidebar-foreground">
-                Lượng dùng AI hôm nay
-              </span>
-            </span>
-            <span className="text-[10px] text-sidebar-foreground-soft">qua app</span>
-          </div>
-
-          {/* TPM — token/phút (cửa sổ 60s) */}
-          <div className="mt-3">
-            <div className="flex items-center justify-between text-[11px] text-sidebar-foreground-soft">
-              <span>TPM</span>
-              <span>
-                {formatTokens(stats.tpm)} / {formatTokens(tpmCap)}
-              </span>
-            </div>
-            <div className="mt-1 h-1.5 overflow-hidden rounded-full bg-sidebar-border">
-              <div className="h-full rounded-full bg-accent transition-all" style={{ width: `${tpmPct}%` }} />
-            </div>
-          </div>
-
-          {/* RPD — số request trong ngày */}
-          <div className="mt-2.5">
-            <div className="flex items-center justify-between text-[11px] text-sidebar-foreground-soft">
-              <span>RPD</span>
-              <span className={rpdReached ? "font-semibold text-red-500" : undefined}>
-                {stats.rpd} / {rpdCap ?? "∞"}
-              </span>
-            </div>
-            <div className="mt-1 h-1.5 overflow-hidden rounded-full bg-sidebar-border">
-              <div
-                className={cn(
-                  "h-full rounded-full transition-all",
-                  rpdReached ? "bg-red-500" : rpdPct >= 80 ? "bg-amber-500" : "bg-accent"
-                )}
-                style={{ width: `${rpdPct}%` }}
-              />
-            </div>
-          </div>
-
-          {allLimited ? (
-            <p className="mt-3 rounded-card border border-red-500/30 bg-red-500/10 px-2.5 py-1.5 text-[11px] font-medium text-red-500">
-              ⚠️ Đã hết lượt gọi AI hôm nay{rpdReached ? ` (${stats.rpd}/${rpdCap})` : ""}.
-            </p>
-          ) : primaryLimited && fallback ? (
-            <p className="mt-3 rounded-card border border-amber-500/30 bg-amber-500/10 px-2.5 py-1.5 text-[11px] font-medium text-amber-600">
-              Gemini 3 Flash đã hết lượt — chuyển sang {fallback.label}.
-            </p>
-          ) : null}
-        </div>
-
         <div className="flex flex-col gap-1">
           <div className="flex items-center gap-1">
             <Link

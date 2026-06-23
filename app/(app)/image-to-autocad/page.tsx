@@ -384,7 +384,7 @@ export default function ImageToAutocadPage() {
     // Báo tiến trình theo từng giai đoạn (ước lượng thời gian) để người dùng biết
     // AutoCAD đang làm gì.
     const stages = [
-      "Đang phân tích mặt bằng & sinh lệnh AutoCAD…",
+      "Đang phân tích mặt bằng & tạo sinh lệnh AutoCAD…",
       "Đang khởi động AutoCAD nền (accoreconsole)…",
       "AutoCAD đang vẽ tường, cửa, nội thất & kích thước…",
       "Đang hatch tường & hoàn thiện bản vẽ…",

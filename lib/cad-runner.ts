@@ -1,4 +1,4 @@
-// Runner: nhận CadPlan → sinh AutoLISP (lib/cad-lisp) → chạy accoreconsole (AutoCAD
+// Runner: nhận CadPlan → tạo sinh AutoLISP (lib/cad-lisp) → chạy accoreconsole (AutoCAD
 // chạy nền) TRÊN template của người dùng → lưu ra DWG → trả buffer. Chỉ chạy Windows
 // (vì cần AutoCAD). Mọi script .scr viết THUẦN ASCII (tiếng Việt qua (chr) trong LISP).
 
@@ -107,7 +107,7 @@ function fwd(p: string): string {
 }
 
 /**
- * Sinh DWG từ mặt bằng. Ném lỗi tiếng Việt nếu thiếu AutoCAD/template hoặc chạy hỏng.
+ * Tạo sinh DWG từ mặt bằng. Ném lỗi tiếng Việt nếu thiếu AutoCAD/template hoặc chạy hỏng.
  */
 export async function exportPlanToDwg(plan: CadPlan): Promise<ExportResult> {
   const accore = detectAccore();

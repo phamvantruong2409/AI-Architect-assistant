@@ -3,9 +3,11 @@ import { GEMINI_MODELS, DEFAULT_GEMINI_MODEL, type GeminiModelId } from "@/lib/g
 import { getGeminiApiKey } from "@/lib/settings-store";
 
 function getGenAI(): GoogleGenerativeAI {
-  // Ưu tiên key do người dùng nhập (lưu trong settings, không nhúng vào .exe);
-  // fallback về biến môi trường .env.local cho môi trường dev.
-  const apiKey = getGeminiApiKey() || process.env.GEMINI_API_KEY;
+  // Gemini ĐƯỢC KHOÁ theo key do NGƯỜI DÙNG nhập (lưu trong settings, KHÔNG nhúng
+  // vào .exe). KHÔNG fallback về biến môi trường: tránh nguy cơ key của nhà phát triển
+  // bị gói vào bản build và để mọi người xài ké quota. Chưa nhập key → mọi tính năng
+  // Gemini báo "hãy nhập key" (xem lib/gemini-error.ts → NO_API_KEY).
+  const apiKey = getGeminiApiKey();
   if (!apiKey) {
     const err = new Error("Chưa có API key Gemini.") as Error & { code?: string };
     err.code = "NO_API_KEY";

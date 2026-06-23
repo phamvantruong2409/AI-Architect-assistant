@@ -19,7 +19,7 @@ const categories = [
   },
   {
     title: "Thuyết minh thiết kế",
-    description: "Sinh thuyết minh dự án tự động từ concept đã chọn.",
+    description: "Tạo sinh thuyết minh dự án tự động từ concept đã chọn.",
     icon: DocumentIcon,
     href: "#",
     status: "soon" as const,
