@@ -108,6 +108,13 @@ export const quickActions: QuickAction[] = [
         cta: "Phân tích khối",
       },
       {
+        label: "Ý tưởng nhanh từ MB",
+        description: "Từ ảnh mặt bằng + phong cách + ghi chú → AI tự dựng prompt đầy đủ → render ảnh 3D",
+        href: "/quick-idea",
+        icon: "sparkles",
+        cta: "Lên ý tưởng",
+      },
+      {
         label: "Image to AutoCAD",
         description: "AI đọc ảnh mặt bằng → tường/cửa/phòng/nội thất → xuất DWG chuẩn trên template",
         href: "/image-to-autocad",
