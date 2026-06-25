@@ -19,10 +19,10 @@ const categories = [
   },
   {
     title: "Thuyết minh thiết kế",
-    description: "Tạo sinh thuyết minh dự án tự động từ concept đã chọn.",
+    description: "Tạo sinh thuyết minh dự án tự động từ thông tin công trình — xuất Word / PDF.",
     icon: DocumentIcon,
-    href: "#",
-    status: "soon" as const,
+    href: "/dossier",
+    status: "live" as const,
   },
   {
     title: "Bảng diện tích",

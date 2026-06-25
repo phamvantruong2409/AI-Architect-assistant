@@ -6,7 +6,22 @@ import { deepseekErrorMessage } from '@/lib/deepseek'
 import type { CheckFormData } from '@/lib/regulatory-types'
 
 export async function POST(req: NextRequest) {
-  const supabase = createServiceClient()
+  // createServiceClient() ném nếu thiếu env (vd SUPABASE_SERVICE_ROLE_KEY).
+  // Bắt tại đây để TRẢ JSON lỗi rõ ràng thay vì 500 body rỗng (client vỡ res.json()).
+  let supabase: ReturnType<typeof createServiceClient>
+  try {
+    supabase = createServiceClient()
+  } catch (e) {
+    return NextResponse.json(
+      {
+        error:
+          e instanceof Error
+            ? `Lỗi cấu hình máy chủ: ${e.message}`
+            : 'Lỗi cấu hình máy chủ Supabase',
+      },
+      { status: 500 },
+    )
+  }
 
   let body: CheckFormData & { floorplan_image_base64?: string }
   try {

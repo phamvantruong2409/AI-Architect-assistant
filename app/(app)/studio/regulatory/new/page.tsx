@@ -55,8 +55,13 @@ export default function NewRegulatoryCheckPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ ...formData, floorplan_image_base64: floorplanBase64 }),
       })
-      const json = await res.json()
-      if (!res.ok) throw new Error(json.error)
+      // Đọc text trước rồi parse — tránh "Unexpected end of JSON input" khi body rỗng
+      // (vd route 500/timeout). Hiện thông báo lỗi đúng nghĩa cho người dùng.
+      const raw = await res.text()
+      const json = raw ? JSON.parse(raw) : null
+      if (!res.ok || !json) {
+        throw new Error(json?.error || `Máy chủ trả lỗi (${res.status}). Vui lòng thử lại.`)
+      }
       router.push(`/studio/regulatory/report/${json.check_id}`)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Phân tích thất bại')

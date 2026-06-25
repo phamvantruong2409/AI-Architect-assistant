@@ -166,13 +166,13 @@ function CardBody({
       </div>
 
       {/* Labels */}
-      <div className="flex-1">
+      <div className="flex-1 min-h-0">
         <p className={`font-semibold text-white dark:text-foreground ${large ? "text-base" : "text-sm"}`}>
           {action.label}
         </p>
         <p
-          className={`mt-0.5 text-white/60 dark:text-foreground-soft leading-relaxed ${
-            large ? "text-sm" : "text-xs"
+          className={`mt-0.5 text-white/60 dark:text-foreground-soft leading-relaxed line-clamp-2 ${
+            large ? "text-[12px]" : "text-[12px]"
           }`}
         >
           {action.description}
@@ -181,7 +181,7 @@ function CardBody({
 
       {/* CTA */}
       <span
-        className={`inline-flex items-center gap-1 font-medium text-teal-400 dark:text-accent transition-all duration-200 group-hover:gap-1.5 ${
+        className={`mt-auto inline-flex items-center gap-1 font-medium text-teal-400 dark:text-accent transition-all duration-200 group-hover:gap-1.5 ${
           large ? "text-sm" : "text-xs"
         }`}
       >

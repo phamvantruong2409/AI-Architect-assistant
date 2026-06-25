@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
-import { Plus, Loader2, ShieldCheck, ExternalLink } from 'lucide-react'
+import { Plus, Loader2, ShieldCheck, ExternalLink, Calculator } from 'lucide-react'
 import type { RegCheck } from '@/lib/regulatory-types'
 import { STATUS_CONFIG, formatDate } from '@/lib/regulatory-utils'
 import { BUILDING_TYPE_LABELS } from '@/lib/regulatory-regulations'
@@ -59,12 +59,20 @@ export default function RegulatoryDashboard() {
           <h1 className="text-xl font-display font-semibold text-stone-100">Kiểm tra Pháp lý</h1>
           <p className="text-sm text-stone-500 mt-1">Kiểm tra công trình với QCXDVN 01:2021, QCVN 06:2022, TCVN 4474</p>
         </div>
-        <Link href="/studio/regulatory/new"
-          className="flex items-center gap-2 bg-stone-200 hover:bg-white text-stone-900 px-4 py-2.5 rounded-xl text-sm font-medium transition-colors"
-        >
-          <Plus size={16} />
-          Kiểm tra mới
-        </Link>
+        <div className="flex items-center gap-2">
+          <Link href="/studio/regulatory/capacity"
+            className="flex items-center gap-2 border border-stone-700 text-stone-200 hover:border-stone-500 px-4 py-2.5 rounded-xl text-sm font-medium transition-colors"
+          >
+            <Calculator size={16} />
+            Tính chỉ tiêu lô đất
+          </Link>
+          <Link href="/studio/regulatory/new"
+            className="flex items-center gap-2 bg-stone-200 hover:bg-white text-stone-900 px-4 py-2.5 rounded-xl text-sm font-medium transition-colors"
+          >
+            <Plus size={16} />
+            Kiểm tra mới
+          </Link>
+        </div>
       </div>
 
       {loading ? (

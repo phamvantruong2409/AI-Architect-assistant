@@ -26,6 +26,29 @@ interface Row extends TakeoffItem {
   group: Group;
 }
 
+/** Số lượng (m² hoặc cái) + đơn giá người dùng nhập cho một mục. */
+interface PriceRow {
+  qty: number;
+  price: number;
+}
+
+/** Khoá giá ổn định qua các lần gộp ảnh: theo nhóm + tên mục (đã chuẩn hoá). */
+function priceKey(group: Group, name: string): string {
+  return `${group}:${name.trim().toLowerCase()}`;
+}
+
+/** Định dạng tiền VND, bỏ phần lẻ. "" nếu 0/không hợp lệ. */
+function formatVnd(n: number): string {
+  if (!Number.isFinite(n) || n <= 0) return "";
+  return n.toLocaleString("vi-VN") + " ₫";
+}
+
+/** Đọc số từ ô nhập (cho phép dấu phẩy/chấm ngăn cách), trả 0 nếu rỗng. */
+function parseNum(s: string): number {
+  const v = parseFloat(s.replace(/[^\d.,]/g, "").replace(/\./g, "").replace(",", "."));
+  return Number.isFinite(v) ? v : 0;
+}
+
 /** Kết quả xử lý ảnh của 1 mục: thumb hiển thị + crop gốc + màu + swatch khớp. */
 interface ItemView {
   thumb: string; // ảnh hiển thị (swatch An Cường nếu khớp, không thì crop)
@@ -51,7 +74,9 @@ interface MergedRow {
   scenes: string[]; // các nhãn ảnh chứa mục này
 }
 
-const THUMB_PX = 256;
+// Độ phân giải ảnh crop/swatch. 768 để khi phóng to (lightbox ~600px) ảnh được
+// THU NHỎ xuống (luôn nét hơn phóng lên); bảng (96px) và Excel (80px) không ảnh hưởng.
+const THUMB_PX = 768;
 
 /** Nhãn ảnh: A, B, C... rồi rớt về "Ảnh N" khi vượt 26. */
 function sceneLabel(i: number): string {
@@ -67,34 +92,87 @@ function loadImage(src: string): Promise<HTMLImageElement> {
   });
 }
 
+/** Tỷ lệ nới biên box khi cắt ảnh để thấy thêm ngữ cảnh xung quanh (12% mỗi chiều). */
+const CROP_PADDING = 0.12;
+
+/**
+ * Nới vùng box ra mỗi cạnh thêm `pad` lần kích thước box (để cắt rộng hơn cho dễ
+ * nhìn), rồi KẸP trong biên ảnh. Trả về toạ độ pixel thật {x, y, w, h}.
+ */
+function paddedRect(
+  box: BBox,
+  W: number,
+  H: number,
+  pad: number,
+): { x: number; y: number; w: number; h: number } {
+  const [ymin, xmin, ymax, xmax] = box;
+  let rx = (xmin / 1000) * W;
+  let ry = (ymin / 1000) * H;
+  let rw = ((xmax - xmin) / 1000) * W;
+  let rh = ((ymax - ymin) / 1000) * H;
+  // Nới đều 2 phía rồi kẹp trong [0, W]×[0, H].
+  const dx = rw * pad;
+  const dy = rh * pad;
+  rx = Math.max(0, rx - dx);
+  ry = Math.max(0, ry - dy);
+  rw = Math.min(W - rx, rw + dx * 2);
+  rh = Math.min(H - ry, rh + dy * 2);
+  return { x: rx, y: ry, w: Math.max(1, rw), h: Math.max(1, rh) };
+}
+
 /** Crop vuông giữa vùng box (chuẩn hoá 0–1000) từ ảnh gốc + lấy màu trung bình. */
 function squareCrop(img: HTMLImageElement, box: BBox): { thumb: string; hex: string } {
   const W = img.naturalWidth || img.width;
   const H = img.naturalHeight || img.height;
-  const [ymin, xmin, ymax, xmax] = box;
-  const rx = (xmin / 1000) * W;
-  const ry = (ymin / 1000) * H;
-  const rw = ((xmax - xmin) / 1000) * W;
-  const rh = ((ymax - ymin) / 1000) * H;
-  const side = Math.max(1, Math.min(rw, rh));
-  const cx = rx + (rw - side) / 2;
-  const cy = ry + (rh - side) / 2;
+
+  // Vùng hiển thị: nới rộng ra để thấy ngữ cảnh; cắt vuông giữa vùng đã nới.
+  const pr = paddedRect(box, W, H, CROP_PADDING);
+  const side = Math.max(1, Math.min(pr.w, pr.h));
+  const cx = pr.x + (pr.w - side) / 2;
+  const cy = pr.y + (pr.h - side) / 2;
 
   const canvas = document.createElement("canvas");
   canvas.width = THUMB_PX;
   canvas.height = THUMB_PX;
   const ctx = canvas.getContext("2d")!;
+  ctx.imageSmoothingQuality = "high";
   ctx.drawImage(img, cx, cy, side, side, 0, 0, THUMB_PX, THUMB_PX);
 
+  // Màu chủ đạo: lấy từ vùng box GỐC (chưa nới) để khớp swatch đúng màu vật liệu.
+  const g0 = paddedRect(box, W, H, 0);
   const one = document.createElement("canvas");
   one.width = 1;
   one.height = 1;
   const octx = one.getContext("2d")!;
-  octx.drawImage(img, cx, cy, side, side, 0, 0, 1, 1);
+  octx.drawImage(img, g0.x, g0.y, g0.w, g0.h, 0, 0, 1, 1);
   const [r, g, b] = octx.getImageData(0, 0, 1, 1).data;
   const hex = "#" + [r, g, b].map((v) => v.toString(16).padStart(2, "0")).join("");
 
-  return { thumb: canvas.toDataURL("image/jpeg", 0.82), hex };
+  return { thumb: canvas.toDataURL("image/jpeg", 0.95), hex };
+}
+
+/**
+ * Crop TRỌN vùng box từ ảnh gốc, GIỮ NGUYÊN độ phân giải & tỷ lệ thật của vùng đó
+ * (không ép vuông, không thu nhỏ) — dùng cho lightbox để xem nét nhất có thể.
+ * Trả về dataURL PNG (không nén thêm) để không mất chi tiết.
+ */
+function fullBoxCrop(img: HTMLImageElement, box: BBox): string {
+  const W = img.naturalWidth || img.width;
+  const H = img.naturalHeight || img.height;
+  // Nới rộng hơn (18%) cho lightbox để thấy rõ vật trong ngữ cảnh xung quanh.
+  const p = paddedRect(box, W, H, 0.18);
+  const rx = Math.round(p.x);
+  const ry = Math.round(p.y);
+  const rw = Math.max(1, Math.round(p.w));
+  const rh = Math.max(1, Math.round(p.h));
+
+  const canvas = document.createElement("canvas");
+  canvas.width = rw;
+  canvas.height = rh;
+  const ctx = canvas.getContext("2d")!;
+  ctx.imageSmoothingQuality = "high";
+  ctx.drawImage(img, rx, ry, rw, rh, 0, 0, rw, rh);
+  return canvas.toDataURL("image/png");
 }
 
 /** Tải 1 swatch (URL public) về dataURL vuông để hiển thị + nhúng Excel. */
@@ -104,8 +182,9 @@ async function swatchToDataUrl(url: string): Promise<string> {
   canvas.width = THUMB_PX;
   canvas.height = THUMB_PX;
   const ctx = canvas.getContext("2d")!;
+  ctx.imageSmoothingQuality = "high";
   ctx.drawImage(img, 0, 0, THUMB_PX, THUMB_PX);
-  return canvas.toDataURL("image/jpeg", 0.82);
+  return canvas.toDataURL("image/jpeg", 0.95);
 }
 
 /** Tách base64 + đuôi ảnh từ một dataURL để nhúng vào workbook ExcelJS. */
@@ -139,7 +218,17 @@ export default function MaterialTakeoffPage() {
   const [library, setLibrary] = useState<SwatchItem[]>([]);
   const [scenes, setScenes] = useState<Scene[]>([]);
   const [exporting, setExporting] = useState(false);
+  // Đơn giá & số lượng người dùng nhập, khoá theo nhóm + tên mục (bền qua gộp ảnh).
+  const [prices, setPrices] = useState<Record<string, PriceRow>>({});
   const fileRef = useRef<HTMLInputElement>(null);
+
+  function updatePrice(group: Group, name: string, patch: Partial<PriceRow>) {
+    const key = priceKey(group, name);
+    setPrices((p) => {
+      const cur: PriceRow = p[key] ?? { qty: 0, price: 0 };
+      return { ...p, [key]: { ...cur, ...patch } };
+    });
+  }
 
   // Bóc tách chạy như TÁC VỤ NỀN → rời sang trang khác vẫn xong, quay lại đọc
   // tiến trình/kết quả live (kèm ảnh gốc để dựng lại thumbnail).
@@ -383,20 +472,27 @@ export default function MaterialTakeoffPage() {
       const border = { top: thin, left: thin, bottom: thin, right: thin };
 
       const buildSheet = (
+        group: Group,
         sheetName: string,
         sectionTitle: string,
         rows: MergedRow[],
         nameHeader: string,
-        tailHeaders: string[],
+        qtyHeader: string,
       ) => {
+        // Thứ tự cột cuối thống nhất 2 sheet: <Số lượng/m²>, Đơn giá, Thành tiền.
+        const tailHeaders = [qtyHeader, "Đơn giá (₫)", "Thành tiền (₫)"];
         const headers = [
           "STT", "Hình ảnh", nameHeader, "Mô tả",
           ...(multi ? ["Có ở ảnh"] : []),
           "Link mua", ...tailHeaders,
         ];
-        const widths = [6, 14, 30, 46, ...(multi ? [12] : []), 12, 12, 10, 14];
+        const widths = [6, 14, 30, 40, ...(multi ? [12] : []), 12, 10, 16, 18];
         const ncol = headers.length;
         const linkCol = multi ? 6 : 5;
+        // 3 cột cuối: qty, đơn giá, thành tiền.
+        const qtyCol = ncol - 2;
+        const priceCol = ncol - 1;
+        const totalCol = ncol;
 
         const ws = wb.addWorksheet(sheetName);
         ws.columns = widths.slice(0, ncol).map((w) => ({ width: w }));
@@ -415,10 +511,12 @@ export default function MaterialTakeoffPage() {
           c.border = border;
         });
 
+        const moneyFmt = '#,##0';
         rows.forEach((mr, i) => {
           const r = i + 3;
           const { item: it, view: v } = mr;
           const name = v?.match ? `${it.name} (An Cường: ${v.match.name})` : it.name;
+          const pr = prices[priceKey(group, it.name)] ?? { qty: 0, price: 0 };
           const row = ws.getRow(r);
           row.height = 66;
           row.getCell(1).value = i + 1;
@@ -427,10 +525,22 @@ export default function MaterialTakeoffPage() {
           if (multi) row.getCell(5).value = mr.scenes.join(", ");
           row.getCell(linkCol).value = { text: "Link mua", hyperlink: buildBuyLink(it, v?.match?.name) };
           row.getCell(linkCol).font = { color: { argb: "FF0D9488" }, underline: true };
+
+          // Số lượng / đơn giá: điền số người dùng đã nhập (0 → để trống cho dễ sửa).
+          if (pr.qty > 0) row.getCell(qtyCol).value = pr.qty;
+          if (pr.price > 0) row.getCell(priceCol).value = pr.price;
+          // Thành tiền = công thức để Excel tự tính lại khi user sửa số.
+          const qCell = ws.getCell(r, qtyCol).address;
+          const pCell = ws.getCell(r, priceCol).address;
+          row.getCell(totalCol).value = { formula: `${qCell}*${pCell}` };
+          row.getCell(priceCol).numFmt = moneyFmt;
+          row.getCell(totalCol).numFmt = moneyFmt;
+
           for (let c = 1; c <= ncol; c++) {
             const cell = row.getCell(c);
             cell.border = border;
-            cell.alignment = { vertical: "middle", horizontal: c === 1 ? "center" : "left", wrapText: true };
+            const isNum = c === 1 || c >= qtyCol;
+            cell.alignment = { vertical: "middle", horizontal: isNum ? "center" : "left", wrapText: true };
           }
 
           // Nhúng ảnh thật vào ô Hình ảnh (cột B, index 1 theo 0-based).
@@ -444,10 +554,28 @@ export default function MaterialTakeoffPage() {
             });
           }
         });
+
+        // Dòng TỔNG CỘNG: SUM cột thành tiền.
+        if (rows.length > 0) {
+          const totalRowIdx = rows.length + 3;
+          const tr = ws.getRow(totalRowIdx);
+          ws.mergeCells(totalRowIdx, 1, totalRowIdx, totalCol - 1);
+          const label = tr.getCell(1);
+          label.value = "TỔNG CỘNG";
+          label.font = { bold: true };
+          label.alignment = { vertical: "middle", horizontal: "right" };
+          const firstData = ws.getCell(3, totalCol).address;
+          const lastData = ws.getCell(rows.length + 2, totalCol).address;
+          const sumCell = tr.getCell(totalCol);
+          sumCell.value = { formula: `SUM(${firstData}:${lastData})` };
+          sumCell.font = { bold: true };
+          sumCell.numFmt = moneyFmt;
+          for (let c = 1; c <= totalCol; c++) tr.getCell(c).border = border;
+        }
       };
 
-      buildSheet("Vật liệu", `${title} — Dự toán vật liệu`, mergedMat, "Tên vật liệu", ["Đơn giá", "m²", "Thành tiền"]);
-      buildSheet("Đồ nội thất", `${title} — Dự toán đồ nội thất`, mergedFur, "Tên đồ nội thất", ["Số lượng", "Đơn giá", "Thành tiền"]);
+      buildSheet("material", "Vật liệu", `${title} — Dự toán vật liệu`, mergedMat, "Tên vật liệu", "Khối lượng (m²)");
+      buildSheet("furniture", "Đồ nội thất", `${title} — Dự toán đồ nội thất`, mergedFur, "Tên đồ nội thất", "Số lượng (cái)");
 
       const buf = await wb.xlsx.writeBuffer();
       const blob = new Blob([buf], {
@@ -580,20 +708,28 @@ export default function MaterialTakeoffPage() {
           <TakeoffTable
             heading="Dự toán vật liệu"
             note="Bề mặt hoàn thiện — tính theo m². Gỗ công nghiệp khớp mã màu An Cường."
+            qtyLabel="Khối lượng (m²)"
             rows={rows.filter((r) => r.group === "material")}
             views={views}
+            prices={prices}
+            sourceImage={preview}
             onPick={changeMatch}
+            onPrice={updatePrice}
           />
           <TakeoffTable
             heading="Dự toán đồ nội thất"
             note="Đồ rời — tính theo cái. Ảnh cắt trực tiếp từ ảnh render."
+            qtyLabel="Số lượng (cái)"
             rows={rows.filter((r) => r.group === "furniture")}
             views={views}
+            prices={prices}
+            sourceImage={preview}
             onPick={changeMatch}
+            onPrice={updatePrice}
           />
 
           <p className="text-xs text-foreground-soft">
-            Gỗ CN khớp được mã An Cường thì link mở đúng sản phẩm; còn lại mở tìm kiếm. Cột Đơn giá, m², Số lượng trong Excel để bạn tự điền.
+            Nhập <strong>khối lượng/số lượng</strong> và <strong>đơn giá</strong> ngay trên bảng — thành tiền &amp; tổng cộng tự tính, và được điền sẵn vào Excel khi xuất (kèm công thức để sửa tiếp). Gỗ CN khớp mã An Cường thì link mở đúng sản phẩm; còn lại mở tìm kiếm.
           </p>
         </div>
       )}
@@ -604,16 +740,47 @@ export default function MaterialTakeoffPage() {
 function TakeoffTable({
   heading,
   note,
+  qtyLabel,
   rows,
   views,
+  prices,
+  sourceImage,
   onPick,
+  onPrice,
 }: {
   heading: string;
   note: string;
+  qtyLabel: string;
   rows: Row[];
   views: Record<string, ItemView>;
+  prices: Record<string, PriceRow>;
+  /** Ảnh render GỐC (full-res) để crop lại vùng box khi phóng to cho nét. */
+  sourceImage: string | null;
   onPick: (rowId: string, swatch: SwatchItem) => void;
+  onPrice: (group: Group, name: string, patch: Partial<PriceRow>) => void;
 }) {
+  // Ảnh đang xem phóng to (lightbox). null = đóng. (Hook phải đứng trước mọi return.)
+  const [zoom, setZoom] = useState<{ src: string; name: string } | null>(null);
+
+  /**
+   * Mở lightbox cho 1 mục. Ưu tiên crop TRỌN vùng box từ ảnh gốc full-res
+   * (nét nhất). Mục khớp swatch An Cường hoặc thiếu ảnh gốc → dùng thumb sẵn có.
+   */
+  async function openZoom(row: Row, v: ItemView | undefined) {
+    const fallback = v?.thumb ?? "";
+    // Khớp swatch An Cường: ảnh là swatch, không có "gốc" nào nét hơn.
+    if (v?.match || !sourceImage || !row.box) {
+      if (fallback) setZoom({ src: fallback, name: row.name });
+      return;
+    }
+    try {
+      const img = await loadImage(sourceImage);
+      setZoom({ src: fullBoxCrop(img, row.box), name: row.name });
+    } catch {
+      if (fallback) setZoom({ src: fallback, name: row.name });
+    }
+  }
+
   if (rows.length === 0) {
     return (
       <Card className="p-5">
@@ -622,6 +789,16 @@ function TakeoffTable({
       </Card>
     );
   }
+
+  // Tổng tiền nhóm = Σ (qty × đơn giá) theo số liệu đang nhập.
+  const total = rows.reduce((sum, row) => {
+    const pr = prices[priceKey(row.group, row.name)];
+    return sum + (pr ? pr.qty * pr.price : 0);
+  }, 0);
+
+  const priceInput =
+    "w-24 rounded border border-border bg-surface-muted px-2 py-1 text-right text-sm text-foreground focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-ring";
+
   return (
     <Card className="overflow-hidden p-0">
       <div className="border-b border-border px-5 py-4">
@@ -631,16 +808,28 @@ function TakeoffTable({
       <div className="divide-y divide-border">
         {rows.map((row) => {
           const v = views[row.id];
+          const pr = prices[priceKey(row.group, row.name)] ?? { qty: 0, price: 0 };
+          const lineTotal = pr.qty * pr.price;
           return (
-            <div key={row.id} className="grid grid-cols-[7rem_1fr_auto] items-start gap-4 px-5 py-4">
-              <div className="h-24 w-24 overflow-hidden rounded-card border border-border bg-surface-muted">
-                {v?.thumb ? (
-                  // eslint-disable-next-line @next/next/no-img-element
+            <div key={row.id} className="grid grid-cols-[6rem_1fr_auto] items-start gap-4 px-5 py-4">
+              {v?.thumb ? (
+                <button
+                  type="button"
+                  onClick={() => openZoom(row, v)}
+                  title="Bấm để phóng to"
+                  className="group relative h-24 w-24 overflow-hidden rounded-card border border-border bg-surface-muted transition-colors hover:border-accent"
+                >
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img src={v.thumb} alt={row.name} className="h-full w-full object-cover" />
-                ) : (
+                  <span className="absolute inset-0 flex items-center justify-center bg-black/40 text-lg text-white opacity-0 transition-opacity group-hover:opacity-100">
+                    🔍
+                  </span>
+                </button>
+              ) : (
+                <div className="h-24 w-24 overflow-hidden rounded-card border border-border bg-surface-muted">
                   <div className="h-full w-full animate-pulse bg-surface-muted" />
-                )}
-              </div>
+                </div>
+              )}
               <div className="min-w-0">
                 <p className="font-medium text-foreground">{row.name}</p>
                 <p className="mt-0.5 text-sm text-foreground-soft">{row.description}</p>
@@ -667,19 +856,81 @@ function TakeoffTable({
                     )}
                   </div>
                 )}
+                <a
+                  href={buildBuyLink(row, v?.match?.name)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="mt-2 inline-flex items-center gap-1 text-xs font-medium text-accent hover:underline"
+                >
+                  Link mua →
+                </a>
               </div>
-              <a
-                href={buildBuyLink(row, v?.match?.name)}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-1 whitespace-nowrap rounded-card border border-border px-3 py-2 text-xs font-medium text-accent transition hover:border-accent"
-              >
-                Link mua →
-              </a>
+
+              {/* Cột nhập đơn giá → thành tiền tự tính */}
+              <div className="flex flex-col items-end gap-1.5 text-xs">
+                <label className="flex items-center gap-2 text-foreground-soft">
+                  <span className="w-28 text-right">{qtyLabel}</span>
+                  <input
+                    type="text"
+                    inputMode="decimal"
+                    className={priceInput}
+                    value={pr.qty ? String(pr.qty) : ""}
+                    placeholder="0"
+                    onChange={(e) => onPrice(row.group, row.name, { qty: parseNum(e.target.value) })}
+                  />
+                </label>
+                <label className="flex items-center gap-2 text-foreground-soft">
+                  <span className="w-28 text-right">Đơn giá (₫)</span>
+                  <input
+                    type="text"
+                    inputMode="numeric"
+                    className={priceInput}
+                    value={pr.price ? pr.price.toLocaleString("vi-VN") : ""}
+                    placeholder="0"
+                    onChange={(e) => onPrice(row.group, row.name, { price: parseNum(e.target.value) })}
+                  />
+                </label>
+                <div className="mt-0.5 flex items-center gap-2">
+                  <span className="w-28 text-right text-foreground-soft">Thành tiền</span>
+                  <span className="w-24 text-right font-semibold text-foreground">
+                    {lineTotal > 0 ? formatVnd(lineTotal) : "—"}
+                  </span>
+                </div>
+              </div>
             </div>
           );
         })}
       </div>
+
+      <div className="flex items-center justify-end gap-3 border-t border-border bg-surface-muted px-5 py-3">
+        <span className="text-sm text-foreground-soft">Tổng cộng {heading.toLowerCase()}:</span>
+        <span className="font-display text-lg text-accent">{total > 0 ? formatVnd(total) : "—"}</span>
+      </div>
+
+      {zoom && (
+        <div
+          className="fixed inset-0 z-[60] flex flex-col items-center justify-center gap-3 bg-black/80 p-6"
+          onClick={() => setZoom(null)}
+        >
+          <button
+            type="button"
+            onClick={() => setZoom(null)}
+            className="absolute right-4 top-4 flex h-9 w-9 items-center justify-center rounded-full bg-white/10 text-lg text-white transition-colors hover:bg-white/20"
+            title="Đóng"
+          >
+            ✕
+          </button>
+          {/* Ảnh crop full-res từ gốc: hiển thị theo kích thước thật, chỉ co lại nếu vượt màn hình (không phóng lên → giữ nét). */}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={zoom.src}
+            alt={zoom.name}
+            className="max-h-[85vh] max-w-[92vw] rounded-card object-contain"
+            onClick={(e) => e.stopPropagation()}
+          />
+          <p className="text-sm text-white/80">{zoom.name}</p>
+        </div>
+      )}
     </Card>
   );
 }

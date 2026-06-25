@@ -2,7 +2,9 @@
   "permissions": {
     "allow": [
       "Skill(run)",
-      "Skill(run:*)"
+      "Skill(run:*)",
+      "PowerShell(npm run dev)",
+      "Bash(git commit -m ' *)"
     ]
   }
 }

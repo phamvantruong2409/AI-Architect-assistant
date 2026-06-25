@@ -162,11 +162,18 @@ export const quickActions: QuickAction[] = [
   },
   {
     label: "Hồ sơ và dự toán",
-    description: "Bóc tách vật liệu & nội thất từ ảnh → dự toán",
+    description: "Thuyết minh thiết kế & bóc tách vật liệu → hồ sơ, dự toán",
     href: "",
     icon: "calculator",
-    cta: "Mở dự toán",
+    cta: "Mở hồ sơ",
     items: [
+      {
+        label: "Thuyết minh AI",
+        description: "Nhập thông tin công trình → AI soạn thuyết minh thiết kế hoàn chỉnh → xuất Word / PDF",
+        href: "/dossier",
+        icon: "document",
+        cta: "Soạn thuyết minh",
+      },
       {
         label: "Bốc Vật liệu AI",
         description: "AI đọc ảnh → liệt kê vật liệu/nội thất + link mua + xuất Excel",
