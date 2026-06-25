@@ -6,6 +6,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
 import { Sidebar } from "./Sidebar";
 import { TaskIndicator } from "./TaskIndicator";
+import { IdleUsageOverlay } from "./UsageTime";
 import { MenuIcon, CloseIcon, ChatIcon } from "./icons";
 import { navItems } from "./nav-items";
 import { createClient } from "@/lib/supabase/client";
@@ -207,6 +208,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       <div className="fixed bottom-6 left-6 z-40">
         <TaskIndicator />
       </div>
+
+      {/* Lớp phủ khi rảnh >5 phút — hiện thời gian đã mở app hôm nay */}
+      <IdleUsageOverlay />
     </div>
   );
 }

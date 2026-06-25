@@ -10,6 +10,7 @@ import { deleteChatSession, formatRelativeTime, type ChatSession } from "@/lib/c
 import { ConfirmDeleteDialog } from "@/components/chat/ConfirmDeleteDialog";
 import { AmbientSound } from "./AmbientSound";
 import { NotificationBell } from "./NotificationBell";
+import { UsageTimeBadge } from "./UsageTime";
 import { navItems } from "./nav-items";
 import { SettingsIcon, TrashIcon, CubeIcon, ShieldIcon, BrainIcon, RocketIcon, PaletteIcon, PencilIcon, ChevronDownIcon } from "./icons";
 
@@ -248,6 +249,9 @@ export function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
           <div className="px-3 py-1">
             <p className="text-xs font-medium text-sidebar-foreground leading-tight">{userName}</p>
             <p className="text-[10px] text-sidebar-foreground-soft">Studio Pro</p>
+            <div className="mt-1.5">
+              <UsageTimeBadge />
+            </div>
           </div>
         </div>
       </div>
